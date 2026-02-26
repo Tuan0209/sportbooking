@@ -3,8 +3,11 @@ package com.sportbooking.api.service;
 import org.springframework.stereotype.Service;
 
 import com.sportbooking.api.dto.request.UserCreateRequest;
+import com.sportbooking.api.dto.response.ApiResponse;
 import com.sportbooking.api.dto.response.UserResponse;
 import com.sportbooking.api.entity.User;
+import com.sportbooking.api.exception.AppException;
+import com.sportbooking.api.exception.ErrorCode;
 import com.sportbooking.api.repository.UserRepository;
 import com.sportbooking.api.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +26,10 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
-    public UserResponse createUser(UserCreateRequest request) {
+    UserResponse createUser(UserCreateRequest request) {
         // Kiểm tra email tồn tại
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new AppException(ErrorCode.USER_EXISTS);
         }
         // PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10); // Tạo
         // password encoder với strength 10
@@ -42,7 +45,7 @@ public class UserService {
         return userMapper.toUserResponse(savedUser);
     }
 
-    public List<UserResponse> getAllUsers() {
+    List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse)
                 .toList();

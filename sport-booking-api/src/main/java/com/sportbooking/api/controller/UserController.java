@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sportbooking.api.dto.request.UserCreateRequest;
+import com.sportbooking.api.dto.response.ApiResponse;
 import com.sportbooking.api.dto.response.UserResponse;
 import com.sportbooking.api.service.UserService;
 import jakarta.validation.Valid;
@@ -27,14 +28,16 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
-        UserResponse response = userService.createUser(request);
-        return ResponseEntity.ok(response);
+    ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.createUser(request));
+        return apiResponse;
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> listUsers() {
-        List<UserResponse> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+    ApiResponse<List<UserResponse>> listUsers() {
+        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.getAllUsers());
+        return apiResponse;
     }
 }
