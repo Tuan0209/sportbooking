@@ -42,6 +42,13 @@ public class UserController {
         return apiResponse;
     }
 
+    @GetMapping("/{id}")
+    ApiResponse<UserResponse> getUserById(@PathVariable String id) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.getUserById(id));
+        return apiResponse;
+    }
+
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteUser(@PathVariable String id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();

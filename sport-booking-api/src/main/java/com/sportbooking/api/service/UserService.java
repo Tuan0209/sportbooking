@@ -52,6 +52,13 @@ public class UserService {
                 .toList();
     }
 
+    // Lấy thông tin user theo id
+    public UserResponse getUserById(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
+    }
+
     // Xóa user theo id, trả về thông tin user đã xóa
     public String deleteUser(String id) {
         User user = userRepository.findById(id)
