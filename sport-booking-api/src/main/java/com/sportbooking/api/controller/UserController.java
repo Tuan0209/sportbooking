@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import com.sportbooking.api.dto.request.UserCreateRequest;
 import com.sportbooking.api.dto.response.ApiResponse;
 import com.sportbooking.api.dto.response.UserResponse;
@@ -38,6 +39,13 @@ public class UserController {
     ApiResponse<List<UserResponse>> listUsers() {
         ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.getAllUsers());
+        return apiResponse;
+    }
+
+    @DeleteMapping("/{id}")
+    ApiResponse<String> deleteUser(@PathVariable String id) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.deleteUser(id));
         return apiResponse;
     }
 }

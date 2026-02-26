@@ -26,7 +26,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
-    UserResponse createUser(UserCreateRequest request) {
+    public UserResponse createUser(UserCreateRequest request) {
         // Kiểm tra email tồn tại
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.USER_EXISTS);
@@ -45,10 +45,18 @@ public class UserService {
         return userMapper.toUserResponse(savedUser);
     }
 
-    List<UserResponse> getAllUsers() {
+    // Lấy danh sách tất cả user
+    public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse)
                 .toList();
     }
 
+    // Xóa user theo id, trả về thông tin user đã xóa
+    public String deleteUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        userRepository.delete(user);
+        return "User with id " + id + " has been deleted successfully.";
+    }
 }
