@@ -16,11 +16,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+import com.sportbooking.api.dto.request.UserUpdateRequest;
 
 @Slf4j // Tự động tạo logger cho class này, có thể dùng log.info(), log.error() để ghi
        // log
+@Builder
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -53,6 +57,15 @@ public class UserController {
     ApiResponse<String> deleteUser(@PathVariable String id) {
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.deleteUser(id));
+        return apiResponse;
+    }
+
+    // Cập nhật thông tin user theo id, trả về thông tin user đã cập nhật
+    @PutMapping("/{id}")
+    public ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("User has been updated successfully.");
+        apiResponse.setResult(userService.updateUser(id, request));
         return apiResponse;
     }
 }
