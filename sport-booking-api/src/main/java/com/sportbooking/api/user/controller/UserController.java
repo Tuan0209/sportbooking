@@ -76,14 +76,25 @@ public class UserController {
     }
 
     // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
+    // @PutMapping(value = "/{id}/avatar", consumes =
+    // MediaType.MULTIPART_FORM_DATA_VALUE)
+    // public ApiResponse<UserResponse> updateAvatar(
+    // @PathVariable String id,
+    // @RequestParam(required = false) MultipartFile file,
+    // @RequestParam(required = false) String imageUrl) throws IOException {
+    // ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+    // apiResponse.setResult(userService.updateAvatar(id, file, imageUrl));
+    // return apiResponse;
+    // }
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserResponse> updateAvatar(
             @PathVariable String id,
             @RequestParam(required = false) MultipartFile file,
             @RequestParam(required = false) String imageUrl) throws IOException {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.updateAvatar(id, file, imageUrl));
-        return apiResponse;
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateAvatar(id, file, imageUrl))
+                .build();
     }
 
 }
