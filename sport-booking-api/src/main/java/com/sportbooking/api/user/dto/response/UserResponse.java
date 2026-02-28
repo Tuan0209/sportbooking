@@ -23,6 +23,7 @@ public class UserResponse {
     private String name;
     private String email;
     private String phone;
+    private String avatarUrl;
     private Role role;
     private Status status;
     private BigDecimal coinBalance;
