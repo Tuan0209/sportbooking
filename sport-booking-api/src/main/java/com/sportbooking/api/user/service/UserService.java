@@ -1,7 +1,11 @@
 package com.sportbooking.api.user.service;
 
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 import com.sportbooking.api.common.enums.ErrorCode;
 import com.sportbooking.api.common.exception.AppException;
 import com.sportbooking.api.user.dto.request.UserCreateRequest;
@@ -17,6 +21,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +36,7 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    String UPLOAD_DIR = "uploads/"; // Thư mục lưu trữ ảnh, có thể cấu hình trong application.properties
 
     public UserResponse createUser(UserCreateRequest request) {
         // Kiểm tra email tồn tại
@@ -83,5 +92,61 @@ public class UserService {
         user.setPhone(request.getPhone());
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponse(updatedUser);
+    }
+
+    // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
+    public UserResponse updateAvatar(
+            String userId,
+            MultipartFile file,
+            String imageUrl) throws IOException {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+
+                    return new AppException(ErrorCode.USER_NOT_FOUND);
+                });
+
+        // Upload từ file
+        if (file != null && !file.isEmpty()) {
+
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+
+                throw new RuntimeException("Chỉ cho phép file ảnh");
+            }
+
+            File directory = new File(UPLOAD_DIR);
+            if (!directory.exists()) {
+
+                directory.mkdirs();
+            }
+
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(UPLOAD_DIR + fileName);
+
+            try {
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            } catch (IOException e) {
+
+                throw e;
+            }
+
+            user.setAvatarUrl(fileName);
+        }
+
+        // Upload từ link
+        else if (imageUrl != null && !imageUrl.isBlank()) {
+
+            user.setAvatarUrl(imageUrl);
+        }
+
+        else {
+
+            throw new RuntimeException("Phải cung cấp file hoặc imageUrl");
+        }
+
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
     }
 }
