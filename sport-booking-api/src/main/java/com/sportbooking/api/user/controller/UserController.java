@@ -1,4 +1,4 @@
-package com.sportbooking.api.controller;
+package com.sportbooking.api.user.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.sportbooking.api.dto.request.UserCreateRequest;
-import com.sportbooking.api.dto.response.ApiResponse;
-import com.sportbooking.api.dto.response.UserResponse;
-import com.sportbooking.api.service.UserService;
+
+import com.sportbooking.api.user.dto.request.UserCreateRequest;
+import com.sportbooking.api.user.dto.request.UserUpdateRequest;
+import com.sportbooking.api.user.dto.response.ApiResponse;
+import com.sportbooking.api.user.dto.response.UserResponse;
+import com.sportbooking.api.user.service.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +23,6 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import org.springframework.web.bind.annotation.PutMapping;
-import com.sportbooking.api.dto.request.UserUpdateRequest;
 
 @Slf4j // Tự động tạo logger cho class này, có thể dùng log.info(), log.error() để ghi
        // log

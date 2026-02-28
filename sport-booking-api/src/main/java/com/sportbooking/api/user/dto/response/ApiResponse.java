@@ -1,4 +1,4 @@
-package com.sportbooking.api.dto.response;
+package com.sportbooking.api.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

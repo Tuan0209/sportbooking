@@ -1,4 +1,4 @@
-package com.sportbooking.api.dto.response;
+package com.sportbooking.api.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sportbooking.api.enums.Role;
-import com.sportbooking.api.enums.Status;
+import com.sportbooking.api.common.enums.Role;
+import com.sportbooking.api.common.enums.Status;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

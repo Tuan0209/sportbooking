@@ -1,4 +1,4 @@
-package com.sportbooking.api.dto.request;
+package com.sportbooking.api.user.dto.request;
 
 import java.time.LocalDateTime;
 

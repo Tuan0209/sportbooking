@@ -1,11 +1,11 @@
-package com.sportbooking.api.entity;
+package com.sportbooking.api.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sportbooking.api.enums.Role;
-import com.sportbooking.api.enums.Status;
+import com.sportbooking.api.common.enums.Role;
+import com.sportbooking.api.common.enums.Status;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

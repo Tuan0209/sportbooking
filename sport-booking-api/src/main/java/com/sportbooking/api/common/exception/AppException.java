@@ -1,4 +1,6 @@
-package com.sportbooking.api.exception;
+package com.sportbooking.api.common.exception;
+
+import com.sportbooking.api.common.enums.ErrorCode;
 
 public class AppException extends RuntimeException {
     public AppException(ErrorCode errorCode) {

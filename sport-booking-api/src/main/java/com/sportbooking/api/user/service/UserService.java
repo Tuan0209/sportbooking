@@ -1,27 +1,22 @@
-package com.sportbooking.api.service;
+package com.sportbooking.api.user.service;
 
 import org.springframework.stereotype.Service;
 
-import com.sportbooking.api.dto.request.UserCreateRequest;
-import com.sportbooking.api.dto.response.ApiResponse;
-import com.sportbooking.api.dto.response.UserResponse;
-import com.sportbooking.api.entity.User;
-import com.sportbooking.api.exception.AppException;
-import com.sportbooking.api.exception.ErrorCode;
-import com.sportbooking.api.repository.UserRepository;
-import com.sportbooking.api.mapper.UserMapper;
+import com.sportbooking.api.common.enums.ErrorCode;
+import com.sportbooking.api.common.exception.AppException;
+import com.sportbooking.api.user.dto.request.UserCreateRequest;
+import com.sportbooking.api.user.dto.request.UserUpdateRequest;
+import com.sportbooking.api.user.dto.response.ApiResponse;
+import com.sportbooking.api.user.dto.response.UserResponse;
+import com.sportbooking.api.user.entity.User;
+import com.sportbooking.api.user.mapper.UserMapper;
+import com.sportbooking.api.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.validation.Valid;
-import com.sportbooking.api.dto.request.UserUpdateRequest;
-import java.util.Optional;
-import java.math.BigDecimal;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDateTime;
+
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -79,7 +74,7 @@ public class UserService {
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         if (userRepository.existsByEmailAndIdNot(request.getEmail(), id)) { // Kiểm tra email đã tồn tại trên user khác
                                                                             // chưa
-            throw new AppException(ErrorCode.USER_EXISTS);
+            throw new AppException(ErrorCode.EMAIL_EXISTS);
         }
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));

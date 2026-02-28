@@ -1,10 +1,11 @@
-package com.sportbooking.api.mapper;
+package com.sportbooking.api.user.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import com.sportbooking.api.entity.User;
-import com.sportbooking.api.dto.request.UserCreateRequest;
-import com.sportbooking.api.dto.response.UserResponse;
+
+import com.sportbooking.api.user.dto.request.UserCreateRequest;
+import com.sportbooking.api.user.dto.response.UserResponse;
+import com.sportbooking.api.user.entity.User;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE) // bo qua cac truong ko duoc map de ko
                                                                                   // bi loi

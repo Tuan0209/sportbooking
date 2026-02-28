@@ -1,10 +1,11 @@
-package com.sportbooking.api.exception;
+package com.sportbooking.api.common.enums;
 
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized exception"),
     USER_EXISTS(1002, "User already exists"),
     USER_INVALID(1003, "Username must be between 3 and 50 characters"),
-    USER_NOT_FOUND(1004, "User not found");
+    USER_NOT_FOUND(1004, "User not found"),
+    EMAIL_EXISTS(1005, "Email already exists");
 
     private int code;
     private String message;
