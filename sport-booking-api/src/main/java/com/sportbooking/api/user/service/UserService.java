@@ -36,6 +36,7 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    UserCloudinaryService cloudinaryService;
     String UPLOAD_DIR = "uploads/"; // Thư mục lưu trữ ảnh, có thể cấu hình trong application.properties
 
     public UserResponse createUser(UserCreateRequest request) {
@@ -95,57 +96,88 @@ public class UserService {
     }
 
     // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
+    // public UserResponse updateAvatar(
+    // String userId,
+    // MultipartFile file,
+    // String imageUrl) throws IOException {
+
+    // User user = userRepository.findById(userId)
+    // .orElseThrow(() -> {
+
+    // return new AppException(ErrorCode.USER_NOT_FOUND);
+    // });
+
+    // // Upload từ file
+    // if (file != null && !file.isEmpty()) {
+
+    // if (file.getContentType() == null ||
+    // !file.getContentType().startsWith("image/")) {
+
+    // throw new RuntimeException("Chỉ cho phép file ảnh");
+    // }
+
+    // File directory = new File(UPLOAD_DIR);
+    // if (!directory.exists()) {
+
+    // directory.mkdirs();
+    // }
+
+    // String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    // Path filePath = Paths.get(UPLOAD_DIR + fileName);
+
+    // try {
+    // Files.copy(file.getInputStream(), filePath,
+    // StandardCopyOption.REPLACE_EXISTING);
+
+    // } catch (IOException e) {
+
+    // throw e;
+    // }
+
+    // user.setAvatarUrl(fileName);
+    // }
+
+    // // Upload từ link
+    // else if (imageUrl != null && !imageUrl.isBlank()) {
+
+    // user.setAvatarUrl(imageUrl);
+    // }
+
+    // else {
+
+    // throw new RuntimeException("Phải cung cấp file hoặc imageUrl");
+    // }
+
+    // userRepository.save(user);
+
+    // return userMapper.toUserResponse(user);
+    // }
     public UserResponse updateAvatar(
             String userId,
             MultipartFile file,
             String imageUrl) throws IOException {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-                    return new AppException(ErrorCode.USER_NOT_FOUND);
-                });
+        String oldAvatar = user.getAvatarUrl();
+        String newAvatarUrl;
 
-        // Upload từ file
         if (file != null && !file.isEmpty()) {
-
-            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
-
-                throw new RuntimeException("Chỉ cho phép file ảnh");
-            }
-
-            File directory = new File(UPLOAD_DIR);
-            if (!directory.exists()) {
-
-                directory.mkdirs();
-            }
-
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(UPLOAD_DIR + fileName);
-
-            try {
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            } catch (IOException e) {
-
-                throw e;
-            }
-
-            user.setAvatarUrl(fileName);
-        }
-
-        // Upload từ link
-        else if (imageUrl != null && !imageUrl.isBlank()) {
-
-            user.setAvatarUrl(imageUrl);
-        }
-
-        else {
-
+            newAvatarUrl = cloudinaryService.uploadFromFile(file, userId);
+        } else if (imageUrl != null && !imageUrl.isBlank()) {
+            newAvatarUrl = cloudinaryService.uploadFromUrl(imageUrl, userId);
+        } else {
             throw new RuntimeException("Phải cung cấp file hoặc imageUrl");
         }
 
+        // delete ảnh cũ (nếu có)
+        cloudinaryService.deleteImage(oldAvatar);
+
+        user.setAvatarUrl(newAvatarUrl);
         userRepository.save(user);
+
+        log.info("User {} updated avatar successfully", userId);
 
         return userMapper.toUserResponse(user);
     }

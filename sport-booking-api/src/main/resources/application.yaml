@@ -14,3 +14,11 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+cloudinary:
+  cloud-name: di3cbuwx4
+  api-key: 996817552155925
+  api-secret: pmJw_zzLGnKjz3FGP3itz8IKcDM
+
+app:
+  avatar:
+    max-size: 5242880 # 5MB
