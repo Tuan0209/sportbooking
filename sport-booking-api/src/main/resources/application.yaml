@@ -22,3 +22,7 @@ cloudinary:
 app:
   avatar:
     max-size: 5242880 # 5MB
+application:
+  jwt:
+    secret-key: your-secret-key-your-secret-key-123456
+    expiration: 86400000

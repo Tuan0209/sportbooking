@@ -15,6 +15,8 @@ import com.sportbooking.api.user.dto.response.UserResponse;
 import com.sportbooking.api.user.entity.User;
 import com.sportbooking.api.user.mapper.UserMapper;
 import com.sportbooking.api.user.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,13 +46,13 @@ public class UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.USER_EXISTS);
         }
-        // PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10); // Tạo
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10); // Tạo
         // password encoder với strength 10
         // Tạo entity
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                // .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordEncoder.encode(request.getPassword()))
                 .password(request.getPassword())
                 .phone(request.getPhone())
                 .build();
