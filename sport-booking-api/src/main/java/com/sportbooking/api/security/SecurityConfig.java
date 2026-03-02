@@ -30,9 +30,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/users/**").permitAll()
                         // Cho phép tất cả các phương thức HTTP trên endpoint /users, có thể cấu hình
                         // chi tiết hơn nếu muốn
-                        .requestMatchers(HttpMethod.POST, "/admin/users/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/users/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/admin/users/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/admin/users/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/admin/users/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/users/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/users/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)

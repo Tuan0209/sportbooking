@@ -35,8 +35,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
-@PreAuthorize("hasRole('USER')") // Chỉ cho phép truy cập nếu user có role USER, cần cấu hình role trong
-                                 // UserDetailsServiceImpl
+@PreAuthorize("hasAuthority('USER')") // Chỉ cho phép truy cập nếu user có role USER, cần cấu hình role trong
+// UserDetailsServiceImpl
 public class UserController {
 
     private final UserService userService;
