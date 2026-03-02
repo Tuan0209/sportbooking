@@ -1,0 +1,33 @@
+package com.sportbooking.api.controller.auth;
+
+import com.sportbooking.api.common.ApiResponse;
+import com.sportbooking.api.dto.request.auth.LoginRequest;
+import com.sportbooking.api.dto.request.auth.RegisterRequest;
+import com.sportbooking.api.dto.response.auth.AuthResponse;
+import com.sportbooking.api.service.auth.AuthService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @PostMapping("/register")
+    ApiResponse<AuthResponse> register(@RequestBody RegisterRequest request) {
+        authService.register(request);
+        return ApiResponse.<AuthResponse>builder()
+                .message("User registered successfully")
+                .build();
+    }
+
+    @PostMapping("/login")
+    ApiResponse<AuthResponse> login(@RequestBody LoginRequest request) {
+        return ApiResponse.<AuthResponse>builder()
+                .result(authService.login(request))
+                .build();
+    }
+}
