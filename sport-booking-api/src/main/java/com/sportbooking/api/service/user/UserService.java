@@ -2,14 +2,10 @@ package com.sportbooking.api.service.user;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
-import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.common.enums.ErrorCode;
 import com.sportbooking.api.common.exception.AppException;
+import com.sportbooking.api.dto.request.user.ChangePasswordRequest;
 import com.sportbooking.api.dto.request.user.UserCreateRequest;
 import com.sportbooking.api.dto.request.user.UserUpdateRequest;
 import com.sportbooking.api.dto.response.user.UserResponse;
@@ -24,8 +20,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
 import lombok.extern.slf4j.Slf4j;
-
+import java.net.URL;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -55,7 +52,6 @@ public class UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .password(request.getPassword())
                 .phone(request.getPhone())
                 .build();
         User savedUser = userRepository.save(user);
@@ -97,6 +93,23 @@ public class UserService {
         user.setPhone(request.getPhone());
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponse(updatedUser);
+    }
+
+    // change password
+    public void changePassword(String userId, ChangePasswordRequest request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
+        // check mật khẩu cũ
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
     // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
@@ -156,6 +169,41 @@ public class UserService {
 
     // return userMapper.toUserResponse(user);
     // }
+    // public UserResponse updateAvatar(
+    // String userId,
+    // MultipartFile file,
+    // String imageUrl) throws IOException {
+
+    // User user = userRepository.findById(userId)
+    // .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+    // String oldAvatar = user.getAvatarUrl();
+    // String newAvatarUrl;
+
+    // if (file != null && !file.isEmpty()) {
+    // if (file.getContentType() == null ||
+    // !file.getContentType().startsWith("image/")) {
+    // throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+    // }
+    // newAvatarUrl = cloudinaryService.uploadFromFile(file, userId);
+    // } else if (imageUrl != null && !imageUrl.isBlank()) {
+    // newAvatarUrl = cloudinaryService.uploadFromUrl(imageUrl, userId);
+    // } else {
+    // throw new RuntimeException("Phải cung cấp file hoặc imageUrl");
+    // }
+
+    // // delete ảnh cũ (nếu có)
+    // if (oldAvatar != null && !oldAvatar.isBlank()) {
+    // cloudinaryService.deleteImage(oldAvatar);
+    // }
+
+    // user.setAvatarUrl(newAvatarUrl);
+    // userRepository.save(user);
+
+    // log.info("User {} updated avatar successfully", userId);
+
+    // return userMapper.toUserResponse(user);
+    // }
     public UserResponse updateAvatar(
             String userId,
             MultipartFile file,
@@ -167,22 +215,46 @@ public class UserService {
         String oldAvatar = user.getAvatarUrl();
         String newAvatarUrl;
 
-        if (file != null && !file.isEmpty()) {
-            newAvatarUrl = cloudinaryService.uploadFromFile(file, userId);
-        } else if (imageUrl != null && !imageUrl.isBlank()) {
-            newAvatarUrl = cloudinaryService.uploadFromUrl(imageUrl, userId);
-        } else {
-            throw new RuntimeException("Phải cung cấp file hoặc imageUrl");
+        // ❗ Không cho gửi cả 2 hoặc cả 2 đều null
+        boolean hasFile = file != null && !file.isEmpty();
+        boolean hasUrl = imageUrl != null && !imageUrl.isBlank();
+
+        if (hasFile == hasUrl) { // cả 2 true hoặc cả 2 false
+            throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        // delete ảnh cũ (nếu có)
-        cloudinaryService.deleteImage(oldAvatar);
+        // ✅ Nhánh upload từ file
+        if (hasFile) {
+
+            if (file.getContentType() == null ||
+                    !file.getContentType().startsWith("image/")) {
+                throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+            }
+
+            newAvatarUrl = cloudinaryService.uploadFromFile(file, userId);
+        }
+        // ✅ Nhánh upload từ URL
+        else {
+
+            // validate URL cơ bản
+            try {
+                new URL(imageUrl); // check format
+            } catch (MalformedURLException e) {
+                throw new AppException(ErrorCode.INVALID_IMAGE_URL);
+            }
+
+            newAvatarUrl = cloudinaryService.uploadFromUrl(imageUrl, userId);
+        }
+
+        // Xóa ảnh cũ nếu có
+        if (oldAvatar != null && !oldAvatar.isBlank()) {
+            cloudinaryService.deleteImage(oldAvatar);
+        }
 
         user.setAvatarUrl(newAvatarUrl);
         userRepository.save(user);
 
-        log.info("User {} updated avatar successfully", userId);
-
         return userMapper.toUserResponse(user);
     }
+
 }
