@@ -26,6 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                                 user.getId(), // 👈 principal = userId
                                 user.getPassword(),
                                 List.of(new SimpleGrantedAuthority(
-                                                "ROLE_" + user.getRole().name())));
+                                                user.getRole().name())));
         }
 }

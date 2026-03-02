@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@PreAuthorize("hasRole('ADMIN')") // Chỉ cho phép truy cập nếu user có role ADMIN, cần cấu hình role trong
-                                  // UserDetailsServiceImpl
+@PreAuthorize("hasAuthority('ADMIN')") // Chỉ cho phép truy cập nếu user có role ADMIN, cần cấu hình role trong
+// UserDetailsServiceImpl
 public class AdminController {
     UserService userService;
 
