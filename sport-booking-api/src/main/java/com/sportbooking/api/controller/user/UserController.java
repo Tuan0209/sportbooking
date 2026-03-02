@@ -11,91 +11,73 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.user.UserCreateRequest;
 import com.sportbooking.api.dto.request.user.UserUpdateRequest;
 import com.sportbooking.api.dto.response.user.UserResponse;
 import com.sportbooking.api.service.user.UserService;
-
+import com.sportbooking.api.dto.request.user.ChangePasswordRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.web.bind.annotation.PutMapping;
 
-@Slf4j // Tự động tạo logger cho class này, có thể dùng log.info(), log.error() để ghi
-       // log
-@Builder
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
+@PreAuthorize("hasRole('USER')") // Chỉ cho phép truy cập nếu user có role USER, cần cấu hình role trong
+                                 // UserDetailsServiceImpl
 public class UserController {
-    UserService userService;
 
-    @PostMapping
-    ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.createUser(request));
-        return apiResponse;
-    }
+    private final UserService userService;
 
-    @GetMapping
-    ApiResponse<List<UserResponse>> listUsers() {
-        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getAllUsers());
-        return apiResponse;
-    }
+    // 🔹 GET PROFILE
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMyProfile() {
 
-    @GetMapping("/{id}")
-    ApiResponse<UserResponse> getUserById(@PathVariable String id) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUserById(id));
-        return apiResponse;
-    }
-
-    @DeleteMapping("/{id}")
-    ApiResponse<String> deleteUser(@PathVariable String id) {
-        ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.deleteUser(id));
-        return apiResponse;
-    }
-
-    // Cập nhật thông tin user theo id, trả về thông tin user đã cập nhật
-    @PutMapping("/{id}")
-    public ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("User has been updated successfully.");
-        apiResponse.setResult(userService.updateUser(id, request));
-        return apiResponse;
-    }
-
-    // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
-    // @PutMapping(value = "/{id}/avatar", consumes =
-    // MediaType.MULTIPART_FORM_DATA_VALUE)
-    // public ApiResponse<UserResponse> updateAvatar(
-    // @PathVariable String id,
-    // @RequestParam(required = false) MultipartFile file,
-    // @RequestParam(required = false) String imageUrl) throws IOException {
-    // ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-    // apiResponse.setResult(userService.updateAvatar(id, file, imageUrl));
-    // return apiResponse;
-    // }
-    @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<UserResponse> updateAvatar(
-            @PathVariable String id,
-            @RequestParam(required = false) MultipartFile file,
-            @RequestParam(required = false) String imageUrl) throws IOException {
-
+        String userId = getCurrentUserId();
         return ApiResponse.<UserResponse>builder()
-                .result(userService.updateAvatar(id, file, imageUrl))
+                .result(userService.getUserById(userId))
                 .build();
     }
 
+    // 🔹 UPDATE PROFILE
+    @PutMapping("/me")
+    public ApiResponse<UserResponse> updateMyProfile(
+            @Valid @RequestBody UserUpdateRequest request) {
+
+        String userId = getCurrentUserId();
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUser(userId, request))
+                .build();
+    }
+
+    // 🔹 CHANGE PASSWORD
+    @PutMapping("/change-password")
+    public ApiResponse<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        String userId = getCurrentUserId(); // Lấy userId từ token, cần cấu hình trong UserDetailsServiceImpl để trả về
+                                            // userId thay vì email
+        userService.changePassword(userId, request);
+        return ApiResponse.<String>builder()
+                .result("Password changed successfully")
+                .build();
+    }
+
+    private String getCurrentUserId() {
+        return SecurityContextHolder.getContext()
+                .getAuthentication() //
+                .getName(); //
+    }
 }
