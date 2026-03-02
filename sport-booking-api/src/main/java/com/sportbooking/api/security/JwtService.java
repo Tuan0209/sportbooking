@@ -1,9 +1,11 @@
 package com.sportbooking.api.security;
 
-import com.sportbooking.api.user.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
+
+import com.sportbooking.api.entity.user.User;
+
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Date;
 
