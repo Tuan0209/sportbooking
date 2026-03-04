@@ -33,10 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
-            String email = jwtService.extractEmail(token);
+            String userId = jwtService.extractUserId(token); // ← extract userId
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                var userDetails = userDetailsService.loadUserByUsername(email);
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userDetails = userDetailsService.loadUserByUsername(userId); // ← truyền userId
 
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
-            // token không hợp lệ → tiếp tục filter chain, Spring Security sẽ trả 401/403
+            // token không hợp lệ
         }
 
         filterChain.doFilter(request, response);
