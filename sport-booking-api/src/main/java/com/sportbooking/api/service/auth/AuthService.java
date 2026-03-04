@@ -38,17 +38,19 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+        String identifier = request.getIdentifier(); // email hoặc phone
 
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                user.getPassword())) {
+        User user = identifier.contains("@")
+                ? userRepository.findByEmail(identifier)
+                        .orElseThrow(() -> new RuntimeException("User not found"))
+                : userRepository.findByPhone(identifier)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }
 
         String token = jwtService.generateToken(user);
-
         return new AuthResponse(token);
     }
 }

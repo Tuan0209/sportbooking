@@ -12,6 +12,10 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByEmailOrPhone(String email, String phone);
+
+    Optional<User> findByPhone(String phone);
+
     boolean existsByEmailAndIdNot(String email, String id); // Kiểm tra email đã tồn tại trên user khác chưa
     // viet tat cua sql la: select count(*) > 0 from user where email = ? and id !=
     // ?

@@ -8,6 +8,7 @@ import com.sportbooking.api.entity.user.User;
 
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Date;
+import java.security.Key;
 
 @Service
 public class JwtService {
@@ -29,12 +30,31 @@ public class JwtService {
                 .compact();
     }
 
+    public String extractUserId(String token) {
+        return getClaims(token).getSubject();
+    }
+
     public String extractEmail(String token) {
+        return getClaims(token).get("email", String.class);
+    }
+
+    public String extractRole(String token) {
+        return (String) getClaims(token).get("role");
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            return !getClaims(token).getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY.getBytes())
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 }
