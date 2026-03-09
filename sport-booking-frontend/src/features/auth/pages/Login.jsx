@@ -9,18 +9,22 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState('email');
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { loginContext } = useContext(AuthContext);
+  const [error, setError] = useState(null); // Thêm state để lưu lỗi
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Reset lỗi trước khi gửi yêu cầu
     try {
       const res = await authService.login(formData);
       if (res.data.code === 0) {
         const role = loginContext(res.data.result.token);
         role === 'ADMIN' ? navigate('/admin/dashboard') : navigate('/dashboard');
+      }else {
+        setError(res.data.message); // Hiển thị lỗi từ API nếu có
       }
     } catch (err) {
-      alert('Đăng nhập thất bại!');
+      setError(err.response?.data?.message || 'Đăng nhập thất bại');
     }
   };
 
@@ -75,16 +79,17 @@ const Login = () => {
               value={formData.password} 
               onChange={e => setFormData({...formData, password: e.target.value})} 
             />
-
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>} {/* Hiển thị lỗi nếu có */}
             <Button type="submit" className="mt-4">Đăng nhập</Button>
-
+             
+              
             <div className="text-center mt-8 text-[15px]">
               <span className="text-gray-500">Bạn quên mật khẩu? </span>
               <button type="button" className="text-[#004d31] font-extrabold underline underline-offset-4">Quên mật khẩu</button>
             </div>
           </form>
         </div>
-
+         
         <div className="text-center mt-10 text-white text-[16px]">
           Bạn chưa có tài khoản? <Link to="/register" className="font-bold underline underline-offset-4 ml-1">Đăng ký ngay</Link>
         </div>
