@@ -9,7 +9,8 @@ public enum ErrorCode {
     INVALID_REQUEST(1006, "Invalid request"),
     INVALID_FILE_TYPE(1006, "Tải lên file khong hợp lệ"),
     INVALID_IMAGE_URL(1006, "Link ảnh không hợp lệ"),
-    INVALID_PASSWORD(1007, "Mật khẩu cũ không đúng");
+    INVALID_PASSWORD(1007, "Mật khẩu cũ không đúng"),
+    WRONG_PASSWORD(1008, "Sai mật khẩu");
 
     private int code;
     private String message;

@@ -1,5 +1,6 @@
 package com.sportbooking.api.service.auth;
 
+import com.sportbooking.api.common.enums.ErrorCode;
 import com.sportbooking.api.common.enums.Role;
 import com.sportbooking.api.dto.request.auth.LoginRequest;
 import com.sportbooking.api.dto.request.auth.RegisterRequest;
@@ -7,7 +8,7 @@ import com.sportbooking.api.dto.response.auth.AuthResponse;
 import com.sportbooking.api.entity.user.User;
 import com.sportbooking.api.repository.user.UserRepository;
 import com.sportbooking.api.security.JwtService;
-
+import com.sportbooking.api.common.exception.AppException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,12 +43,12 @@ public class AuthService {
 
         User user = identifier.contains("@")
                 ? userRepository.findByEmail(identifier)
-                        .orElseThrow(() -> new RuntimeException("User not found"))
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                 : userRepository.findByPhone(identifier)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
         }
 
         String token = jwtService.generateToken(user);
