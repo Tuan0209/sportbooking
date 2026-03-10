@@ -3,88 +3,52 @@ import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Login from '../features/auth/pages/Login';
 import Register from '../features/auth/pages/Register';
-
-// 1. Route dành cho những trang CHỈ truy cập khi CHƯA đăng nhập (Login, Register)
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-
-  if (loading) return null; // Đợi kiểm tra token xong
-
-  if (user) {
-    // Nếu đã login rồi thì tự động điều hướng về dashboard theo role
-    return <Navigate to={user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'} replace />;
-  }
-
-  return children;
-};
-
-// 2. Route dành cho những trang BẮT BUỘC phải đăng nhập
-const ProtectedRoute = ({ children, role }) => {
-  const { user, loading } = useContext(AuthContext);
-
-  if (loading) return null;
-
-  if (!user) {
-    // Chưa login thì trả về trang login
-    return <Navigate to="/login" replace />;
-  }
-
-  if (role && user.role !== role) {
-    // Sai quyền (ví dụ User đòi vào trang Admin) thì đẩy về trang chủ của họ
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
+import AdminLayout from '../layouts/AdminLayout'; // Import layout mới
 
 const AppRoutes = () => {
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) return <div>Loading...</div>; // Nên có loading indicator
+
   return (
     <Routes>
-      {/* Bao bọc Login và Register bằng PublicRoute */}
+      {/* 1. Trang điều hướng gốc (/) */}
       <Route 
-        path="/login" 
+        path="/" 
         element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } 
-      />
-      <Route 
-        path="/register" 
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
+          user ? (
+            user.role === 'ADMIN' ? <Navigate to="/admin/dashboard" /> : <Navigate to="/user/dashboard" />
+          ) : (
+            <Navigate to="/login" />
+          )
         } 
       />
 
-      {/* Các route bảo vệ cho User */}
-      <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <div className="p-10 text-2xl font-bold text-green-700">
-              Chào mừng khách hàng quay trở lại!
-            </div>
-          </ProtectedRoute>
-        } 
-      />
+      {/* 2. Public Routes */}
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+      <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
 
-      {/* Các route bảo vệ cho Admin */}
-      <Route 
-        path="/admin/dashboard" 
-        element={
-          <ProtectedRoute role="ADMIN">
-            <div className="p-10 text-2xl font-bold text-red-700">
-              Khu vực quản trị hệ thống
-            </div>
-          </ProtectedRoute>
-        } 
-      />
+      {/* 3. Admin Routes */}
+      {user?.role === 'ADMIN' && (
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<div>Thống kê Admin</div>} />
+          <Route path="users" element={<div>Quản lý người dùng</div>} />
+          <Route path="fields" element={<div>Quản lý sân bóng</div>} />
+          <Route path="bookings" element={<div>Quản lý lịch đặt</div>} />
+        </Route>
+      )}
 
-      {/* Điều hướng mặc định */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<div className="p-10 text-center text-xl">404 - Trang không tồn tại</div>} />
+      {/* 4. User Routes */}
+      {user?.role === 'USER' && (
+        <Route path="/user" element={<AdminLayout />}>
+          <Route path="dashboard" element={<div>Chào mừng bạn đến với AlooBo!</div>} />
+          <Route path="fields" element={<div>Danh sách sân bóng</div>} />
+          <Route path="profile" element={<div>Trang cá nhân</div>} />
+        </Route>
+      )}
+
+      {/* 5. Catch All - Tránh dùng Navigate trực tiếp nếu không chắc chắn */}
+      <Route path="*" element={user ? <Navigate to="/" /> : <Navigate to="/login" />} />
     </Routes>
   );
 };
