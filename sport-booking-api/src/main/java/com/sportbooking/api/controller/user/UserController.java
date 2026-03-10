@@ -39,45 +39,54 @@ import org.springframework.web.bind.annotation.PutMapping;
 // UserDetailsServiceImpl
 public class UserController {
 
-    private final UserService userService;
+    UserService userService;
 
-    // 🔹 GET PROFILE
+    // ── GET PROFILE ──────────────────────────────────────────────────────────────
+
     @GetMapping("/me")
-    public ApiResponse<UserResponse> getMyProfile() {
-
-        String userId = getCurrentUserId();
+    ApiResponse<UserResponse> getMyProfile() {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getUserById(userId))
+                .result(userService.getUserById(getCurrentUserId()))
                 .build();
     }
 
-    // 🔹 UPDATE PROFILE
+    // ── UPDATE PROFILE (name / email / phone only) ───────────────────────────────
+    // User KHÔNG được tự đổi role, status, password, coinBalance qua endpoint này
+
     @PutMapping("/me")
-    public ApiResponse<UserResponse> updateMyProfile(
-            @Valid @RequestBody UserUpdateRequest request) {
-
-        String userId = getCurrentUserId();
+    ApiResponse<UserResponse> updateMyProfile(@Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.updateUser(userId, request))
+                .result(userService.updateUser(getCurrentUserId(), request))
                 .build();
     }
 
-    // 🔹 CHANGE PASSWORD
-    @PutMapping("/change-password")
-    public ApiResponse<String> changePassword(
-            @Valid @RequestBody ChangePasswordRequest request) {
+    // ── UPDATE AVATAR ────────────────────────────────────────────────────────────
 
-        String userId = getCurrentUserId(); // Lấy userId từ token, cần cấu hình trong UserDetailsServiceImpl để trả về
-                                            // userId thay vì email
-        userService.changePassword(userId, request);
+    @PutMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<UserResponse> updateMyAvatar(
+            @RequestParam(required = false) MultipartFile file,
+            @RequestParam(required = false) String imageUrl) throws IOException {
+
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateAvatar(getCurrentUserId(), file, imageUrl))
+                .build();
+    }
+
+    // ── CHANGE PASSWORD ──────────────────────────────────────────────────────────
+
+    @PutMapping("/change-password")
+    ApiResponse<String> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(getCurrentUserId(), request);
         return ApiResponse.<String>builder()
                 .result("Password changed successfully")
                 .build();
     }
 
+    // ── HELPER ───────────────────────────────────────────────────────────────────
+
     private String getCurrentUserId() {
         return SecurityContextHolder.getContext()
-                .getAuthentication() //
-                .getName(); //
+                .getAuthentication()
+                .getName();
     }
 }

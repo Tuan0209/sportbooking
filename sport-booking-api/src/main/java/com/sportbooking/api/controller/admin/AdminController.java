@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.MediaType;
-
+import com.sportbooking.api.dto.request.user.AdminUpdateUserRequest;
 import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.user.UserCreateRequest;
 import com.sportbooking.api.dto.request.user.UserUpdateRequest;
@@ -40,58 +40,53 @@ import org.springframework.web.bind.annotation.PutMapping;
 @PreAuthorize("hasAuthority('ADMIN')") // Chỉ cho phép truy cập nếu user có role ADMIN, cần cấu hình role trong
 // UserDetailsServiceImpl
 public class AdminController {
+
     UserService userService;
+
+    // ── CREATE ──────────────────────────────────────────────────────────────────
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.createUser(request));
-        return apiResponse;
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.createUser(request))
+                .build();
     }
+
+    // ── READ ─────────────────────────────────────────────────────────────────────
 
     @GetMapping
     ApiResponse<List<UserResponse>> listUsers() {
-        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getAllUsers());
-        return apiResponse;
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getAllUsers())
+                .build();
     }
 
     @GetMapping("/{id}")
     ApiResponse<UserResponse> getUserById(@PathVariable String id) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.getUserById(id));
-        return apiResponse;
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserById(id))
+                .build();
     }
 
-    @DeleteMapping("/{id}")
-    ApiResponse<String> deleteUser(@PathVariable String id) {
-        ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.deleteUser(id));
-        return apiResponse;
-    }
+    // ── UPDATE (full — admin only) ───────────────────────────────────────────────
+    // Admin được cập nhật tất cả: name, email, phone, role, status, password,
+    // coinBalance
 
-    // Cập nhật thông tin user theo id, trả về thông tin user đã cập nhật
     @PutMapping("/{id}")
-    public ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("User has been updated successfully.");
-        apiResponse.setResult(userService.updateUser(id, request));
-        return apiResponse;
+    ApiResponse<UserResponse> updateUser(
+            @PathVariable String id,
+            @Valid @RequestBody AdminUpdateUserRequest request) {
+
+        return ApiResponse.<UserResponse>builder()
+                .message("User has been updated successfully.")
+                .result(userService.adminUpdateUser(id, request))
+                .build();
     }
 
-    // Cập nhật avatar cho user, có thể upload file hoặc cung cấp URL của ảnh
-    // @PutMapping(value = "/{id}/avatar", consumes =
-    // MediaType.MULTIPART_FORM_DATA_VALUE)
-    // public ApiResponse<UserResponse> updateAvatar(
-    // @PathVariable String id,
-    // @RequestParam(required = false) MultipartFile file,
-    // @RequestParam(required = false) String imageUrl) throws IOException {
-    // ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-    // apiResponse.setResult(userService.updateAvatar(id, file, imageUrl));
-    // return apiResponse;
-    // }
+    // ── UPDATE AVATAR ────────────────────────────────────────────────────────────
+
     @PutMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<UserResponse> updateAvatar(
+    ApiResponse<UserResponse> updateAvatar(
             @PathVariable String id,
             @RequestParam(required = false) MultipartFile file,
             @RequestParam(required = false) String imageUrl) throws IOException {
@@ -101,4 +96,12 @@ public class AdminController {
                 .build();
     }
 
+    // ── DELETE ───────────────────────────────────────────────────────────────────
+
+    @DeleteMapping("/{id}")
+    ApiResponse<String> deleteUser(@PathVariable String id) {
+        return ApiResponse.<String>builder()
+                .result(userService.deleteUser(id))
+                .build();
+    }
 }
