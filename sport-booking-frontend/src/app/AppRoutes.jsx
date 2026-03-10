@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import Login from '../features/auth/pages/Login';
 import Register from '../features/auth/pages/Register';
 import AdminLayout from '../layouts/AdminLayout'; // Import layout mới
-
+import ManageUsers from '../features/user/pages/admin/ManageUsers'; // Trang quản lý người dùng cho admin
 const AppRoutes = () => {
   const { user, loading } = useContext(AuthContext);
 
@@ -32,7 +32,7 @@ const AppRoutes = () => {
       {user?.role === 'ADMIN' && (
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<div>Thống kê Admin</div>} />
-          <Route path="users" element={<div>Quản lý người dùng</div>} />
+          <Route path="users" element={<ManageUsers />} />
           <Route path="fields" element={<div>Quản lý sân bóng</div>} />
           <Route path="bookings" element={<div>Quản lý lịch đặt</div>} />
         </Route>

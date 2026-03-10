@@ -8,11 +8,11 @@ const Header = ({ onMenuClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   
   // Dòng này sẽ không còn lỗi nữa
-  const dropdownRef = useRef(null); 
+  const dropdownRef = useRef(null);  // Ref để theo dõi dropdown menu 
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) { 
         setShowDropdown(false);
       }
     };
