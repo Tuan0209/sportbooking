@@ -7,11 +7,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect(() => { 
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        setUser(jwtDecode(token));
+        setUser(jwtDecode(token)); // Giải mã token để lấy thông tin người dùng và lưu vào state
       } catch {
         localStorage.removeItem('token');
       }
@@ -19,10 +19,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const loginContext = (token) => {
+  const loginContext = (token) => { 
     localStorage.setItem('token', token);
     const decoded = jwtDecode(token);
-    setUser(decoded);
+    setUser(decoded);  
     return decoded.role;
   };
 
