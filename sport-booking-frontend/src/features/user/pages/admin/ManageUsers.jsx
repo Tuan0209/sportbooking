@@ -221,10 +221,50 @@ const ManageUsers = () => {
 
       {/* MODAL CẬP NHẬT AVATAR GIỮ NGUYÊN */}
       <Modal isOpen={isAvatarModalOpen} onClose={() => setIsAvatarModalOpen(false)} title="Thay đổi ảnh đại diện">
-          {/* ... phần code modal avatar trước đó ... */}
-      </Modal>
+    <div className="space-y-6">
+      <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+        <label className="text-sm text-indigo-700 font-bold mb-3 flex items-center gap-2">
+          <LinkIcon size={16} /> Nhập link ảnh trực tiếp
+        </label>
+        <div className="flex gap-2">
+          <input 
+            type="text" 
+            placeholder="https://images.unsplash.com/..."
+            className="flex-1 px-4 py-3.5 rounded-xl border border-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white shadow-sm"
+            value={avatarUrlInput}
+            onChange={(e) => setAvatarUrlInput(e.target.value)}
+          />
+          <button 
+            onClick={() => handleAvatarUpdate('url', avatarUrlInput)}
+            disabled={!avatarUrlInput}
+            className="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold disabled:opacity-50 hover:bg-indigo-700 transition-colors"
+          >
+            Lưu
+          </button>
+        </div>
+      </div>
 
-      <input type="file" hidden ref={fileInputRef} onChange={handleFileChange} accept="image/*" />
+      <div className="relative flex items-center py-2">
+        <div className="flex-grow border-t border-gray-100"></div>
+        <span className="flex-shrink mx-4 text-xs font-black text-gray-300 uppercase tracking-widest">Hoặc</span>
+        <div className="flex-grow border-t border-gray-100"></div>
+      </div>
+
+      <button 
+        onClick={() => fileInputRef.current.click()}
+        className="w-full py-10 border-2 border-dashed border-gray-200 rounded-[2rem] hover:border-indigo-400 hover:bg-indigo-50/50 transition-all group flex flex-col items-center justify-center"
+      >
+        <div className="p-4 bg-gray-50 rounded-2xl group-hover:bg-indigo-100 transition-colors mb-3">
+           <Camera className="text-gray-400 group-hover:text-indigo-600 transition-colors" size={32} />
+        </div>
+        <p className="text-sm font-bold text-gray-500 group-hover:text-indigo-600">Tải ảnh lên từ thiết bị</p>
+        <p className="text-[11px] text-gray-400 mt-1">Chấp nhận JPG, PNG, WEBP</p>
+      </button>
+    </div>
+  </Modal>
+
+  <input type="file" hidden ref={fileInputRef} onChange={handleFileChange} accept="image/*" />
+
 
       {/* --- MODAL USER FORM (CẬP NHẬT MỚI) --- */}
       <Modal 
