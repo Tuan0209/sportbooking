@@ -42,6 +42,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/areas", "/api/areas/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/areas/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/areas/**").hasAuthority("ADMIN")
+                        //
+                        .requestMatchers(HttpMethod.GET, "/api/fields", "/api/fields/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/fields", "/api/fields/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/fields/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/fields/**").hasAuthority("ADMIN")
+                        //
+                        .requestMatchers(HttpMethod.GET, "/api/field-types", "/api/field-types/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/field-types").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/field-types/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/field-types/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
