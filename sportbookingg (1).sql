@@ -148,7 +148,7 @@ CREATE TABLE `field_images` (
 -- Cấu trúc bảng cho bảng `field_options`
 --
 
-CREATE TABLE `field_options` (
+CREATE TABLE `field_options` ( //là bảng để lưu các tùy chọn của sân như: đèn chiếu sáng, có chỗ để xe, có phòng thay đồ
   `id` char(36) NOT NULL,
   `field_id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE `field_time_blocks` (
 -- Cấu trúc bảng cho bảng `field_types`
 --
 
-CREATE TABLE `field_types` (
+CREATE TABLE `field_types` (  //là bảng để lưu các loại sân như: sân 5, sân 7, sân 11
   `id` char(36) NOT NULL,
   `name` varchar(50) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()

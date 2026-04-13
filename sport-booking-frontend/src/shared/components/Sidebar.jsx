@@ -1,12 +1,21 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Users, Settings, MapPin, X } from 'lucide-react';
+import { Home, 
+  Users, 
+  MapPin, 
+  LayoutGrid, 
+  Calendar, 
+  Settings, 
+  X,
+  ChevronRight } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
-  const adminLinks = [
+   const adminLinks = [
     { name: 'Tổng quan', icon: <Home size={20} />, path: '/admin/dashboard' },
-    { name: 'Quản lý sân', icon: <MapPin size={20} />, path: '/admin/fields' },
-    { name: 'Quản lý lịch đặt', icon: <Calendar size={20} />, path: '/admin/bookings' },
-    { name: 'Người dùng', icon: <Users size={20} />, path: '/admin/users' },
+    { name: 'Quản lý User', icon: <Users size={20} />, path: '/admin/users' },
+    { name: 'Quản lý Khu vực', icon: <MapPin size={20} />, path: '/admin/areas' }, // Mới thêm
+    { name: 'Quản lý Sân bóng', icon: <LayoutGrid size={20} />, path: '/admin/fields' }, // Mới thêm
+    { name: 'Quản lý Loại sân', icon: <LayoutGrid size={20} />, path: '/admin/field-types' }, // Mới thêm
+    { name: 'Lịch đặt sân', icon: <Calendar size={20} />, path: '/admin/bookings' },
   ];
 
   const userLinks = [

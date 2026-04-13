@@ -5,6 +5,9 @@ import Login from '../features/auth/pages/Login';
 import Register from '../features/auth/pages/Register';
 import AdminLayout from '../layouts/AdminLayout'; // Import layout mới
 import ManageUsers from '../features/user/pages/admin/ManageUsers'; // Trang quản lý người dùng cho admin
+import ManageAreas from '../features/field/pages/admin/ManageAreas'; // Trang quản lý khu vực cho admin
+import ManageFields from '../features/field/pages/admin/ManageFields'; // Trang quản lý sân chi tiết cho admin
+import ManageFieldTypes from '../features/field/pages/admin/ManageFieldTypes'; // Trang quản lý loại sân cho admin
 const AppRoutes = () => {
   const { user, loading } = useContext(AuthContext);
 
@@ -33,8 +36,10 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<div>Thống kê Admin</div>} />
           <Route path="users" element={<ManageUsers />} />
-          <Route path="fields" element={<div>Quản lý sân bóng</div>} />
           <Route path="bookings" element={<div>Quản lý lịch đặt</div>} />
+           <Route path="areas" element={<ManageAreas />} />   {/* Thêm Route này */}
+         <Route path="fields" element={<ManageFields />} /> {/* Thêm Route này */}
+         <Route path="field-types" element={<ManageFieldTypes />} /> {/* Thêm Route này */}
         </Route>
       )}
 
