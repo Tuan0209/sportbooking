@@ -4,18 +4,32 @@ import { formatPrice, formatTime } from '../../../../shared/utils/formatDate';
 
 const FieldDetail = ({ field, onBack, onBooking }) => {
   const [activeTab, setActiveTab] = useState('info');
+  const fieldImages = field.images || []; 
+  
+  const coverImg = fieldImages.find(img => img.type === 'cover')?.imageUrl;
+  const thumbImg = fieldImages.find(img => img.type === 'thumbnail')?.imageUrl;
+  const galleryImages = fieldImages.filter(img => img.type === 'gallery');
 
   return (
     <div className="min-h-screen bg-white pb-24 animate-in slide-in-from-right duration-300">
       {/* 1. Header & Image Area */}
-      <div className="relative h-72">
+      <div className="relative h-72 bg-slate-200">
         <img 
-          src={field.imageUrl || "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=80&w=800"} 
+          src={coverImg || "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=80&w=800"} // Dùng coverImg ở đây
           className="w-full h-full object-cover"
           alt={field.name}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20"></div>
-        
+        {/* Logo sân tròn */}
+<div className="absolute -bottom-6 left-6 w-20 h-20 rounded-full border-4 border-white shadow-lg bg-white overflow-hidden z-10">
+   {thumbImg ? (
+     <img src={thumbImg} className="w-full h-full object-cover" />
+   ) : (
+     <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-500 font-bold text-xl">
+        {field.name?.charAt(0)}
+     </div>
+   )}
+</div>
         {/* Nút quay lại & Tiện ích */}
         <div className="absolute top-4 left-4 right-4 flex justify-between">
           <button onClick={onBack} className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white">
@@ -83,6 +97,18 @@ const FieldDetail = ({ field, onBack, onBooking }) => {
            {activeTab === 'info' && (
              <p>Sân được thiết kế tiêu chuẩn quốc tế, mặt sân cực tốt giúp giảm chấn thương. Hệ thống đèn LED công suất lớn hỗ trợ thi đấu ban đêm cực tốt...</p>
            )}
+           {activeTab === 'images' && (
+      <div className="grid grid-cols-2 gap-3 animate-in fade-in duration-300">
+         {galleryImages.map((img) => (
+           <div key={img.id} className="h-32 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:scale-[1.02] transition-transform">
+              <img src={img.image_url} className="w-full h-full object-cover" alt="gallery" />
+           </div>
+         ))}
+         {galleryImages.length === 0 && (
+            <p className="col-span-2 text-center py-10 text-slate-400 italic">Chưa có hình ảnh thực tế từ sân</p>
+         )}
+      </div>
+   )}
         </div>
       </div>
 

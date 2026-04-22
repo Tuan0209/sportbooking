@@ -3,11 +3,13 @@ import { fieldService } from '../../services/fieldService';
 import { formatPrice, formatTime } from '../../../../shared/utils/formatDate';
 import { 
   Plus, Edit, Trash2, Search, MapPin, 
-  Clock, DollarSign, LayoutGrid, Globe 
+  Clock, DollarSign, LayoutGrid, Globe , Image as ImageIcon
 } from 'lucide-react';
 import Modal from '../../../../shared/components/Modal';
 import Input from '../../../../shared/components/Input';
 import Button from '../../../../shared/components/Button';
+import FieldImagesModal from '../../components/admin/FieldImagesModal';
+
 
 // Hàm định dạng màu sắc trạng thái giống ảnh mẫu
 const getStatusStyles = (status) => {
@@ -18,6 +20,7 @@ const getStatusStyles = (status) => {
     default: return 'bg-gray-100 text-gray-700 border-gray-200';
   }
 };
+// Modal quản lý ảnh sân
 
 const ManageFields = () => {
   const [fields, setFields] = useState([]); 
@@ -33,6 +36,9 @@ const ManageFields = () => {
   const [filterArea, setFilterArea] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [isImgModalOpen, setIsImgModalOpen] = useState(false);
+  const [selectedFieldForImg, setSelectedFieldForImg] = useState(null);
+
 
   const [formData, setFormData] = useState({
     name: '', areaId: '', fieldTypeId: '', address: '',
@@ -150,6 +156,7 @@ const ManageFields = () => {
             <tbody className="divide-y divide-slate-50">
               {filteredFields.map((f) => (
                 <tr key={f.id} className="hover:bg-slate-50/50 transition-colors group">
+                   
                   <td className="px-8 py-5">
                     <p className="font-black text-slate-800 text-[15px]">{f.name}</p>
                     <p className="text-[10px] text-slate-400 font-medium italic truncate max-w-[150px]">{f.address}</p>
@@ -168,6 +175,7 @@ const ManageFields = () => {
                   <td className="px-6 py-5 text-center font-bold text-slate-500 text-[12px] whitespace-nowrap italic">
                     {formatTime(f.openTime)} - {formatTime(f.closeTime)}
                   </td>
+                      
                   {/* CỘT TRẠNG THÁI MỚI */}
                   <td className="px-6 py-5 text-center">
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase border tracking-widest ${getStatusStyles(f.status)}`}>
@@ -175,6 +183,17 @@ const ManageFields = () => {
                     </span>
                   </td>
                   <td className="px-8 py-5 text-right flex items-center justify-end gap-2">
+                     <button 
+                        onClick={() => {
+                        setSelectedFieldForImg(f);
+                        setIsImgModalOpen(true);
+                  }}
+                     className="p-2.5 text-amber-600 hover:bg-amber-50 rounded-xl transition-all shadow-sm border border-transparent hover:border-amber-100"
+                     title="Quản lý ảnh"
+                  >
+               <ImageIcon size={18} />
+               </button>
+
                     <button onClick={() => handleOpenModal(f)} className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"><Edit size={18} /></button>
                     <button onClick={() => handleDelete(f.id)} className="p-2.5 text-red-500 hover:bg-red-100 rounded-xl transition-all"><Trash2 size={18} /></button>
                   </td>
@@ -224,6 +243,12 @@ const ManageFields = () => {
             </div>
          </form>
       </Modal>
+      <FieldImagesModal 
+        isOpen={isImgModalOpen}
+        onClose={() => setIsImgModalOpen(false)}
+        fieldId={selectedFieldForImg?.id}
+        fieldName={selectedFieldForImg?.name}
+      />
     </div>
   );
 };

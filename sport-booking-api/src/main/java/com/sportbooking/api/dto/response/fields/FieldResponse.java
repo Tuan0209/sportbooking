@@ -35,6 +35,8 @@ public class FieldResponse {
     BigDecimal latitude;
     BigDecimal longitude;
     FieldStatus status;
+    String coverUrl; // anh cover (banner)
+    String thumbnailUrl; // anh thumbnail (logo tron)
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }
