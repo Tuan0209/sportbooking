@@ -52,6 +52,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/field-types").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/field-types/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/field-types/**").hasAuthority("ADMIN")
+                        //
+                        .requestMatchers(HttpMethod.GET, "/api/field-images/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/field-images/*/cover",
+                                "/api/field-images/*/thumbnail",
+                                "/api/field-images/*/gallery")
+                        .hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/field-images/*/cover",
+                                "/api/field-images/*/thumbnail")
+                        .hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/field-images/image/**",
+                                "/api/field-images/*/all")
+                        .hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
