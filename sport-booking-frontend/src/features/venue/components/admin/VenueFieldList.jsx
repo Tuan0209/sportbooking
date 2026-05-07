@@ -9,6 +9,8 @@ import Modal from '../../../../shared/components/Modal';
 import Input from '../../../../shared/components/Input';
 import Button from '../../../../shared/components/Button';
 
+import FieldPricingModal from '../../../field/components/admin/FieldPricingModal';
+
 // Helper style trạng thái sân
 const getStatusStyles = (status) => {
   switch (status) {
@@ -24,6 +26,9 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
   const [fieldTypes, setFieldTypes] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [selectedField, setSelectedField] = useState(null);
+  // Modal quản lý khung giá (price slots)
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [pricingField, setPricingField] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -164,6 +169,13 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
                 <td className="px-8 py-5 text-right">
                   <div className="flex justify-end gap-2">
                     <button 
+                onClick={() => { setPricingField(f); setIsPricingModalOpen(true); }}
+                className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-100 shadow-sm"
+                title="Quản lý khung giá"
+              >
+                <DollarSign size={16}/>
+              </button> 
+                    <button 
                       onClick={() => handleOpenModal(f)} 
                       className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all border border-transparent hover:border-indigo-100 shadow-sm"
                     >
@@ -273,6 +285,11 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
           </div>
         </form>
       </Modal>
+      <FieldPricingModal 
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
+        field={pricingField}
+      />
     </div>
   );
 };

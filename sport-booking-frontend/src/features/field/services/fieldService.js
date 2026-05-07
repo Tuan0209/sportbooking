@@ -18,7 +18,14 @@ export const fieldService = {
   createField: (data) => axiosClient.post('/fields', data),
   updateField: (id, data) => axiosClient.put(`/fields/${id}`, data),
   deleteField: (id) => axiosClient.delete(`/fields/${id}`),
-
+  // --- QUẢN LÝ KHUNG GIÁ (PRICE SLOTS) ---
+  getPriceSlots: (fieldId) => axiosClient.get(`/fields/${fieldId}/price-slots`),
+  
+  createPriceSlot: (data) => axiosClient.post('/price-slots', data),
+  
+  updatePriceSlot: (id, data) => axiosClient.put(`/price-slots/${id}`, data),
+  
+  deletePriceSlot: (id) => axiosClient.delete(`/price-slots/${id}`),
   // --- QUẢN LÝ ẢNH SÂN ---
   getImages: (fieldId) => axiosClient.get(`/field-images/${fieldId}`),
 
