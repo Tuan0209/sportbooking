@@ -1,107 +1,96 @@
 import React, { useState } from 'react';
-import { Star, Heart, Share2, Clock, MapPin } from 'lucide-react';
+import { Star, Heart, Share2, Clock, MapPin, Loader2 } from 'lucide-react';
 import { formatTime } from '../../../../shared/utils/formatDate';
 import { formatDistance } from '../../../../shared/utils/distance';
 
-const VenueCard = ({ venue, distance, onBooking }) => {
+const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
-  return (
-    <div className="bg-white rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group flex flex-col border border-gray-100/50">
-      {/* 1. Phần Ảnh Bìa (Cover) */}
-      <div className="relative h-56 overflow-hidden bg-slate-200">
-        {venue.coverUrl ? (
-          <img 
-            src={venue.coverUrl} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            alt={venue.name}
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-green-400/20 via-blue-400/20 to-purple-400/20 flex items-center justify-center text-4xl">
-            ⚽
-          </div>
-        )}
-        
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60"></div>
+  // 1. Logic cho Badge Trạng thái (Góc trái ảnh)
+  const renderStatusBadge = () => {
+    switch (venue.status) {
+      case 'ACTIVE':
+        return <div className="bg-[#00a651] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm">Đang mở cửa</div>;
+      case 'INACTIVE':
+        return <div className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm">Tạm ngưng</div>;
+      case 'MAINTENANCE':
+        return <div className="bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm">Đang bảo trì</div>;
+      default:
+        return null;
+    }
+  };
 
-        {/* Badges Overlay */}
+  // 2. Logic cho Nút Đặt lịch (Dưới cùng)
+  const isAvailable = venue.status === 'ACTIVE';
+
+  return (
+    <div className={`bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col border border-gray-100 transition-all duration-300 ${!isAvailable ? 'opacity-90' : 'hover:shadow-2xl'}`}>
+      <div className="relative h-52 overflow-hidden bg-slate-200">
+        <img 
+          src={venue.coverUrl || "https://images.unsplash.com/photo-1595030044556-acfaa60edc0f?q=80&w=500"} 
+          className={`w-full h-full object-cover transition-all duration-700 ${isAvailable ? 'group-hover:scale-110' : 'grayscale-[0.5]'}`}
+          alt={venue.name}
+        />
+        
+        {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-          <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm w-fit">
-            <Star size={14} className="text-yellow-500 fill-yellow-500" />
-            <span className="text-[12px] font-black text-gray-800">
-              {venue.rating > 0 ? `${venue.rating} (${venue.totalReviews})` : 'Mới'}
-            </span>
+          <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm w-fit">
+            <Star size={12} className="text-yellow-500 fill-yellow-500" />
+            <span className="text-[11px] font-black">5.0</span>
           </div>
-          {venue.status === 'ACTIVE' && (
-            <div className="bg-[#00a651]/95 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm w-fit">
-              Đang mở cửa
-            </div>
-          )}
+          {renderStatusBadge()}
         </div>
 
-        {/* Actions Overlay */}
         <div className="absolute top-4 right-4 flex flex-col gap-2">
-          <button 
-            onClick={(e) => { e.stopPropagation(); setIsFavorite(!isFavorite); }}
-            className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all"
-          >
-            <Heart size={20} className={`${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
-          </button>
-          <button className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
-            <Share2 size={18} className="text-gray-600" />
+          <button onClick={() => setIsFavorite(!isFavorite)} className="w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90">
+            <Heart size={18} className={isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'} />
           </button>
         </div>
       </div>
 
-      {/* 2. Phần Thông Tin */}
-      <div className="p-5 flex flex-col relative flex-1">
-        {/* Thumbnail Overlap */}
+      <div className="p-5 flex flex-col flex-1">
         <div className="flex gap-4 items-start">
-          <div className="w-16 h-16 rounded-2xl border-4 border-white shadow-xl bg-white -mt-12 z-10 overflow-hidden shrink-0 flex items-center justify-center">
-            {venue.thumbnailUrl ? (
-              <img src={venue.thumbnailUrl} className="w-full h-full object-cover" alt="logo" />
-            ) : (
-              <span className="text-xl font-black text-indigo-300 uppercase">{venue.name?.charAt(0)}</span>
-            )}
+          <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-lg bg-white -mt-10 z-10 overflow-hidden shrink-0 flex items-center justify-center">
+            {venue.thumbnailUrl ? <img src={venue.thumbnailUrl} className="w-full h-full object-cover" alt="logo" /> : <span className="text-lg font-black text-indigo-300">{venue.name?.charAt(0)}</span>}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-black text-gray-900 text-lg leading-tight truncate uppercase tracking-tight">
-              {venue.name}
-            </h3>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
-              {venue.areaName}
-            </p>
+            <h3 className="font-black text-gray-900 text-[15px] leading-tight truncate uppercase tracking-tight">{venue.name}</h3>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{venue.areaName}</p>
           </div>
         </div>
 
-        {/* Rows */}
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-4 space-y-2">
           <div className="flex items-center gap-2">
-            <MapPin size={16} className="text-[#f3a638]" />
-            <span className="text-[13px] font-black text-[#f3a638] shrink-0">
-              {formatDistance(distance)}
+            <MapPin size={14} className="text-[#f3a638]" />
+            {/* HIỂN THỊ KHOẢNG CÁCH THÔNG MINH */}
+            <span className="text-[12px] font-black text-[#f3a638] shrink-0 min-w-[45px]">
+              {isLocating ? (
+                <span className="flex items-center gap-1 animate-pulse text-[10px]">
+                  <Loader2 size={10} className="animate-spin" /> tính...
+                </span>
+              ) : (
+                formatDistance(distance)
+              )}
             </span>
-            <span className="text-[13px] text-gray-500 font-medium truncate italic">
-              {venue.address}
-            </span>
+            <span className="text-[12px] text-gray-500 font-medium truncate italic">{venue.address}</span>
           </div>
-          <div className="flex items-center gap-2 text-gray-500">
-            <Clock size={16} className="text-[#00a651]" />
-            <span className="text-[13px] font-bold">
-              {formatTime(venue.openTime)} - {formatTime(venue.closeTime)}
-            </span>
+          <div className="flex items-center gap-2 text-gray-400">
+            <Clock size={14} />
+            <span className="text-[12px] font-bold">{formatTime(venue.openTime)} - {formatTime(venue.closeTime)}</span>
           </div>
         </div>
 
-        {/* Booking Button */}
-        <div className="mt-6">
+        <div className="mt-5">
           <button 
+            disabled={!isAvailable}
             onClick={() => onBooking(venue.id)}
-            className="w-full py-4 bg-gradient-to-r from-[#f3a638] to-[#f7b733] hover:from-[#e6952d] hover:to-[#f3a638] text-white font-black text-[13px] uppercase tracking-[0.1em] rounded-[1.2rem] shadow-lg shadow-orange-100 transition-all active:scale-[0.98]"
+            className={`w-full py-3.5 rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 ${
+              isAvailable 
+              ? 'bg-gradient-to-r from-[#f3a638] to-[#f7b733] text-white shadow-orange-100 hover:brightness-105' 
+              : 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed'
+            }`}
           >
-            Đặt Lịch Ngay
+            {isAvailable ? 'Đặt Lịch Ngay' : 'Hiện chưa thể đặt'}
           </button>
         </div>
       </div>

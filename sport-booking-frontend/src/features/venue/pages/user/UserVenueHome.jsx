@@ -10,15 +10,30 @@ const UserVenueHome = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('home');
-
+  const [isLocating, setIsLocating] = useState(true); 
   useEffect(() => {
+     // 1. Kiểm tra vị trí trong cache (sessionStorage) trước
+    const cachedLoc = sessionStorage.getItem('user_location');
+    if (cachedLoc) {
+      setUserLocation(JSON.parse(cachedLoc));
+      setIsLocating(false);
+    }
+    // 2. Lấy vị trí GPS thật (cập nhật lại nếu có thay đổi)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        null,
-        { timeout: 10000 }
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setUserLocation(loc);
+          setIsLocating(false);
+          sessionStorage.setItem('user_location', JSON.stringify(loc)); // Lưu cache
+        },
+        () => setIsLocating(false), // Lỗi GPS thì ngừng loading
+        { timeout: 5000 }
       );
+    } else {
+      setIsLocating(false);
     }
+
     venueService.getAllVenues().then(res => {
       if (res.data.code === 0) setVenues(res.data.result);
       setLoading(false);
@@ -92,7 +107,8 @@ const UserVenueHome = () => {
                 key={venue.id} 
                 venue={venue} 
                 distance={venue.distance} 
-                onBooking={(id) => console.log("Booking venue:", id)} 
+                isLocating={isLocating} // Truyền trạng thái đang tìm GPS vào card
+                 onBooking={(id) => console.log("Booking:", id)} 
               />
             ))}
           </div>
