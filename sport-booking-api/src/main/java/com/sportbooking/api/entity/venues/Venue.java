@@ -65,13 +65,23 @@ public class Venue {
     @Column(name = "close_time", nullable = false)
     LocalTime closeTime;
 
-    @OneToMany(mappedBy = "venue", cascade = { CascadeType.ALL }, orphanRemoval = true) // xoa san khi xoa venue
-    private List<Field> fields;
-
     @OneToMany(mappedBy = "venue", fetch = FetchType.LAZY)
     private List<VenueImage> images;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     VenueStatus status = VenueStatus.ACTIVE;
+
+    @Column(precision = 2, scale = 1)
+    @Builder.Default
+    private BigDecimal rating = BigDecimal.ZERO;
+    // @Column(name = "is_favorite")
+    // @Builder.Default
+    // Boolean isFavorite;
+    @Column(name = "total_reviews")
+    @Builder.Default
+    private Integer totalReviews = 0;
+
+    @OneToMany(mappedBy = "venue", cascade = { CascadeType.ALL }, orphanRemoval = true) // xoa san khi xoa venue
+    private List<Field> fields;
 }

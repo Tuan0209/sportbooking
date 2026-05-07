@@ -17,6 +17,11 @@ public interface VenueMapper {
     @Mapping(target = "thumbnailUrl", expression = "java(getImageUrl(venue, com.sportbooking.api.common.enums.VenueImageType.thumbnail))")
 
     @Mapping(target = "coverUrl", expression = "java(getImageUrl(venue, com.sportbooking.api.common.enums.VenueImageType.cover))")
+    @Mapping(target = "rating", expression = "java(venue.getRating() != null ? venue.getRating() : java.math.BigDecimal.ZERO)")
+
+    @Mapping(target = "totalReviews", expression = "java(venue.getTotalReviews() != null ? venue.getTotalReviews() : 0)")
+
+    @Mapping(target = "isFavorite", ignore = true)
 
     VenueResponse toResponse(Venue venue);
 

@@ -40,6 +40,9 @@ public class VenueResponse {
     int totalFields;
     String coverUrl; // anh cover (banner)
     String thumbnailUrl; // anh thumbnail (logo tron)
+    Integer totalReviews;
+    BigDecimal rating;
+    Boolean isFavorite;
     VenueStatus status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

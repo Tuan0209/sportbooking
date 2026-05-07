@@ -70,7 +70,7 @@ import Register from '../features/auth/pages/Register';
 
 // User/Customer Features (Thay thế UserBooking cũ)
 import UserHome from '../features/field/pages/user/UserHome';
-
+import UserVenueHome from '../features/venue/pages/user/UserVenueHome';
 // Admin Features
 import ManageUsers from '../features/user/pages/admin/ManageUsers';
 import ManageFields from '../features/field/pages/admin/ManageFields';
@@ -132,7 +132,7 @@ const AppRoutes = () => {
         path="/dashboard" 
         element={
           <ProtectedRoute roleRequired="USER">
-            <UserHome />
+             <UserVenueHome />
           </ProtectedRoute>
         } 
       />
