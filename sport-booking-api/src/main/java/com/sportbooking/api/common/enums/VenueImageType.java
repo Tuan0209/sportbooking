@@ -1,6 +1,6 @@
 package com.sportbooking.api.common.enums;
 
-public enum FieldImageType {
+public enum VenueImageType {
     cover,
     gallery,
     thumbnail

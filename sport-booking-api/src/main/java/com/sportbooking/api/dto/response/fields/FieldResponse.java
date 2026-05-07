@@ -3,6 +3,7 @@ package com.sportbooking.api.dto.response.fields;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import com.sportbooking.api.common.enums.FieldStatus;
 
@@ -20,7 +21,10 @@ public class FieldResponse {
     String id;
     String name;
 
-    // Area info
+    String venueId;
+    String venueName;
+    String sportTypeId;
+    String sportTypeName;
     String areaId;
     String areaName;
 
@@ -28,15 +32,11 @@ public class FieldResponse {
     String fieldTypeId;
     String fieldTypeName;
 
-    String address;
     BigDecimal pricePerHour;
     LocalTime openTime;
     LocalTime closeTime;
-    BigDecimal latitude;
-    BigDecimal longitude;
     FieldStatus status;
-    String coverUrl; // anh cover (banner)
-    String thumbnailUrl; // anh thumbnail (logo tron)
+    List<FieldPriceSlotResponse> priceSlots;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

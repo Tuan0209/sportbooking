@@ -1,9 +1,10 @@
-package com.sportbooking.api.dto.request.fields;
+package com.sportbooking.api.dto.request.venues;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import com.sportbooking.api.common.enums.FieldStatus;
+
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,18 +13,22 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FieldUpdateRequest {
+public class VenueCreateRequest {
 
+    @NotBlank
     String name;
-    String areaId;
-    String venueId;
-    String fieldTypeId;
+
+    @NotBlank
     String address;
-    BigDecimal pricePerHour;
+
+    @NotBlank
+    String areaId;
+    @NotNull
     LocalTime openTime;
+
+    @NotNull
     LocalTime closeTime;
+
     BigDecimal latitude;
     BigDecimal longitude;
-    FieldStatus status;
-    List<FieldPriceSlotCreateRequest> priceSlots;
 }
