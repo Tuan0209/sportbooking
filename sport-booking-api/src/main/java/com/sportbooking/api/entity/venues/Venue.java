@@ -6,10 +6,13 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import org.hibernate.annotations.UuidGenerator;
 import com.sportbooking.api.entity.fields.Field;
+import com.sportbooking.api.common.enums.VenueStatus;
 import com.sportbooking.api.entity.areas.Area;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -67,4 +70,8 @@ public class Venue {
 
     @OneToMany(mappedBy = "venue", fetch = FetchType.LAZY)
     private List<VenueImage> images;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    VenueStatus status = VenueStatus.ACTIVE;
 }

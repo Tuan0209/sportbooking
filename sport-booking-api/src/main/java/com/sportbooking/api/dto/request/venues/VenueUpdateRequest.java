@@ -5,6 +5,8 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
+import com.sportbooking.api.common.enums.VenueStatus;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,6 +16,7 @@ public class VenueUpdateRequest {
     String name;
     String address;
     String areaId;
+    VenueStatus status;
 
     LocalTime openTime;
 

@@ -1,0 +1,39 @@
+Kiểu tìm kiếm và lọc dữ liệu trong đoạn code trên được gọi là Client-Side Filtering (Lọc dữ liệu phía Client) hay còn gọi là Local Search.
+Dưới đây là phân tích chi tiết về cách nó hoạt động:
+1. Đây là kiểu tìm kiếm gì?
+Tên gọi: Client-side Filtering.
+Đặc điểm: Toàn bộ dữ liệu được tải từ Server về máy người dùng một lần duy nhất. Việc tìm kiếm và lọc sau đó diễn ra hoàn toàn trong bộ nhớ trình duyệt (RAM), không cần gửi thêm yêu cầu (Request) nào lên Server nữa.
+2. Cách hoạt động chi tiết (Step-by-step)
+Quy trình này diễn ra qua 4 bước chính trong React:
+Bước 1: Lưu trữ dữ liệu gốc và dữ liệu hiển thị
+Trong code, bạn có 2 mảng trạng thái (state):
+venues: Giữ danh sách "gốc" (toàn bộ dữ liệu lấy từ API).
+filteredVenues: Giữ danh sách "đã lọc" (dùng để hiển thị lên bảng).
+Bước 2: Theo dõi sự thay đổi (Trigger)
+Sử dụng Hook useEffect để "lắng nghe" sự thay đổi của 4 yếu tố:
+code
+JavaScript
+useEffect(() => {
+  // Logic lọc nằm ở đây
+}, [searchTerm, filterArea, filterStatus, venues]);
+Mỗi khi bạn gõ một phím vào ô Search, hoặc chọn một mục trong Dropdown, React sẽ ngay lập tức chạy lại đoạn mã bên trong useEffect này.
+Bước 3: Thực hiện toán tử Lọc (Logic)
+Bên trong useEffect, chương trình thực hiện các phép kiểm tra điều kiện:
+Sao chép: Tạo một bản sao từ mảng gốc: result = [...venues].
+Lọc theo từ khóa (searchTerm):
+Chuyển cả tên sân và từ khóa về chữ thường (toLowerCase) để tìm kiếm không phân biệt hoa thường.
+Dùng hàm .includes() để kiểm tra xem từ khóa có nằm trong tên hoặc địa chỉ hay không.
+Lọc theo khu vực (filterArea): Nếu người dùng chọn một quận cụ thể, nó chỉ giữ lại các bản ghi có areaId khớp chính xác.
+Lọc theo trạng thái (filterStatus): Giữ lại các bản ghi có status trùng khớp.
+Bước 4: Cập nhật giao diện (Re-render)
+Sau khi tính toán xong mảng result cuối cùng, code gọi setFilteredVenues(result). React thấy state thay đổi nên sẽ vẽ lại (render) cái bảng với danh sách mới.
+3. Ưu và Nhược điểm của kiểu này
+Ưu điểm:
+Cực kỳ nhanh (Instant): Kết quả hiện ra ngay lập tức khi người dùng vừa gõ xong, tạo cảm giác mượt mà (không có độ trễ mạng).
+Giảm tải cho Server: Server chỉ cần xử lý 1 request lấy dữ liệu lúc đầu, sau đó không cần làm gì thêm khi người dùng tìm kiếm.
+Trải nghiệm người dùng (UX) tốt: Phù hợp với các trang quản trị (Admin Dashboard) nơi danh sách dữ liệu thường chỉ từ vài trăm đến 1-2 nghìn dòng.
+Nhược điểm:
+Tốn bộ nhớ lúc đầu: Nếu danh sách có hàng chục nghìn hoặc hàng triệu bản ghi, việc tải hết về máy sẽ làm ứng dụng bị chậm hoặc treo trình duyệt.
+Dữ liệu không "tươi": Nếu có một Admin khác vừa thêm sân mới, bạn sẽ không thấy kết quả đó cho đến khi bạn tải lại trang (F5).
+Khi nào nên dùng kiểu khác (Server-side Search)?
+Khi dữ liệu của bạn quá lớn (Big Data). Lúc đó, mỗi lần tìm kiếm bạn sẽ phải gửi từ khóa lên API, Server sẽ thực hiện câu lệnh SELECT ... WHERE name LIKE %...% trong Database và chỉ trả về 10-20 kết quả mỗi trang (Phân trang).

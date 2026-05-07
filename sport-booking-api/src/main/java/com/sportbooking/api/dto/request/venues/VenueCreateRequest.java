@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.sportbooking.api.common.enums.VenueStatus;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +25,7 @@ public class VenueCreateRequest {
 
     @NotBlank
     String areaId;
+    VenueStatus status;
     @NotNull
     LocalTime openTime;
 

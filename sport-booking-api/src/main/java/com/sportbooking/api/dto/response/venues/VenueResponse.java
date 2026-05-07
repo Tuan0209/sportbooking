@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+
+import com.sportbooking.api.common.enums.VenueStatus;
 import com.sportbooking.api.dto.response.fields.FieldResponse;
 
 import lombok.AccessLevel;
@@ -38,6 +40,7 @@ public class VenueResponse {
     int totalFields;
     String coverUrl; // anh cover (banner)
     String thumbnailUrl; // anh thumbnail (logo tron)
+    VenueStatus status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

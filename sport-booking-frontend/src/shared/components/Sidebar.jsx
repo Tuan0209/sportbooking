@@ -7,6 +7,7 @@ import {
   Calendar, 
   Settings, 
   X,
+  Globe
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
@@ -22,7 +23,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
     {
       title: 'Quản lý địa điểm',
       links: [
-        { name: 'Venue', icon: <MapPin size={20} />, path: '/admin/venues' }, // ⭐ thêm
+        { name: 'Quản lý Cơ sở', icon: <Globe size={20} />, path: '/admin/venues' },
         { name: 'Khu vực', icon: <MapPin size={20} />, path: '/admin/areas' },
         { name: 'Sân', icon: <LayoutGrid size={20} />, path: '/admin/fields' },
         { name: 'Loại sân', icon: <LayoutGrid size={20} />, path: '/admin/field-types' },

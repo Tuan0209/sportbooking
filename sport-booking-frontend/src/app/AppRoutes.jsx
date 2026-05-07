@@ -76,7 +76,8 @@ import ManageUsers from '../features/user/pages/admin/ManageUsers';
 import ManageFields from '../features/field/pages/admin/ManageFields';
 import ManageFieldTypes from '../features/field/pages/admin/ManageFieldTypes';
 import ManageAreas from '../features/field/pages/admin/ManageAreas';
-
+import ManageVenues from '../features/venue/pages/admin/ManageVenues';
+import VenueDetail from '../features/venue/pages/admin/VenueDetail';  
 // 1. Route bảo vệ: Chỉ dành cho khách chưa đăng nhập (Login/Register)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -115,6 +116,9 @@ const AppRoutes = () => {
         }
       >
         <Route path="dashboard" element={<div className="p-8">Thống kê tổng quan Admin</div>} />
+        <Route path="venues" element={<ManageVenues />} />
+        <Route path="venues/:venueId" element={<VenueDetail />} /> {/* Route mới */}
+        <Route path="fields" element={<ManageFields />} /> {/* Giữ lại làm trang tra cứu tổng hợp */}
         <Route path="users" element={<ManageUsers />} />
         <Route path="fields" element={<ManageFields />} />
         <Route path="field-types" element={<ManageFieldTypes />} />

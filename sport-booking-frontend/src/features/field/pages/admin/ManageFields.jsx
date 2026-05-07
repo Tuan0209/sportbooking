@@ -50,7 +50,7 @@ const ManageFields = () => {
 
   useEffect(() => {
     let result = [...fields];
-    if (searchTerm) result = result.filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (searchTerm) result = result.filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase())); 
     if (filterArea) result = result.filter(f => f.areaId === filterArea);
     if (filterType) result = result.filter(f => f.fieldTypeId === filterType);
     if (filterStatus) result = result.filter(f => f.status === filterStatus);
