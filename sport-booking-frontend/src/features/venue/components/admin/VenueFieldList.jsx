@@ -36,7 +36,9 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
     pricePerHour: '',
     openTime: '06:00',
     closeTime: '22:00',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    slotInterval: 30
+
   });
 
   // Lấy danh sách loại sân khi mở modal
@@ -57,7 +59,8 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
         pricePerHour: field.pricePerHour,
         openTime: field.openTime?.slice(0, 5),
         closeTime: field.closeTime?.slice(0, 5),
-        status: field.status
+        status: field.status,
+        slotInterval: field.slotInterval || 30
       });
     } else {
       setSelectedField(null);
@@ -67,7 +70,8 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
         pricePerHour: '',
         openTime: '06:00',
         closeTime: '22:00',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        slotInterval: 30
       });
     }
     setIsModalOpen(true);
@@ -76,7 +80,7 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-
+    console.log("Submitting field data:", formData);
     // Format thời gian sang HH:mm:ss cho Backend
     const payload = {
       ...formData,
@@ -144,6 +148,9 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Loại hình</th>
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Giá thuê</th>
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Hoạt động</th>
+              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">
+  Slot
+</th>
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Trạng thái</th>
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Thao tác</th>
             </tr>
@@ -161,6 +168,11 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
                 <td className="px-8 py-5 text-center text-[12px] font-bold text-slate-500 italic">
                   {formatTime(f.openTime)} - {formatTime(f.closeTime)}
                 </td>
+                <td className="px-8 py-5 text-center">
+  <span className="px-3 py-1 bg-cyan-50 text-cyan-700 rounded-xl text-[11px] font-black">
+    {f.slotInterval || 30}p
+  </span>
+</td>
                 <td className="px-8 py-5 text-center">
                    <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase border tracking-widest ${getStatusStyles(f.status)}`}>
                      {f.status}
@@ -253,6 +265,7 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
                <DollarSign size={14}/> Cấu hình giá & thời gian
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
               <Input 
                 label="Giá thuê/Giờ" 
                 type="number"
@@ -277,7 +290,34 @@ const VenueFieldList = ({ venueId, venueName, initialFields, onRefresh }) => {
               />
             </div>
           </div>
+           <div className="space-y-2">
+  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+    Slot Interval
+  </label>
 
+  <div className="flex flex-wrap gap-2">
+    {[15, 30, 45, 60, 90, 120].map((slot) => (
+      <button
+        type="button"
+        key={slot}
+        onClick={() =>
+          setFormData({
+            ...formData,
+            slotInterval: slot
+          })
+        }
+        className={`px-4 py-2 rounded-xl text-xs font-black transition-all border active:scale-95
+          ${
+            formData.slotInterval === slot
+              ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-indigo-50'
+          }`}
+      >
+        {slot}p
+      </button>
+    ))}
+  </div>
+</div>
           <div className="pt-4">
             <Button type="submit" disabled={submitting}>
               {submitting ? <Loader2 className="animate-spin mx-auto"/> : (selectedField ? "Lưu cấu hình sân" : "Xác nhận thêm sân")}

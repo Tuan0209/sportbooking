@@ -23,13 +23,16 @@ public interface FieldMapper {
     @Mapping(target = "sportTypeId", source = "fieldType.sportType.id")
     @Mapping(target = "sportTypeName", source = "fieldType.sportType.name")
 
-    @Mapping(target = "priceSlots", ignore = true)
+    @Mapping(target = "priceSlots", source = "priceSlots")
+    @Mapping(target = "slotInterval", source = "slotInterval")
     FieldResponse toFieldResponse(Field field);
 
     // ─── CREATE ─────────────────────────────
     @Mapping(target = "fieldType", ignore = true)
     @Mapping(target = "venue", ignore = true)
     @Mapping(target = "priceSlots", ignore = true)
+    @Mapping(target = "slotInterval", ignore = true)
+
     Field toField(FieldCreateRequest request);
 
     // ─── UPDATE ─────────────────────────────
@@ -37,5 +40,6 @@ public interface FieldMapper {
     @Mapping(target = "fieldType", ignore = true)
     @Mapping(target = "venue", ignore = true)
     @Mapping(target = "priceSlots", ignore = true)
+    @Mapping(target = "slotInterval", source = "slotInterval")
     void updateFieldFromRequest(FieldUpdateRequest request, @MappingTarget Field field);
 }

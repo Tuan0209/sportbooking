@@ -5,7 +5,7 @@ import { formatDistance } from '../../../../shared/utils/distance';
 
 const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-
+  const rating = venue.rating || 0;
   // 1. Logic cho Badge Trạng thái (Góc trái ảnh)
   const renderStatusBadge = () => {
     switch (venue.status) {
@@ -35,9 +35,14 @@ const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm w-fit">
-            <Star size={12} className="text-yellow-500 fill-yellow-500" />
-            <span className="text-[11px] font-black">5.0</span>
-          </div>
+            <Star 
+        size={12} 
+        className={`${rating > 0 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+      />
+      <span className="text-[11px] font-black text-gray-800">
+        {rating > 0 ? rating.toFixed(1) : 'Mới'}
+      </span>
+    </div>
           {renderStatusBadge()}
         </div>
 

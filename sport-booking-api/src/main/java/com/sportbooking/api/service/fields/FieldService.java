@@ -326,7 +326,7 @@ public class FieldService {
 
         field.setFieldType(fieldType);
         field.setVenue(venue);
-
+        field.setSlotInterval(request.getSlotInterval() != null ? request.getSlotInterval() : 30); // default 30 phút
         // kế thừa giờ từ venue
         if (field.getOpenTime() == null) {
             field.setOpenTime(venue.getOpenTime());

@@ -36,6 +36,7 @@ public class FieldResponse {
     LocalTime openTime;
     LocalTime closeTime;
     FieldStatus status;
+    Integer slotInterval;
     List<FieldPriceSlotResponse> priceSlots;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

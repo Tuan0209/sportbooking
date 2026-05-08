@@ -78,6 +78,7 @@ import ManageFieldTypes from '../features/field/pages/admin/ManageFieldTypes';
 import ManageAreas from '../features/field/pages/admin/ManageAreas';
 import ManageVenues from '../features/venue/pages/admin/ManageVenues';
 import VenueDetail from '../features/venue/pages/admin/VenueDetail';  
+import UserFieldBooking from '../features/booking/pages/UserFieldBooking';
 // 1. Route bảo vệ: Chỉ dành cho khách chưa đăng nhập (Login/Register)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -136,6 +137,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+  path="/booking/:venueId" 
+  element={
+    <ProtectedRoute roleRequired="USER">
+      <UserFieldBooking />
+    </ProtectedRoute>
+  } 
+/>
 
       {/* --- DEFAULT REDIRECT --- */}
       <Route path="/" element={<Navigate to="/login" replace />} />

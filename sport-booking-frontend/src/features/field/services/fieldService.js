@@ -28,6 +28,10 @@ export const fieldService = {
   deletePriceSlot: (id) => axiosClient.delete(`/price-slots/${id}`),
   // --- QUẢN LÝ ẢNH SÂN ---
   getImages: (fieldId) => axiosClient.get(`/field-images/${fieldId}`),
+  // --- LẤY DANH SÁCH SÂN THEO CƠ SỞ ---
+ getFieldsByVenue: (venueId) => axiosClient.get(`/venues/${venueId}`), // Lấy venue kèm fields nested
+  getFieldPrice: (fieldId, start, end) => axiosClient.get(`/fields/${fieldId}/price`, { params: { start, end } }),
+  getFieldSlots: (fieldId, date) => axiosClient.get(`/fields/${fieldId}/slots`, { params: { date } }), // API giả định lấy trạng thái trống/đã đặt
 
   uploadCover: (fieldId, file, isUpdate = false) => {
     const data = new FormData();
