@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Star, Heart, Share2, Clock, MapPin, Loader2 } from 'lucide-react';
 import { formatTime } from '../../../../shared/utils/formatDate';
 import { formatDistance } from '../../../../shared/utils/distance';
-
+import { useNavigate } from 'react-router-dom';
 const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const rating = venue.rating || 0;
+  const navigate = useNavigate();
   // 1. Logic cho Badge Trạng thái (Góc trái ảnh)
   const renderStatusBadge = () => {
     switch (venue.status) {
@@ -88,7 +89,7 @@ const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
         <div className="mt-5">
           <button 
             disabled={!isAvailable}
-            onClick={() => onBooking(venue.id)}
+            onClick={() => navigate(`/booking/${venue.id}`)}
             className={`w-full py-3.5 rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 ${
               isAvailable 
               ? 'bg-gradient-to-r from-[#f3a638] to-[#f7b733] text-white shadow-orange-100 hover:brightness-105' 

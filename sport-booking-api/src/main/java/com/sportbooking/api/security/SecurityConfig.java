@@ -120,7 +120,8 @@ public class SecurityConfig {
                                                 .hasAuthority("ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/price-slots/**")
                                                 .hasAuthority("ADMIN")
-
+                                                .requestMatchers(HttpMethod.POST, "/api/bookings/**")
+                                                .permitAll()
                                                 .anyRequest().authenticated())
                                 .formLogin(AbstractHttpConfigurer::disable)
                                 .httpBasic(AbstractHttpConfigurer::disable)
