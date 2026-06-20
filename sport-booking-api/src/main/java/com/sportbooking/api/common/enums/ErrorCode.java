@@ -10,7 +10,11 @@ public enum ErrorCode {
     INVALID_FILE_TYPE(1006, "Tải lên file khong hợp lệ"),
     INVALID_IMAGE_URL(1006, "Link ảnh không hợp lệ"),
     INVALID_PASSWORD(1007, "Mật khẩu cũ không đúng"),
-    WRONG_PASSWORD(1008, "Sai mật khẩu");
+    WRONG_PASSWORD(1008, "Sai mật khẩu"),
+    FIELD_NOT_FOUND(2001, "Field not found"),
+    SLOT_ALREADY_BOOKED(2002, "Khung giờ đã được đặt"),
+    BOOKING_NOT_FOUND(2003, "Booking not found"),
+    INSUFFICIENT_COINS(2004, "Số dư coin không đủ để thanh toán");
 
     private int code;
     private String message;

@@ -10,18 +10,36 @@ import com.sportbooking.api.entity.fields.Field;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface FieldMapper {
 
-    @Mapping(target = "areaId", source = "area.id")
-    @Mapping(target = "areaName", source = "area.name")
+    // ─── ENTITY → RESPONSE ─────────────────────────────
     @Mapping(target = "fieldTypeId", source = "fieldType.id")
     @Mapping(target = "fieldTypeName", source = "fieldType.name")
-    FieldResponse toFieldResponse(Field field); // map Field sang FieldResponse
 
-    @Mapping(target = "area", ignore = true) // set thủ công trong service
-    @Mapping(target = "fieldType", ignore = true) // set thủ công trong service
-    Field toField(FieldCreateRequest request); // map FieldCreateRequest sang Field
+    @Mapping(target = "venueId", source = "venue.id")
+    @Mapping(target = "venueName", source = "venue.name")
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "area", ignore = true)
+    // nếu muốn lấy luôn area từ venue
+    @Mapping(target = "areaId", source = "venue.area.id")
+    @Mapping(target = "areaName", source = "venue.area.name")
+    @Mapping(target = "sportTypeId", source = "fieldType.sportType.id")
+    @Mapping(target = "sportTypeName", source = "fieldType.sportType.name")
+
+    @Mapping(target = "priceSlots", source = "priceSlots")
+    @Mapping(target = "slotInterval", source = "slotInterval")
+    FieldResponse toFieldResponse(Field field);
+
+    // ─── CREATE ─────────────────────────────
     @Mapping(target = "fieldType", ignore = true)
-    void updateFieldFromRequest(FieldUpdateRequest request, @MappingTarget Field field); // partial update
+    @Mapping(target = "venue", ignore = true)
+    @Mapping(target = "priceSlots", ignore = true)
+    @Mapping(target = "slotInterval", ignore = true)
+
+    Field toField(FieldCreateRequest request);
+
+    // ─── UPDATE ─────────────────────────────
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "fieldType", ignore = true)
+    @Mapping(target = "venue", ignore = true)
+    @Mapping(target = "priceSlots", ignore = true)
+    @Mapping(target = "slotInterval", source = "slotInterval")
+    void updateFieldFromRequest(FieldUpdateRequest request, @MappingTarget Field field);
 }

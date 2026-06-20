@@ -1,6 +1,7 @@
 import axiosClient from "../../../shared/services/axiosClient";
 
 export const userService = {
+   getMe: () => axiosClient.get('/users/me'),
   // Lấy tất cả user
   getAllUsers: () => axiosClient.get('/admin/users'),
 

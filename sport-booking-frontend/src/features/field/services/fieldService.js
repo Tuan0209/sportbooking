@@ -18,4 +18,45 @@ export const fieldService = {
   createField: (data) => axiosClient.post('/fields', data),
   updateField: (id, data) => axiosClient.put(`/fields/${id}`, data),
   deleteField: (id) => axiosClient.delete(`/fields/${id}`),
+  // --- QUẢN LÝ KHUNG GIÁ (PRICE SLOTS) ---
+  getPriceSlots: (fieldId) => axiosClient.get(`/fields/${fieldId}/price-slots`),
+  
+  createPriceSlot: (data) => axiosClient.post('/price-slots', data),
+  
+  updatePriceSlot: (id, data) => axiosClient.put(`/price-slots/${id}`, data),
+  
+  deletePriceSlot: (id) => axiosClient.delete(`/price-slots/${id}`),
+  // --- QUẢN LÝ ẢNH SÂN ---
+  getImages: (fieldId) => axiosClient.get(`/field-images/${fieldId}`),
+  // --- LẤY DANH SÁCH SÂN THEO CƠ SỞ ---
+ getFieldsByVenue: (venueId) => axiosClient.get(`/venues/${venueId}`), // Lấy venue kèm fields nested
+  getFieldPrice: (fieldId, start, end) => axiosClient.get(`/fields/${fieldId}/price`, { params: { start, end } }),
+  getFieldSlots: (fieldId, date) => axiosClient.get(`/fields/${fieldId}/slots`, { params: { date } }), // API giả định lấy trạng thái trống/đã đặt
+
+  uploadCover: (fieldId, file, isUpdate = false) => {
+    const data = new FormData();
+    data.append('file', file);
+    return isUpdate 
+      ? axiosClient.put(`/field-images/${fieldId}/cover`, data)
+      : axiosClient.post(`/field-images/${fieldId}/cover`, data);
+  },
+
+  uploadThumbnail: (fieldId, file, isUpdate = false) => {
+    const data = new FormData();
+    data.append('file', file);
+    return isUpdate 
+      ? axiosClient.put(`/field-images/${fieldId}/thumbnail`, data)
+      : axiosClient.post(`/field-images/${fieldId}/thumbnail`, data);
+  },
+
+  uploadGallery: (fieldId, files) => {
+    const data = new FormData();
+    // Gửi nhiều file (Multipart)
+    Array.from(files).forEach(file => data.append('files', file));
+    return axiosClient.post(`/field-images/${fieldId}/gallery`, data);
+  },
+
+  deleteImage: (imageId) => axiosClient.delete(`/field-images/image/${imageId}`),
+
+  deleteAllImages: (fieldId) => axiosClient.delete(`/field-images/${fieldId}/all`),
 };

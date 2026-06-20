@@ -9,8 +9,11 @@ import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.fields.FieldCreateRequest;
 import com.sportbooking.api.dto.request.fields.FieldUpdateRequest;
 import com.sportbooking.api.dto.response.fields.FieldResponse;
+import com.sportbooking.api.dto.response.fields.TimeSlotResponse;
+import com.sportbooking.api.repository.fields.FieldRepository;
 import com.sportbooking.api.service.fields.FieldService;
-
+import com.sportbooking.api.service.fields.FieldTimeSlotService;
+import com.sportbooking.api.entity.fields.Field;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/fields")
 @Slf4j
 public class FieldController {
-
+    FieldRepository fieldRepository;
+    FieldTimeSlotService fieldTimeSlotService;
     FieldService fieldService;
 
     @GetMapping
@@ -72,5 +76,14 @@ public class FieldController {
         return ApiResponse.<String>builder()
                 .result(fieldService.deleteField(id))
                 .build();
+    }
+
+    @GetMapping("/{fieldId}/time-slots")
+    public List<TimeSlotResponse> getTimeSlots(@PathVariable String fieldId) {
+
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found: " + fieldId));
+
+        return fieldTimeSlotService.generateSlots(field);
     }
 }

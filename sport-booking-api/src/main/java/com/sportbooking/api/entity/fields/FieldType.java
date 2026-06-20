@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.sportbooking.api.entity.sport.SportType;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -30,4 +32,8 @@ public class FieldType {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "sport_type_id")
+    SportType sportType;
 }

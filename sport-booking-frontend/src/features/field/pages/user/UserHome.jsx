@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fieldService } from '../../services/fieldService';
 import FieldCard from "../../../../shared/components/FieldCard";
 import { 
@@ -8,6 +9,7 @@ import {
 
 const UserHome = () => {
   const [fields, setFields] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -88,9 +90,12 @@ const UserHome = () => {
             <Zap size={24} />
             <span className="text-[10px] font-black uppercase">Nổi bật</span>
          </div>
-         <div className="flex flex-col items-center gap-1 text-gray-400 flex-1 cursor-pointer hover:text-indigo-500">
+        <div 
+  onClick={() => navigate('/profile')}
+  className="flex flex-col items-center gap-1 text-gray-400 flex-1 cursor-pointer hover:text-indigo-500"
+>
             <User size={24} />
-            <span className="text-[10px] font-black uppercase">Tài khoản</span>
+            <span className="text-[10px] font-black uppercase">Tài </span>
          </div>
       </div>
     </div>

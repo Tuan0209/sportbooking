@@ -1,8 +1,9 @@
 package com.sportbooking.api.dto.response.fields;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import com.sportbooking.api.common.enums.FieldImageType;
+import java.time.LocalTime;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,14 +14,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FieldImageResponse {
+public class FieldPriceSlotResponse {
 
     String id;
     String fieldId;
     String fieldName;
-    String imageUrl;
-    FieldImageType type;
-    boolean isPrimary;
-    int sortOrder;
+    LocalTime startTime;
+    LocalTime endTime;
+    BigDecimal price;
+    LocalDate startDate;
+    LocalDate endDate;
+    Integer dayOfWeek; // null = tat ca ngay
+    Integer priority;
     LocalDateTime createdAt;
 }

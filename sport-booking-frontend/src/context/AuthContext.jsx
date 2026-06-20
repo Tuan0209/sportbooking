@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { userService } from '../features/user/services/userService';
 
 export const AuthContext = createContext();
 
@@ -7,23 +8,41 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { 
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        setUser(jwtDecode(token)); // Giải mã token để lấy thông tin người dùng và lưu vào state
-      } catch {
-        localStorage.removeItem('token');
+  const loadProfile = async () => {
+    try {
+      const res = await userService.getMe();
+
+      if (res.data.code === 0) {
+        setUser(res.data.result);
       }
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem('token');
+      setUser(null);
     }
-    setLoading(false);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    loadProfile().finally(() => {
+      setLoading(false);
+    });
   }, []);
 
-  const loginContext = (token) => { 
+  const loginContext = async (token) => {
     localStorage.setItem('token', token);
-    const decoded = jwtDecode(token);
-    setUser(decoded);  
-    return decoded.role;
+
+    const role = jwtDecode(token).role;
+
+    await loadProfile();
+
+    return role;
   };
 
   const logout = () => {
@@ -32,7 +51,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loginContext, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        loginContext,
+        logout,
+        loading
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );
