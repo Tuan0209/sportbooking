@@ -3,6 +3,7 @@ package com.sportbooking.api.entity.booking;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.sportbooking.api.common.enums.BookingStatus;
@@ -50,6 +51,12 @@ public class Booking {
 
     @Column(name = "customer_phone", nullable = false)
     String customerPhone;
+
+    @Column(name = "start_time")
+    LocalTime startTime;
+
+    @Column(name = "end_time")
+    LocalTime endTime;
 
     @Column(columnDefinition = "TEXT")
     String note;

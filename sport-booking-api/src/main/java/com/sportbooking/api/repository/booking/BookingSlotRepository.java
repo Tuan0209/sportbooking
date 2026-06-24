@@ -2,6 +2,7 @@ package com.sportbooking.api.repository.booking;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,9 @@ public interface BookingSlotRepository
             String fieldId,
             LocalDate bookingDate,
             LocalTime startTime);
+
+    // Tất cả khung giờ đã đặt của các sân thuộc 1 cơ sở trong 1 ngày
+    List<BookingSlot> findByField_Venue_IdAndBookingDate(
+            String venueId,
+            LocalDate bookingDate);
 }

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { fieldService } from '../../field/services/fieldService';
+import { bookingService } from '../services/bookingService';
 import { formatPrice } from '../../../shared/utils/formatDate';
 const formatLocalDate = (date) => {
   const year = date.getFullYear();
@@ -25,6 +26,7 @@ const UserFieldBooking = () => {
   const [venue, setVenue] = useState(null);
   const [fields, setFields] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState({});
+  const [bookedSet, setBookedSet] = useState(new Set());
   const [selectedDate, setSelectedDate] = useState(formatLocalDate(new Date()));
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,15 @@ const UserFieldBooking = () => {
       if (res.data.code === 0 && res.data.result) {
         setVenue(res.data.result);
         setFields(res.data.result.fields || []);
+      }
+      // Lấy các khung giờ đã được đặt trong ngày để tô màu "Đã đặt"
+      try {
+        const booked = await bookingService.getBookedSlots(venueId, selectedDate);
+        if (booked.data.code === 0) {
+          setBookedSet(new Set((booked.data.result || []).map((b) => `${b.fieldId}|${b.startTime}`)));
+        }
+      } catch (err) {
+        setBookedSet(new Set());
       }
     } catch (e) {
       console.error(e);
@@ -237,12 +248,20 @@ const UserFieldBooking = () => {
               <p className="text-[11px] text-white/70">Chọn khung giờ phù hợp</p>
             </div>
           </div>
-          <div
-            onClick={() => { setTempDate(selectedDate); setIsCalendarOpen(true); }}
-            className="relative bg-white text-pitch rounded-2xl px-3 py-2 flex items-center gap-2 text-sm font-semibold shadow-card cursor-pointer active:scale-95 transition-all"
-          >
-            <CalendarIcon size={16} />
-            {new Date(selectedDate).toLocaleDateString('vi-VN')}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => navigate(`/monthly/${venueId}`)}
+              className="bg-white/15 hover:bg-white/25 text-white rounded-2xl px-3 py-2 text-sm font-semibold transition-all active:scale-95 whitespace-nowrap"
+            >
+              Vé tháng
+            </button>
+            <div
+              onClick={() => { setTempDate(selectedDate); setIsCalendarOpen(true); }}
+              className="relative bg-white text-pitch rounded-2xl px-3 py-2 flex items-center gap-2 text-sm font-semibold shadow-card cursor-pointer active:scale-95 transition-all"
+            >
+              <CalendarIcon size={16} />
+              {new Date(selectedDate).toLocaleDateString('vi-VN')}
+            </div>
           </div>
         </div>
         <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
@@ -254,6 +273,9 @@ const UserFieldBooking = () => {
           </div>
           <div className="flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-xs whitespace-nowrap">
             <div className="w-3 h-3 rounded-full bg-line border border-white/30"></div> Không khả dụng
+          </div>
+          <div className="flex items-center gap-2 bg-white/15 rounded-full px-3 py-1 text-xs whitespace-nowrap">
+            <div className="w-3 h-3 rounded-full bg-amber"></div> Đã đặt
           </div>
         </div>
       </div>
@@ -292,15 +314,18 @@ const UserFieldBooking = () => {
                     const width = ((field.slotInterval || 60) / 30) * zoomScale;
                     const isSelected = selectedSlots[`${field.id}|${time}`];
                     const isClosed = time < field.openTime?.slice(0, 5) || time >= field.closeTime?.slice(0, 5);
-                    const isNotAvailable = field.status !== 'ACTIVE' || isClosed;
+                    const isBooked = bookedSet.has(`${field.id}|${time}`);
+                    const isNotAvailable = field.status !== 'ACTIVE' || isClosed || isBooked;
                     return (
                       <div
                         key={time}
                         onClick={() => !isNotAvailable && toggleSlot(field.id, time)}
                         style={{ width: `${width - 4}px` }}
-                        className={`h-[64px] shrink-0 rounded-xl border relative transition-all duration-150 flex items-center justify-center ${isNotAvailable ? 'bg-chalk border-line text-muted line-through cursor-not-allowed' : isSelected ? 'bg-pitch border-pitch text-white shadow-glow' : 'bg-white border-line text-ink hover:border-pitch hover:bg-pitch-soft cursor-pointer'}`}>
+                        className={`h-[64px] shrink-0 rounded-xl border relative transition-all duration-150 flex items-center justify-center ${isBooked ? 'bg-amber-50 border-amber-200 text-amber-600 cursor-not-allowed' : isNotAvailable ? 'bg-chalk border-line text-muted line-through cursor-not-allowed' : isSelected ? 'bg-pitch border-pitch text-white shadow-glow' : 'bg-white border-line text-ink hover:border-pitch hover:bg-pitch-soft cursor-pointer'}`}>
                         {isSelected ? (
                           <span className="text-white text-[11px] font-bold">{getSlotPriceDisplay(field, time)}</span>
+                        ) : isBooked ? (
+                          <span className="text-[9px] font-bold uppercase tracking-wide">Đã đặt</span>
                         ) : !isNotAvailable ? (
                           <span className="text-[10px] font-medium text-muted">{getSlotPriceDisplay(field, time)}</span>
                         ) : null}

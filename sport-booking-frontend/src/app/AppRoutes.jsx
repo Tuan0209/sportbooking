@@ -16,6 +16,7 @@ import ManageVenues from '../features/venue/pages/admin/ManageVenues';
 import VenueDetail from '../features/venue/pages/admin/VenueDetail';  
 import UserFieldBooking from '../features/booking/pages/UserFieldBooking';
 import BookingConfirm from '../features/booking/pages/BookingConfirm';
+import MonthlyBooking from '../features/booking/pages/MonthlyBooking';
 import Explore from '../features/venue/pages/user/Explore';
 import Trending from '../features/venue/pages/user/Trending';
 const PublicRoute = ({ children }) => {
@@ -65,6 +66,7 @@ const AppRoutes = () => {
         <Route path="/trending" element={<Trending />} />
       </Route>
       <Route path="/booking/:venueId" element={<UserFieldBooking />} />
+      <Route path="/monthly/:venueId" element={<MonthlyBooking />} />
       <Route path="/booking-confirm" element={<BookingConfirm />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<NotFound />} />
