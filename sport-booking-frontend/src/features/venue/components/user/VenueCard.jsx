@@ -3,11 +3,24 @@ import { Star, Heart, Clock, MapPin, Loader2 } from 'lucide-react';
 import { formatTime } from '../../../../shared/utils/formatDate';
 import { formatDistance } from '../../../../shared/utils/distance';
 import { useNavigate } from 'react-router-dom';
+import { favoriteService } from '../../services/favoriteService';
 
-const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+const VenueCard = ({ venue, distance, onBooking, isLocating, isFavorite: initialFavorite = false }) => {
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const rating = venue.rating || 0;
   const navigate = useNavigate();
+
+  const toggleFavorite = async (e) => {
+    e.stopPropagation();
+    const prev = isFavorite;
+    setIsFavorite(!prev); // cập nhật lạc quan
+    try {
+      const res = await favoriteService.toggle(venue.id);
+      if (res.data.code === 0) setIsFavorite(res.data.result.favorited);
+    } catch (err) {
+      setIsFavorite(prev); // hoàn tác nếu lỗi
+    }
+  };
 
   // Badge trạng thái (góc trái ảnh)
   const renderStatusBadge = () => {
@@ -47,7 +60,7 @@ const VenueCard = ({ venue, distance, onBooking, isLocating }) => {
 
         <div className="absolute top-4 right-4 flex flex-col gap-2">
           <button
-            onClick={() => setIsFavorite(!isFavorite)}
+            onClick={toggleFavorite}
             className="w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90"
             aria-label="Yêu thích"
           >

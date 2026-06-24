@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Loader2, Wallet, Landmark, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Wallet, Landmark, RotateCcw, CheckCircle2, Star } from 'lucide-react';
 import { refundService } from '../../payment/services/refundService';
+import { reviewService } from '../../review/services/reviewService';
 import { formatPrice } from '../../../shared/utils/formatDate';
 
 const STATUS = {
@@ -18,7 +19,9 @@ const MyBookings = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refundFor, setRefundFor] = useState(null); // booking đang yêu cầu hoàn
+  const [reviewFor, setReviewFor] = useState(null); // booking đang đánh giá
   const [done, setDone] = useState(false);
+  const [reviewed, setReviewed] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -73,6 +76,11 @@ const MyBookings = () => {
                       <RotateCcw size={15} /> Hoàn tiền
                     </button>
                   )}
+                  {(b.status === 'CONFIRMED' || b.status === 'COMPLETED') && (
+                    <button onClick={() => setReviewFor(b)} className="text-sm font-semibold border border-line text-ink px-4 py-2 rounded-xl hover:bg-chalk transition inline-flex items-center gap-1">
+                      <Star size={15} className="text-amber" /> Đánh giá
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -86,6 +94,28 @@ const MyBookings = () => {
           onClose={() => setRefundFor(null)}
           onSuccess={() => { setRefundFor(null); setDone(true); load(); }}
         />
+      )}
+
+      {reviewFor && (
+        <ReviewModal
+          booking={reviewFor}
+          onClose={() => setReviewFor(null)}
+          onSuccess={() => { setReviewFor(null); setReviewed(true); }}
+        />
+      )}
+
+      {reviewed && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setReviewed(false)} />
+          <div className="bg-white w-full max-w-sm rounded-4xl shadow-card-hover relative p-7 text-center animate-fade-up">
+            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center text-amber mx-auto mb-4">
+              <Star size={34} className="fill-amber" />
+            </div>
+            <h3 className="font-display text-xl font-extrabold text-ink">Cảm ơn đánh giá của bạn!</h3>
+            <p className="text-muted text-sm mt-2">Đánh giá giúp cộng đồng chọn sân tốt hơn.</p>
+            <button onClick={() => setReviewed(false)} className="mt-5 w-full h-12 rounded-2xl bg-pitch text-white font-semibold shadow-glow hover:bg-pitch-deep transition">Đã hiểu</button>
+          </div>
+        </div>
       )}
 
       {done && (
@@ -165,6 +195,59 @@ const RefundModal = ({ booking, onClose, onSuccess }) => {
           <button onClick={onClose} className="py-3 text-sm font-bold text-muted rounded-2xl border border-line bg-white">Huỷ</button>
           <button onClick={submit} disabled={!canSubmit || submitting} className={`py-3 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition ${canSubmit && !submitting ? 'bg-pitch text-white shadow-glow hover:bg-pitch-deep' : 'bg-line text-muted'}`}>
             {submitting && <Loader2 size={16} className="animate-spin" />} Gửi yêu cầu
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ReviewModal = ({ booking, onClose, onSuccess }) => {
+  const [rating, setRating] = useState(5);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async () => {
+    setSubmitting(true);
+    try {
+      await reviewService.create({ bookingId: booking.id, rating, comment });
+      onSuccess();
+    } catch (e) {
+      alert(e.response?.data?.message || 'Gửi đánh giá thất bại (có thể bạn đã đánh giá đơn này).');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+      <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-white w-full max-w-sm rounded-4xl shadow-card-hover relative overflow-hidden animate-fade-up">
+        <div className="p-6 border-b border-line">
+          <h3 className="font-display text-lg font-bold text-ink">Đánh giá sân</h3>
+          <p className="text-muted text-sm mt-1">{booking.fieldName} · {booking.venueName}</p>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center justify-center gap-2 mb-5">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <button key={s} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)} onClick={() => setRating(s)}>
+                <Star size={36} className={(hover || rating) >= s ? 'text-amber fill-amber' : 'text-line'} />
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            placeholder="Chia sẻ cảm nhận của bạn về sân..."
+            className="w-full rounded-xl bg-chalk border border-line px-4 py-3 text-ink placeholder:text-muted outline-none focus:ring-2 focus:ring-pitch focus:border-pitch"
+          />
+        </div>
+        <div className="p-4 grid grid-cols-2 gap-3 border-t border-line bg-chalk">
+          <button onClick={onClose} className="py-3 text-sm font-bold text-muted rounded-2xl border border-line bg-white">Huỷ</button>
+          <button onClick={submit} disabled={submitting} className="py-3 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 bg-pitch text-white shadow-glow hover:bg-pitch-deep transition disabled:opacity-60">
+            {submitting && <Loader2 size={16} className="animate-spin" />} Gửi đánh giá
           </button>
         </div>
       </div>

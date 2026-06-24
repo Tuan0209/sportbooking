@@ -9,7 +9,9 @@ import {
   X,
   Globe,
   Wallet,
-  RotateCcw
+  RotateCcw,
+  Tag,
+  Crown
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
@@ -37,6 +39,13 @@ const Sidebar = ({ isOpen, onClose, role }) => {
         { name: 'Lịch đặt', icon: <Calendar size={20} />, path: '/admin/bookings' },
         { name: 'Duyệt thanh toán', icon: <Wallet size={20} />, path: '/admin/payments' },
         { name: 'Duyệt hoàn tiền', icon: <RotateCcw size={20} />, path: '/admin/refunds' },
+      ],
+    },
+    {
+      title: 'Khuyến mãi',
+      links: [
+        { name: 'Voucher', icon: <Tag size={20} />, path: '/admin/vouchers' },
+        { name: 'Gói thành viên', icon: <Crown size={20} />, path: '/admin/membership-plans' },
       ],
     },
     {

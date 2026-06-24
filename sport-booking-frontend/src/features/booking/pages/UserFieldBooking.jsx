@@ -223,6 +223,8 @@ const UserFieldBooking = () => {
       state: {
         venueName: venue?.name,
         venueAddress: venue?.address,
+        venueLat: venue?.latitude,
+        venueLng: venue?.longitude,
         fieldId: field.id,
         fieldName: field.name,
         fieldTypeName: field.fieldTypeName,

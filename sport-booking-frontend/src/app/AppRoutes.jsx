@@ -23,6 +23,11 @@ import PaymentPage from '../features/payment/pages/PaymentPage';
 import ManagePayments from '../features/payment/pages/admin/ManagePayments';
 import ManageRefunds from '../features/payment/pages/admin/ManageRefunds';
 import MyBookings from '../features/booking/pages/MyBookings';
+import Favorites from '../features/venue/pages/user/Favorites';
+import Wallet from '../features/wallet/pages/Wallet';
+import Membership from '../features/membership/pages/Membership';
+import ManageVouchers from '../features/voucher/pages/admin/ManageVouchers';
+import ManagePlans from '../features/membership/pages/admin/ManagePlans';
 const PublicRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading) return null;
@@ -59,6 +64,8 @@ const AppRoutes = () => {
         <Route path="areas" element={<ManageAreas />} />
         <Route path="payments" element={<ManagePayments />} />
         <Route path="refunds" element={<ManageRefunds />} />
+        <Route path="vouchers" element={<ManageVouchers />} />
+        <Route path="membership-plans" element={<ManagePlans />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
@@ -76,6 +83,9 @@ const AppRoutes = () => {
       <Route path="/booking-confirm" element={<BookingConfirm />} />
       <Route path="/payment/:bookingId" element={<PaymentPage />} />
       <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/favorites" element={<Favorites />} />
+      <Route path="/wallet" element={<Wallet />} />
+      <Route path="/membership" element={<Membership />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

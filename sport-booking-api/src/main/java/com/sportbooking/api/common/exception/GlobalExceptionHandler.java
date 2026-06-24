@@ -8,13 +8,16 @@ import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.common.enums.ErrorCode;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice // @ControllerAdvice la 1 annotation cua Spring de xu ly cac exception toan cuc
                   // trong ung dung
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class) // @ExceptionHandler de chi dinh loai exception ma ham nay se xu
                                                       // ly
     ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+        log.error("Uncategorized exception", ex); // log stack de de debug
         return ResponseEntity.badRequest().body(ApiResponse.builder()
                 .code(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
                 .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
@@ -30,19 +33,24 @@ public class GlobalExceptionHandler {
                 .build()); // tra ve
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class) // xu ly tat ca cac exception khac
+    @ExceptionHandler(value = MethodArgumentNotValidException.class) // xu ly loi validate
     ResponseEntity<ApiResponse> handlingValidationExceptions(MethodArgumentNotValidException ex) {
-        String enumKey = ex.getFieldError().getDefaultMessage(); // lay ra key tu message trong annotation @Size o
-                                                                 // UserCreateRequest
-        ErrorCode errorCode = ErrorCode.valueOf(enumKey); // chuyen key do thanh enum ErrorCode
+        String message = ex.getFieldError() != null
+                ? ex.getFieldError().getDefaultMessage()
+                : "Dữ liệu không hợp lệ";
+
+        // Nếu message là key của ErrorCode thì dùng code tương ứng, ngược lại trả message gốc
         try {
-            errorCode = ErrorCode.valueOf(enumKey);
+            ErrorCode errorCode = ErrorCode.valueOf(message);
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .code(errorCode.getCode())
+                    .message(errorCode.getMessage())
+                    .build());
         } catch (IllegalArgumentException e) {
-            errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION; // neu key do khong ton tai trong enum thi tra ve loi chung
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .code(ErrorCode.INVALID_REQUEST.getCode())
+                    .message(message)
+                    .build());
         }
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message(errorCode.getMessage())
-                .build()); // tra ve loi 400 va thong bao loi tu enum ErrorCode
     }
 }

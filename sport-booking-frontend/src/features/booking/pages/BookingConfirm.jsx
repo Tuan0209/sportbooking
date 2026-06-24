@@ -2,13 +2,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../context/AuthContext';
 import { bookingService } from '../services/bookingService';
+import { voucherService } from '../../voucher/services/voucherService';
+import VenueMap from '../../../shared/components/VenueMap';
 import {
   ChevronLeft,
   MapPin,
   CalendarDays,
   User,
   Phone,
-  NotebookPen
+  NotebookPen,
+  Tag,
+  X
 } from 'lucide-react';
 
 import { formatPrice } from '../../../shared/utils/formatDate';
@@ -23,6 +27,12 @@ const BookingConfirm = () => {
   const [paymentMethod, setPaymentMethod] = useState('COIN');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Voucher
+  const [voucherCode, setVoucherCode] = useState('');
+  const [voucher, setVoucher] = useState(null); // { code, discount, finalAmount }
+  const [voucherErr, setVoucherErr] = useState('');
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -41,13 +51,41 @@ const BookingConfirm = () => {
     );
   }
 
+  const baseTotal = Number(state?.totalPrice || 0);
+  const finalTotal = voucher ? Number(voucher.finalAmount) : baseTotal;
+
+  const applyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    setApplying(true);
+    setVoucherErr('');
+    try {
+      const res = await voucherService.apply(voucherCode.trim(), baseTotal);
+      if (res.data.code === 0) {
+        setVoucher(res.data.result);
+      } else {
+        setVoucherErr(res.data.message || 'Mã không hợp lệ');
+      }
+    } catch (err) {
+      setVoucherErr(err.response?.data?.message || 'Mã không hợp lệ');
+      setVoucher(null);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const removeVoucher = () => {
+    setVoucher(null);
+    setVoucherCode('');
+    setVoucherErr('');
+  };
+
   const handleConfirm = async () => {
     if (!state?.slots || state.slots.length === 0) {
       setError('Không có khung giờ để đặt.');
       return;
     }
 
-    const totalPrice = Number(state.totalPrice || 0);
+    const totalPrice = finalTotal;
     const userCoins = Number(user?.coinBalance || 0);
 
     if (paymentMethod === 'COIN' && userCoins < totalPrice) {
@@ -65,8 +103,8 @@ const BookingConfirm = () => {
         slots: state.slots,
         customerName: fullName,
         customerPhone: phone,
-        note,
-        totalPrice: state.totalPrice,
+        note: voucher ? `${note || ''} [Mã: ${voucher.code}]`.trim() : note,
+        totalPrice: finalTotal,
         paymentMethod: paymentMethod
       });
 
@@ -159,6 +197,17 @@ const BookingConfirm = () => {
               </p>
             </div>
 
+            {/* Bản đồ OpenStreetMap theo địa chỉ cơ sở */}
+            <div className="pt-2">
+              <VenueMap
+                lat={state.venueLat}
+                lng={state.venueLng}
+                name={state.venueName}
+                address={state.venueAddress}
+                height={200}
+              />
+            </div>
+
           </div>
 
         </div>
@@ -220,15 +269,66 @@ const BookingConfirm = () => {
               </span>
             </div>
 
+            {voucher && (
+              <div className="flex items-center justify-between border-b border-line pb-3">
+                <span className="text-muted text-sm">Giảm giá ({voucher.code})</span>
+                <span className="font-semibold text-pitch">- {formatPrice(voucher.discount)}</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pt-1">
               <span className="text-ink font-semibold">Tổng tiền</span>
-              <span className="text-2xl font-display font-extrabold text-pitch">
-                {formatPrice(state.totalPrice)}
-              </span>
+              <div className="text-right">
+                {voucher && (
+                  <span className="block text-sm text-muted line-through">{formatPrice(baseTotal)}</span>
+                )}
+                <span className="text-2xl font-display font-extrabold text-pitch">
+                  {formatPrice(finalTotal)}
+                </span>
+              </div>
             </div>
 
           </div>
 
+        </div>
+
+        {/* MÃ GIẢM GIÁ */}
+        <div className="bg-white border border-line rounded-2xl p-4 shadow-card">
+          <div className="flex items-center gap-2 mb-3">
+            <Tag size={18} className="text-pitch" />
+            <h3 className="font-display font-bold text-ink text-lg">Mã giảm giá</h3>
+          </div>
+
+          {voucher ? (
+            <div className="flex items-center justify-between bg-pitch-soft border border-pitch/20 rounded-xl px-4 py-3">
+              <div>
+                <p className="font-bold text-pitch">{voucher.code}</p>
+                <p className="text-xs text-muted">Đã giảm {formatPrice(voucher.discount)}</p>
+              </div>
+              <button onClick={removeVoucher} className="text-muted hover:text-red-500" aria-label="Bỏ mã">
+                <X size={18} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                <input
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                  placeholder="Nhập mã (vd WELCOME10)"
+                  className="flex-1 h-12 rounded-xl bg-chalk border border-line px-4 text-ink uppercase outline-none focus:ring-2 focus:ring-pitch focus:border-pitch"
+                />
+                <button
+                  onClick={applyVoucher}
+                  disabled={applying || !voucherCode.trim()}
+                  className={`px-5 rounded-xl font-semibold transition ${applying || !voucherCode.trim() ? 'bg-chalk text-muted border border-line' : 'bg-pitch text-white shadow-glow hover:bg-pitch-deep'}`}
+                >
+                  {applying ? '...' : 'Áp dụng'}
+                </button>
+              </div>
+              {voucherErr && <p className="text-sm text-red-600 mt-2">{voucherErr}</p>}
+            </>
+          )}
         </div>
 
         <div className="bg-white border border-line rounded-2xl p-4 shadow-card">
@@ -294,7 +394,7 @@ const BookingConfirm = () => {
               </p>
             )}
 
-            {paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < Number(state.totalPrice) && (
+            {paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < finalTotal && (
               <p className="text-sm text-red-600">
                 Số dư không đủ. Vui lòng nạp thêm coin hoặc chọn hình thức khác.
               </p>
@@ -425,7 +525,7 @@ const BookingConfirm = () => {
 
         <button
           onClick={handleConfirm}
-          disabled={loading || (paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < Number(state.totalPrice))}
+          disabled={loading || (paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < finalTotal)}
           className={`
             w-full
             h-14
@@ -434,7 +534,7 @@ const BookingConfirm = () => {
             font-semibold
             text-lg
             transition
-            ${loading || (paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < Number(state.totalPrice)) ? 'bg-line text-muted cursor-not-allowed' : 'bg-pitch shadow-glow hover:bg-pitch-deep'}
+            ${loading || (paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < finalTotal) ? 'bg-line text-muted cursor-not-allowed' : 'bg-pitch shadow-glow hover:bg-pitch-deep'}
           `}
         >
           {loading ? 'Đang xử lý...' : 'XÁC NHẬN ĐẶT SÂN'}

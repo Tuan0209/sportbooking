@@ -17,7 +17,10 @@ public enum ErrorCode {
     INSUFFICIENT_COINS(2004, "Số dư coin không đủ để thanh toán"),
     PAYMENT_NOT_FOUND(3001, "Không tìm thấy thông tin thanh toán"),
     REFUND_NOT_FOUND(3002, "Không tìm thấy yêu cầu hoàn tiền"),
-    REFUND_INVALID(3003, "Yêu cầu hoàn tiền không hợp lệ");
+    REFUND_INVALID(3003, "Yêu cầu hoàn tiền không hợp lệ"),
+    VOUCHER_INVALID(4001, "Mã giảm giá không hợp lệ hoặc đã hết hạn"),
+    VOUCHER_MIN_ORDER(4002, "Đơn hàng chưa đạt giá trị tối thiểu để dùng mã"),
+    PLAN_NOT_FOUND(4003, "Không tìm thấy gói thành viên");
 
     private int code;
     private String message;

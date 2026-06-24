@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { venueService } from '../../services/venueService';
+import { favoriteService } from '../../services/favoriteService';
 import VenueCard from '../../components/user/VenueCard';
 import { Search, MapPin, X } from 'lucide-react';
 
@@ -12,6 +13,7 @@ const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sport, setSport] = useState('');
   const [area, setArea] = useState('');
+  const [favIds, setFavIds] = useState(new Set());
 
   useEffect(() => {
     venueService
@@ -20,6 +22,9 @@ const Explore = () => {
         if (res.data.code === 0) setVenues(res.data.result || []);
       })
       .finally(() => setLoading(false));
+    favoriteService.myFavoriteIds()
+      .then((res) => { if (res.data.code === 0) setFavIds(new Set(res.data.result || [])); })
+      .catch(() => {});
   }, []);
 
   // Gom danh sách môn & khu vực từ dữ liệu thật
@@ -120,7 +125,7 @@ const Explore = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
             {filtered.map((v) => (
-              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} />
+              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} isFavorite={favIds.has(v.id)} />
             ))}
           </div>
         )}

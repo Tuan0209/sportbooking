@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { venueService } from '../../services/venueService';
+import { favoriteService } from '../../services/favoriteService';
 import { calculateDistance } from '../../../../shared/utils/distance';
 import VenueCard from '../../components/user/VenueCard';
 import { Search, SlidersHorizontal, Map as MapIcon, CalendarCheck, Heart, Home, Compass, Zap, User } from 'lucide-react';
@@ -12,7 +13,15 @@ const UserVenueHome = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('home');
-  const [isLocating, setIsLocating] = useState(true); 
+  const [isLocating, setIsLocating] = useState(true);
+  const [favIds, setFavIds] = useState(new Set());
+
+  useEffect(() => {
+    favoriteService.myFavoriteIds()
+      .then((res) => { if (res.data.code === 0) setFavIds(new Set(res.data.result || [])); })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
      // 1. Kiểm tra vị trí trong cache (sessionStorage) trước
     const cachedLoc = sessionStorage.getItem('user_location');
@@ -84,7 +93,7 @@ const UserVenueHome = () => {
           <div className="flex items-center gap-2 shrink-0 overflow-x-auto scrollbar-hide py-1">
              <QuickAction icon={<MapIcon size={18}/>} label="Bản đồ" color="text-blue-500" bg="bg-blue-50" onClick={() => navigate('/map')} />
              <QuickAction icon={<CalendarCheck size={18}/>} label="Sân đã đặt" color="text-pitch" bg="bg-pitch-soft" onClick={() => navigate('/my-bookings')} />
-             <QuickAction icon={<Heart size={18}/>} label="Yêu thích" color="text-red-500" bg="bg-red-50" />
+             <QuickAction icon={<Heart size={18}/>} label="Yêu thích" color="text-red-500" bg="bg-red-50" onClick={() => navigate('/favorites')} />
           </div>
         </div>
       </div>
@@ -126,12 +135,13 @@ const UserVenueHome = () => {
           /* Grid 4 cột trên màn hình siêu rộng để không bị trống */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
             {processedVenues.map(venue => (
-              <VenueCard 
-                key={venue.id} 
-                venue={venue} 
-                distance={venue.distance} 
-                isLocating={isLocating} // Truyền trạng thái đang tìm GPS vào card
-                 onBooking={(id) => console.log("Booking:", id)} 
+              <VenueCard
+                key={venue.id}
+                venue={venue}
+                distance={venue.distance}
+                isLocating={isLocating}
+                isFavorite={favIds.has(venue.id)}
+                 onBooking={(id) => console.log("Booking:", id)}
               />
             ))}
           </div>

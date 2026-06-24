@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import {
   LayoutGrid,
@@ -20,6 +21,7 @@ import {
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -212,23 +214,33 @@ const Profile = () => {
               </div>
 
               {/* QUICK ACTIONS */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                 <QuickCard
-                  title="Khám phá sân"
-                  desc="Tìm sân bóng gần vị trí của bạn."
-                  button="Khám phá"
+                  title="Ví của tôi"
+                  desc="Xem số dư & nạp coin nhanh."
+                  button="Mở ví"
+                  onClick={() => navigate('/wallet')}
                 />
 
                 <QuickCard
-                  title="Nạp coin"
-                  desc="Thanh toán nhanh và đặt sân tiện lợi."
-                  button="Nạp ngay"
+                  title="Gói thành viên"
+                  desc="Ưu đãi giảm giá khi đặt sân."
+                  button="Xem gói"
+                  onClick={() => navigate('/membership')}
+                />
+
+                <QuickCard
+                  title="Sân đã đặt"
+                  desc="Lịch sử đặt, đánh giá & hoàn tiền."
+                  button="Xem lịch sử"
+                  onClick={() => navigate('/my-bookings')}
                 />
 
                 <QuickCard
                   title="Sân yêu thích"
-                  desc="Quản lý danh sách sân bạn đã lưu."
+                  desc="Danh sách sân bạn đã lưu."
                   button="Xem danh sách"
+                  onClick={() => navigate('/favorites')}
                 />
               </div>
             </div>
@@ -398,7 +410,7 @@ const BookingCard = () => {
   );
 };
 
-const QuickCard = ({ title, desc, button }) => {
+const QuickCard = ({ title, desc, button, onClick }) => {
   return (
     <div className="bg-white rounded-2xl border border-line shadow-card p-6 hover:shadow-card-hover transition-all">
       <h3 className="font-display text-xl font-bold text-ink">
@@ -409,7 +421,7 @@ const QuickCard = ({ title, desc, button }) => {
         {desc}
       </p>
 
-      <button className="mt-6 px-5 py-3 rounded-2xl bg-pitch text-white font-semibold shadow-glow hover:bg-pitch-deep transition-all">
+      <button onClick={onClick} className="mt-6 px-5 py-3 rounded-2xl bg-pitch text-white font-semibold shadow-glow hover:bg-pitch-deep transition-all">
         {button}
       </button>
     </div>
