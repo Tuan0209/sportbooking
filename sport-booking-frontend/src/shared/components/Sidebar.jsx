@@ -8,7 +8,8 @@ import {
   Settings,
   X,
   Globe,
-  Wallet
+  Wallet,
+  RotateCcw
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
@@ -35,6 +36,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
       links: [
         { name: 'Lịch đặt', icon: <Calendar size={20} />, path: '/admin/bookings' },
         { name: 'Duyệt thanh toán', icon: <Wallet size={20} />, path: '/admin/payments' },
+        { name: 'Duyệt hoàn tiền', icon: <RotateCcw size={20} />, path: '/admin/refunds' },
       ],
     },
     {

@@ -22,6 +22,7 @@ import com.sportbooking.api.dto.request.booking.CreateMonthlyBookingRequest;
 import com.sportbooking.api.dto.response.booking.BookedSlotResponse;
 import com.sportbooking.api.dto.response.booking.BookingResponse;
 import com.sportbooking.api.dto.response.booking.MonthlyBookingResponse;
+import com.sportbooking.api.dto.response.booking.MyBookingResponse;
 import com.sportbooking.api.entity.booking.Booking;
 import com.sportbooking.api.entity.booking.BookingSlot;
 import com.sportbooking.api.entity.fields.Field;
@@ -30,6 +31,10 @@ import com.sportbooking.api.repository.booking.BookingRepository;
 import com.sportbooking.api.repository.booking.BookingSlotRepository;
 import com.sportbooking.api.repository.fields.FieldRepository;
 import com.sportbooking.api.repository.user.UserRepository;
+import com.sportbooking.api.repository.payment.PaymentRepository;
+import com.sportbooking.api.repository.refund.RefundRequestRepository;
+import com.sportbooking.api.common.enums.PaymentStatus;
+import com.sportbooking.api.common.enums.RefundStatus;
 import com.sportbooking.api.entity.payment.Payment;
 import com.sportbooking.api.service.payment.PaymentService;
 
@@ -44,6 +49,8 @@ public class BookingService {
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
+    private final RefundRequestRepository refundRequestRepository;
 
     @Transactional
     public BookingResponse create(
@@ -161,6 +168,38 @@ public class BookingService {
                         booking.getStatus().name())
                 .paymentId(paymentId)
                 .build();
+    }
+
+    /** Danh sách sân đã đặt của người dùng hiện tại (kèm trạng thái thanh toán & có thể hoàn tiền). */
+    public List<MyBookingResponse> getMyBookings(Authentication authentication) {
+        String userId = authentication.getName();
+        return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(b -> {
+                    Payment payment = paymentRepository.findByBookingId(b.getId()).orElse(null);
+                    String paymentStatus = payment != null ? payment.getStatus().name() : null;
+
+                    boolean alreadyRefunding = refundRequestRepository.existsByBookingIdAndStatusIn(
+                            b.getId(),
+                            List.of(RefundStatus.REQUESTED, RefundStatus.APPROVED, RefundStatus.DONE));
+
+                    boolean refundable = b.getStatus() == BookingStatus.CONFIRMED
+                            && payment != null
+                            && payment.getStatus() == PaymentStatus.PAID
+                            && !alreadyRefunding;
+
+                    return MyBookingResponse.builder()
+                            .id(b.getId())
+                            .bookingCode(b.getBookingCode())
+                            .fieldName(b.getField().getName())
+                            .venueName(b.getField().getVenue().getName())
+                            .bookingDate(b.getBookingDate())
+                            .totalPrice(b.getTotalPrice())
+                            .status(b.getStatus().name())
+                            .paymentStatus(paymentStatus)
+                            .refundable(refundable)
+                            .build();
+                })
+                .toList();
     }
 
     /** Lấy danh sách khung giờ đã đặt của các sân thuộc 1 cơ sở trong 1 ngày. */

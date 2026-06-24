@@ -82,8 +82,8 @@ const UserVenueHome = () => {
 
           {/* CÁC NÚT CHỨC NĂNG: ĐÃ ĐẨY LÊN NGANG HÀNG THANH SEARCH */}
           <div className="flex items-center gap-2 shrink-0 overflow-x-auto scrollbar-hide py-1">
-             <QuickAction icon={<MapIcon size={18}/>} label="Bản đồ" color="text-blue-500" bg="bg-blue-50" />
-             <QuickAction icon={<CalendarCheck size={18}/>} label="Sân đã đặt" color="text-green-600" bg="bg-green-50" />
+             <QuickAction icon={<MapIcon size={18}/>} label="Bản đồ" color="text-blue-500" bg="bg-blue-50" onClick={() => navigate('/map')} />
+             <QuickAction icon={<CalendarCheck size={18}/>} label="Sân đã đặt" color="text-pitch" bg="bg-pitch-soft" onClick={() => navigate('/my-bookings')} />
              <QuickAction icon={<Heart size={18}/>} label="Yêu thích" color="text-red-500" bg="bg-red-50" />
           </div>
         </div>
@@ -157,8 +157,8 @@ const UserVenueHome = () => {
 </div>);
 };
 
-const QuickAction = ({ icon, label, color, bg }) => (
-  <button className={`flex items-center gap-2 px-5 py-2.5 ${bg} ${color} rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 whitespace-nowrap shadow-sm border border-transparent hover:border-current`}>
+const QuickAction = ({ icon, label, color, bg, onClick }) => (
+  <button onClick={onClick} className={`flex items-center gap-2 px-5 py-2.5 ${bg} ${color} rounded-2xl text-[11px] font-bold uppercase tracking-wider transition-all active:scale-95 whitespace-nowrap shadow-sm border border-transparent hover:border-current`}>
     {icon} {label}
   </button>
 );

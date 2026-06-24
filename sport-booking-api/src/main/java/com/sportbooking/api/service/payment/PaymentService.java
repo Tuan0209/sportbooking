@@ -112,6 +112,22 @@ public class PaymentService {
         return toResponse(payment);
     }
 
+    /** Giả lập PayOS thanh toán thành công (dùng khi chưa cấu hình tài khoản PayOS thật). */
+    @Transactional
+    public PaymentResponse mockSuccess(String paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        payment.setStatus(PaymentStatus.PAID);
+        payment.setPaidAt(LocalDateTime.now());
+        paymentRepository.save(payment);
+
+        Booking booking = payment.getBooking();
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        return toResponse(payment);
+    }
+
     /** Danh sách thanh toán cho admin duyệt (loại trừ thanh toán bằng coin). */
     public List<AdminPaymentResponse> listForAdmin() {
         return paymentRepository.findAllByOrderByCreatedAtDesc().stream()

@@ -21,6 +21,8 @@ import Explore from '../features/venue/pages/user/Explore';
 import Trending from '../features/venue/pages/user/Trending';
 import PaymentPage from '../features/payment/pages/PaymentPage';
 import ManagePayments from '../features/payment/pages/admin/ManagePayments';
+import ManageRefunds from '../features/payment/pages/admin/ManageRefunds';
+import MyBookings from '../features/booking/pages/MyBookings';
 const PublicRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading) return null;
@@ -56,6 +58,7 @@ const AppRoutes = () => {
         <Route path="field-types" element={<ManageFieldTypes />} />
         <Route path="areas" element={<ManageAreas />} />
         <Route path="payments" element={<ManagePayments />} />
+        <Route path="refunds" element={<ManageRefunds />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
@@ -72,6 +75,7 @@ const AppRoutes = () => {
       <Route path="/monthly/:venueId" element={<MonthlyBooking />} />
       <Route path="/booking-confirm" element={<BookingConfirm />} />
       <Route path="/payment/:bookingId" element={<PaymentPage />} />
+      <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

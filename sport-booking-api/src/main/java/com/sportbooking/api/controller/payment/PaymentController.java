@@ -35,4 +35,13 @@ public class PaymentController {
                 .result(paymentService.uploadProof(id, file))
                 .build();
     }
+
+    /** Giả lập PayOS thanh toán thành công (chế độ demo khi chưa có tài khoản PayOS). */
+    @PostMapping("/{id}/mock-success")
+    public ApiResponse<PaymentResponse> mockSuccess(@PathVariable String id) {
+        return ApiResponse.<PaymentResponse>builder()
+                .code(0)
+                .result(paymentService.mockSuccess(id))
+                .build();
+    }
 }

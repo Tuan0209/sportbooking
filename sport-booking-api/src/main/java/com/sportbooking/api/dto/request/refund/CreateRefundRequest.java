@@ -1,0 +1,31 @@
+package com.sportbooking.api.dto.request.refund;
+
+import com.sportbooking.api.common.enums.RefundMethod;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CreateRefundRequest {
+
+    @NotBlank(message = "booking_id không được để trống")
+    String bookingId;
+
+    @NotNull(message = "refund_method không được để trống")
+    RefundMethod refundMethod;
+
+    // Bắt buộc khi BANK_TRANSFER
+    String bankName;
+    String bankAccount;
+    String bankAccountName;
+}

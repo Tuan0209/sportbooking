@@ -14,4 +14,6 @@ public interface BookingRepository
     List<Booking> findByFieldIdAndBookingDate(
             String fieldId,
             LocalDate bookingDate);
+
+    List<Booking> findByUserIdOrderByCreatedAtDesc(String userId);
 }

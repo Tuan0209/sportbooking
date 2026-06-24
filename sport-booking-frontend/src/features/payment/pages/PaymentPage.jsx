@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Copy, Check, Upload, Loader2, ShieldCheck, Clock } from 'lucide-react';
+import { ChevronLeft, Copy, Check, Upload, Loader2, ShieldCheck, Clock, CreditCard } from 'lucide-react';
 import { paymentService } from '../services/paymentService';
 import { formatPrice } from '../../../shared/utils/formatDate';
 
@@ -27,6 +27,18 @@ const PaymentPage = () => {
     setTimeout(() => setCopied(''), 1500);
   };
 
+  const handlePayos = async () => {
+    setUploading(true);
+    try {
+      const res = await paymentService.mockSuccess(payment.paymentId);
+      if (res.data.code === 0) setPayment(res.data.result);
+    } catch (err) {
+      alert('Thanh toán PayOS thất bại, vui lòng thử lại.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -49,7 +61,8 @@ const PaymentPage = () => {
   }
 
   const paid = payment.status === 'PAID';
-  const waiting = !!payment.proofImageUrl && !paid;
+  const isPayos = payment.method === 'PAYOS';
+  const waiting = !isPayos && !!payment.proofImageUrl && !paid;
 
   return (
     <div className="min-h-screen bg-chalk pb-10">
@@ -74,29 +87,45 @@ const PaymentPage = () => {
           </div>
         ) : (
           <div className="bg-white border border-line rounded-2xl p-4 text-center">
-            <p className="text-muted text-sm">Quét mã hoặc chuyển khoản theo thông tin bên dưới</p>
+            <p className="text-muted text-sm">
+              {isPayos ? 'Thanh toán nhanh qua cổng PayOS' : 'Quét mã hoặc chuyển khoản theo thông tin bên dưới'}
+            </p>
           </div>
         )}
 
-        {/* QR */}
-        {!paid && (
+        {/* PAYOS */}
+        {isPayos && !paid && (
+          <div className="bg-white border border-line rounded-2xl shadow-card p-6 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-2xl bg-pitch-soft flex items-center justify-center text-pitch mb-4">
+              <CreditCard size={30} />
+            </div>
+            <p className="font-display font-bold text-ink text-lg">Cổng thanh toán PayOS</p>
+            <p className="text-muted text-sm mt-1">Số tiền cần thanh toán</p>
+            <p className="font-display text-2xl font-extrabold text-pitch mt-1">{formatPrice(payment.amount)}</p>
+          </div>
+        )}
+
+        {/* QR (chỉ chuyển khoản tay) */}
+        {!isPayos && !paid && (
           <div className="bg-white border border-line rounded-2xl shadow-card p-5 flex flex-col items-center">
             <img src={payment.qrUrl} alt="QR chuyển khoản" className="w-60 h-60 object-contain" />
             <p className="text-[11px] text-muted mt-2">Quét bằng app ngân hàng để chuyển nhanh</p>
           </div>
         )}
 
-        {/* THÔNG TIN CK */}
-        <div className="bg-white border border-line rounded-2xl shadow-card p-5 space-y-3">
-          <Row label="Ngân hàng" value={payment.bankName} />
-          <Row label="Số tài khoản" value={payment.accountNo} onCopy={() => copy(payment.accountNo, 'acc')} copied={copied === 'acc'} />
-          <Row label="Chủ tài khoản" value={payment.accountName} />
-          <Row label="Số tiền" value={formatPrice(payment.amount)} valueClass="text-pitch font-display font-extrabold" onCopy={() => copy(String(Math.round(payment.amount)), 'amt')} copied={copied === 'amt'} />
-          <Row label="Nội dung CK" value={payment.transferContent} onCopy={() => copy(payment.transferContent, 'ct')} copied={copied === 'ct'} />
-        </div>
+        {/* THÔNG TIN CK (chỉ chuyển khoản tay) */}
+        {!isPayos && (
+          <div className="bg-white border border-line rounded-2xl shadow-card p-5 space-y-3">
+            <Row label="Ngân hàng" value={payment.bankName} />
+            <Row label="Số tài khoản" value={payment.accountNo} onCopy={() => copy(payment.accountNo, 'acc')} copied={copied === 'acc'} />
+            <Row label="Chủ tài khoản" value={payment.accountName} />
+            <Row label="Số tiền" value={formatPrice(payment.amount)} valueClass="text-pitch font-display font-extrabold" onCopy={() => copy(String(Math.round(payment.amount)), 'amt')} copied={copied === 'amt'} />
+            <Row label="Nội dung CK" value={payment.transferContent} onCopy={() => copy(payment.transferContent, 'ct')} copied={copied === 'ct'} />
+          </div>
+        )}
 
         {/* ẢNH BILL */}
-        {payment.proofImageUrl && (
+        {!isPayos && payment.proofImageUrl && (
           <div className="bg-white border border-line rounded-2xl shadow-card p-4">
             <p className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2">Bill đã gửi</p>
             <img src={payment.proofImageUrl} alt="bill" className="w-full rounded-xl border border-line" />
@@ -104,7 +133,18 @@ const PaymentPage = () => {
         )}
 
         {/* HÀNH ĐỘNG */}
-        {!paid && (
+        {!paid && isPayos && (
+          <button
+            onClick={handlePayos}
+            disabled={uploading}
+            className={`w-full h-14 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all ${uploading ? 'bg-chalk text-muted border border-line' : 'bg-pitch text-white shadow-glow hover:bg-pitch-deep'}`}
+          >
+            {uploading ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
+            {uploading ? 'Đang xử lý...' : 'Thanh toán qua PayOS'}
+          </button>
+        )}
+
+        {!paid && !isPayos && (
           <label className={`block w-full text-center h-14 rounded-2xl font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${uploading ? 'bg-chalk text-muted border border-line' : 'bg-pitch text-white shadow-glow hover:bg-pitch-deep'}`}>
             {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
             {uploading ? 'Đang tải...' : payment.proofImageUrl ? 'Tải lại ảnh bill' : 'Tải lên ảnh bill'}

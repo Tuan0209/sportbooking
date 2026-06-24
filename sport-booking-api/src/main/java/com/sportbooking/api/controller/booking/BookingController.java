@@ -11,6 +11,7 @@ import com.sportbooking.api.dto.request.booking.CreateMonthlyBookingRequest;
 import com.sportbooking.api.dto.response.booking.BookedSlotResponse;
 import com.sportbooking.api.dto.response.booking.BookingResponse;
 import com.sportbooking.api.dto.response.booking.MonthlyBookingResponse;
+import com.sportbooking.api.dto.response.booking.MyBookingResponse;
 import com.sportbooking.api.service.booking.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,15 @@ public class BookingController {
                         bookingService.create(
                                 request,
                                 authentication))
+                .build();
+    }
+
+    /** Danh sách sân đã đặt của người dùng hiện tại. */
+    @GetMapping("/my")
+    public ApiResponse<List<MyBookingResponse>> myBookings(Authentication authentication) {
+        return ApiResponse.<List<MyBookingResponse>>builder()
+                .code(0)
+                .result(bookingService.getMyBookings(authentication))
                 .build();
     }
 

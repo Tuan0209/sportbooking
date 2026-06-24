@@ -72,8 +72,8 @@ const BookingConfirm = () => {
 
       const result = res.data.result;
 
-      // Chuyển khoản QR -> sang trang thanh toán hiển thị QR + upload bill
-      if (paymentMethod === 'BANK_QR') {
+      // Chuyển khoản QR / PayOS -> sang trang thanh toán
+      if (paymentMethod === 'BANK_QR' || paymentMethod === 'PAYOS') {
         navigate(`/payment/${result.id}`);
         return;
       }
@@ -260,6 +260,24 @@ const BookingConfirm = () => {
               />
               Chuyển khoản ngân hàng (QR)
             </label>
+
+            <label className={`flex items-center gap-3 font-medium text-ink border rounded-xl px-4 py-3 cursor-pointer transition-all ${paymentMethod === 'PAYOS' ? 'border-pitch bg-pitch-soft' : 'border-line'}`}>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="PAYOS"
+                checked={paymentMethod === 'PAYOS'}
+                onChange={() => setPaymentMethod('PAYOS')}
+                className="accent-pitch w-4 h-4"
+              />
+              Cổng thanh toán PayOS
+            </label>
+
+            {paymentMethod === 'PAYOS' && (
+              <p className="text-sm text-muted">
+                Bạn sẽ được chuyển tới cổng PayOS để thanh toán.
+              </p>
+            )}
 
             {paymentMethod === 'COIN' && (
               <div className="rounded-xl bg-pitch-soft p-3">

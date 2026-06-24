@@ -8,6 +8,8 @@ export const paymentService = {
     form.append('file', file);
     return axiosClient.post(`/payments/${paymentId}/proof`, form);
   },
+  // Giả lập PayOS thanh toán thành công (demo)
+  mockSuccess: (paymentId) => axiosClient.post(`/payments/${paymentId}/mock-success`),
 
   // Admin
   adminList: () => axiosClient.get('/admin/payments'),
