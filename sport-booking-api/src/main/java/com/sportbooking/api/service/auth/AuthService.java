@@ -4,6 +4,7 @@ import com.sportbooking.api.common.enums.ErrorCode;
 import com.sportbooking.api.common.enums.Role;
 import com.sportbooking.api.dto.request.auth.LoginRequest;
 import com.sportbooking.api.dto.request.auth.RegisterRequest;
+import com.sportbooking.api.dto.request.auth.ResetPasswordRequest;
 import com.sportbooking.api.dto.response.auth.AuthResponse;
 import com.sportbooking.api.entity.user.User;
 import com.sportbooking.api.repository.user.UserRepository;
@@ -53,5 +54,14 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
         return new AuthResponse(token);
+    }
+
+    /** Đặt lại mật khẩu: xác minh email tồn tại rồi đổi mật khẩu. */
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail().trim())
+                .orElseThrow(() -> new AppException(ErrorCode.RESET_INFO_MISMATCH));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

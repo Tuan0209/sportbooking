@@ -7,6 +7,7 @@ import UserLayout from '../layouts/UserLayout'; // Import Layout người dùng 
 
 import Login from '../features/auth/pages/Login';
 import Register from '../features/auth/pages/Register';
+import ForgotPassword from '../features/auth/pages/ForgotPassword';
 import UserVenueHome from '../features/venue/pages/user/UserVenueHome';
 import ManageUsers from '../features/user/pages/admin/ManageUsers';
 import ManageFields from '../features/field/pages/admin/ManageFields';
@@ -56,6 +57,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
 
       {/* --- ADMIN ROUTES --- */}
       <Route path="/admin" element={<ProtectedRoute roleRequired="ADMIN"><AdminLayout /></ProtectedRoute>}>

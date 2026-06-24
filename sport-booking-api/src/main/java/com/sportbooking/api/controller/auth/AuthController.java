@@ -3,6 +3,7 @@ package com.sportbooking.api.controller.auth;
 import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.auth.LoginRequest;
 import com.sportbooking.api.dto.request.auth.RegisterRequest;
+import com.sportbooking.api.dto.request.auth.ResetPasswordRequest;
 import com.sportbooking.api.dto.response.auth.AuthResponse;
 import com.sportbooking.api.service.auth.AuthService;
 
@@ -29,6 +30,14 @@ public class AuthController {
     ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.<AuthResponse>builder()
                 .result(authService.login(request))
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    ApiResponse<AuthResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ApiResponse.<AuthResponse>builder()
+                .message("Đặt lại mật khẩu thành công")
                 .build();
     }
 }

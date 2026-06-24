@@ -89,7 +89,7 @@ const Login = () => {
             <Button type="submit" className="mt-5">Đăng nhập</Button>
 
             <div className="text-center mt-6 text-[14px]">
-              <button type="button" className="text-pitch font-semibold hover:text-pitch-deep transition-colors">
+              <button type="button" onClick={() => navigate('/forgot-password')} className="text-pitch font-semibold hover:text-pitch-deep transition-colors">
                 Quên mật khẩu?
               </button>
             </div>
