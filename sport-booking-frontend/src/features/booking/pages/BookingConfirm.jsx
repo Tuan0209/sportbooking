@@ -59,7 +59,7 @@ const BookingConfirm = () => {
     setLoading(true);
 
     try {
-      await bookingService.createBooking({
+      const res = await bookingService.createBooking({
         fieldId: state.fieldId,
         bookingDate: state.bookingDate,
         slots: state.slots,
@@ -69,6 +69,14 @@ const BookingConfirm = () => {
         totalPrice: state.totalPrice,
         paymentMethod: paymentMethod
       });
+
+      const result = res.data.result;
+
+      // Chuyển khoản QR -> sang trang thanh toán hiển thị QR + upload bill
+      if (paymentMethod === 'BANK_QR') {
+        navigate(`/payment/${result.id}`);
+        return;
+      }
 
       if (paymentMethod === 'COIN' && user) {
         setUser({
@@ -229,7 +237,7 @@ const BookingConfirm = () => {
           </h3>
 
           <div className="space-y-3 text-ink-soft text-sm">
-            <label className="flex items-center gap-3 font-medium text-ink">
+            <label className={`flex items-center gap-3 font-medium text-ink border rounded-xl px-4 py-3 cursor-pointer transition-all ${paymentMethod === 'COIN' ? 'border-pitch bg-pitch-soft' : 'border-line'}`}>
               <input
                 type="radio"
                 name="paymentMethod"
@@ -241,14 +249,32 @@ const BookingConfirm = () => {
               Thanh toán bằng coin
             </label>
 
-            <div className="rounded-xl bg-pitch-soft p-3">
-              <p className="text-muted mb-1">
-                Số dư coin hiện tại:
+            <label className={`flex items-center gap-3 font-medium text-ink border rounded-xl px-4 py-3 cursor-pointer transition-all ${paymentMethod === 'BANK_QR' ? 'border-pitch bg-pitch-soft' : 'border-line'}`}>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="BANK_QR"
+                checked={paymentMethod === 'BANK_QR'}
+                onChange={() => setPaymentMethod('BANK_QR')}
+                className="accent-pitch w-4 h-4"
+              />
+              Chuyển khoản ngân hàng (QR)
+            </label>
+
+            {paymentMethod === 'COIN' && (
+              <div className="rounded-xl bg-pitch-soft p-3">
+                <p className="text-muted mb-1">Số dư coin hiện tại:</p>
+                <p className="text-lg font-display font-bold text-pitch">
+                  {Number(user?.coinBalance || 0).toLocaleString()} Coin
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'BANK_QR' && (
+              <p className="text-sm text-muted">
+                Sau khi xác nhận, bạn sẽ nhận mã QR để chuyển khoản và tải lên ảnh bill.
               </p>
-              <p className="text-lg font-display font-bold text-pitch">
-                {Number(user?.coinBalance || 0).toLocaleString()} Coin
-              </p>
-            </div>
+            )}
 
             {paymentMethod === 'COIN' && Number(user?.coinBalance || 0) < Number(state.totalPrice) && (
               <p className="text-sm text-red-600">

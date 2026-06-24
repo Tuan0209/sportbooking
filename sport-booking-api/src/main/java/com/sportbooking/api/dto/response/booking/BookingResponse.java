@@ -33,4 +33,6 @@ public class BookingResponse {
     BigDecimal totalPrice;
 
     String status;
+
+    String paymentId; // có khi thanh toán BANK_QR / PAYOS
 }

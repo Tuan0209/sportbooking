@@ -122,6 +122,9 @@ public class SecurityConfig {
                                                 .hasAuthority("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/bookings/**")
                                                 .permitAll()
+                                                // Duyệt thanh toán / hoàn tiền: chỉ ADMIN
+                                                .requestMatchers("/admin/payments/**", "/admin/refunds/**")
+                                                .hasAuthority("ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(AbstractHttpConfigurer::disable)
                                 .httpBasic(AbstractHttpConfigurer::disable)

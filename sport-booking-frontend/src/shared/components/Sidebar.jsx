@@ -7,7 +7,8 @@ import {
   Calendar,
   Settings,
   X,
-  Globe
+  Globe,
+  Wallet
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
@@ -30,9 +31,10 @@ const Sidebar = ({ isOpen, onClose, role }) => {
       ],
     },
     {
-      title: 'Đặt sân',
+      title: 'Đặt sân & thanh toán',
       links: [
         { name: 'Lịch đặt', icon: <Calendar size={20} />, path: '/admin/bookings' },
+        { name: 'Duyệt thanh toán', icon: <Wallet size={20} />, path: '/admin/payments' },
       ],
     },
     {

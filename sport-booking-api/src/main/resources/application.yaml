@@ -31,6 +31,16 @@ cloudinary:
 app:
   avatar:
     max-size: 5242880 # 5MB
+  bank: # Thông tin nhận chuyển khoản thủ công (sinh QR VietQR)
+    bin: "970422"            # MB Bank
+    account-no: "0909123456"
+    account-name: "SAN BONG SVD"
+    bank-name: "MB Bank"
+
+payos: # Để trống nếu chưa có tài khoản -> chạy chế độ mô phỏng
+  client-id: ""
+  api-key: ""
+  checksum-key: ""
 application:
   jwt:
     secret-key: your-secret-key-your-secret-key-123456

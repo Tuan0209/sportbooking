@@ -14,7 +14,10 @@ public enum ErrorCode {
     FIELD_NOT_FOUND(2001, "Field not found"),
     SLOT_ALREADY_BOOKED(2002, "Khung giờ đã được đặt"),
     BOOKING_NOT_FOUND(2003, "Booking not found"),
-    INSUFFICIENT_COINS(2004, "Số dư coin không đủ để thanh toán");
+    INSUFFICIENT_COINS(2004, "Số dư coin không đủ để thanh toán"),
+    PAYMENT_NOT_FOUND(3001, "Không tìm thấy thông tin thanh toán"),
+    REFUND_NOT_FOUND(3002, "Không tìm thấy yêu cầu hoàn tiền"),
+    REFUND_INVALID(3003, "Yêu cầu hoàn tiền không hợp lệ");
 
     private int code;
     private String message;

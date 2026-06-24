@@ -30,6 +30,8 @@ import com.sportbooking.api.repository.booking.BookingRepository;
 import com.sportbooking.api.repository.booking.BookingSlotRepository;
 import com.sportbooking.api.repository.fields.FieldRepository;
 import com.sportbooking.api.repository.user.UserRepository;
+import com.sportbooking.api.entity.payment.Payment;
+import com.sportbooking.api.service.payment.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +43,7 @@ public class BookingService {
     private final BookingSlotRepository bookingSlotRepository;
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
+    private final PaymentService paymentService;
 
     @Transactional
     public BookingResponse create(
@@ -138,6 +141,13 @@ public class BookingService {
 
         bookingSlotRepository.saveAll(bookingSlots);
 
+        // Với chuyển khoản QR / PayOS: tạo bản ghi thanh toán PENDING
+        String paymentId = null;
+        if (paymentMethod == PaymentMethod.BANK_QR || paymentMethod == PaymentMethod.PAYOS) {
+            Payment payment = paymentService.createForBooking(booking, paymentMethod);
+            paymentId = payment.getId();
+        }
+
         return BookingResponse.builder()
                 .id(booking.getId())
                 .bookingCode(
@@ -149,6 +159,7 @@ public class BookingService {
                         booking.getTotalPrice())
                 .status(
                         booking.getStatus().name())
+                .paymentId(paymentId)
                 .build();
     }
 
