@@ -13,4 +13,6 @@ public interface RefundRequestRepository extends JpaRepository<RefundRequest, St
     List<RefundRequest> findAllByOrderByCreatedAtDesc();
 
     boolean existsByBookingIdAndStatusIn(String bookingId, List<com.sportbooking.api.common.enums.RefundStatus> statuses);
+
+    long countByStatus(com.sportbooking.api.common.enums.RefundStatus status);
 }

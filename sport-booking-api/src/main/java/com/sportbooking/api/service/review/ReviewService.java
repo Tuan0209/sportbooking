@@ -79,6 +79,27 @@ public class ReviewService {
                 .build();
     }
 
+    /** [ADMIN] Tất cả đánh giá để kiểm duyệt. */
+    public List<ReviewResponse> adminListAll() {
+        return reviewRepository.findAllByOrderByCreatedAtDesc()
+                .stream().map(this::toResponse).toList();
+    }
+
+    /** [ADMIN] Xoá 1 đánh giá và cập nhật lại điểm cơ sở. */
+    @Transactional
+    public void adminDelete(String reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REQUEST));
+        Venue venue = review.getField().getVenue();
+        reviewRepository.delete(review);
+
+        double avg = reviewRepository.avgRatingByVenue(venue.getId());
+        long count = reviewRepository.countByVenue(venue.getId());
+        venue.setRating(BigDecimal.valueOf(avg).setScale(1, RoundingMode.HALF_UP));
+        venue.setTotalReviews((int) count);
+        venueRepository.save(venue);
+    }
+
     private ReviewResponse toResponse(Review r) {
         return ReviewResponse.builder()
                 .id(r.getId())
@@ -87,6 +108,7 @@ public class ReviewService {
                 .rating(r.getRating())
                 .comment(r.getComment())
                 .fieldName(r.getField().getName())
+                .venueName(r.getField().getVenue().getName())
                 .createdAt(r.getCreatedAt())
                 .build();
     }

@@ -14,6 +14,8 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
 
     List<Review> findByField_Venue_IdOrderByCreatedAtDesc(String venueId);
 
+    List<Review> findAllByOrderByCreatedAtDesc();
+
     boolean existsByBookingId(String bookingId);
 
     @Query("select coalesce(avg(r.rating),0) from Review r where r.field.venue.id = :venueId")

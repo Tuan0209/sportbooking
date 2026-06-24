@@ -3,6 +3,7 @@ import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../../context/AuthContext';
 import { bookingService } from '../services/bookingService';
 import { voucherService } from '../../voucher/services/voucherService';
+import { serviceService } from '../../service/services/serviceService';
 import VenueMap from '../../../shared/components/VenueMap';
 import {
   ChevronLeft,
@@ -12,7 +13,10 @@ import {
   Phone,
   NotebookPen,
   Tag,
-  X
+  X,
+  Coffee,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 import { formatPrice } from '../../../shared/utils/formatDate';
@@ -34,6 +38,23 @@ const BookingConfirm = () => {
   const [voucherErr, setVoucherErr] = useState('');
   const [applying, setApplying] = useState(false);
 
+  // Dịch vụ kèm sân
+  const [services, setServices] = useState([]);
+  const [qty, setQty] = useState({}); // { serviceId: số lượng }
+
+  useEffect(() => {
+    serviceService.list()
+      .then((res) => { if (res.data.code === 0) setServices(res.data.result || []); })
+      .catch(() => {});
+  }, []);
+
+  const changeQty = (id, delta) =>
+    setQty((prev) => {
+      const next = Math.max(0, (prev[id] || 0) + delta);
+      return { ...prev, [id]: next };
+    });
+  const servicesTotal = services.reduce((sum, s) => sum + (qty[s.id] || 0) * Number(s.price), 0);
+
   useEffect(() => {
     if (user) {
       setFullName(user.name || '');
@@ -52,7 +73,7 @@ const BookingConfirm = () => {
   }
 
   const baseTotal = Number(state?.totalPrice || 0);
-  const finalTotal = voucher ? Number(voucher.finalAmount) : baseTotal;
+  const finalTotal = (voucher ? Number(voucher.finalAmount) : baseTotal) + servicesTotal;
 
   const applyVoucher = async () => {
     if (!voucherCode.trim()) return;
@@ -276,6 +297,13 @@ const BookingConfirm = () => {
               </div>
             )}
 
+            {servicesTotal > 0 && (
+              <div className="flex items-center justify-between border-b border-line pb-3">
+                <span className="text-muted text-sm">Dịch vụ kèm theo</span>
+                <span className="font-semibold text-ink">+ {formatPrice(servicesTotal)}</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pt-1">
               <span className="text-ink font-semibold">Tổng tiền</span>
               <div className="text-right">
@@ -330,6 +358,35 @@ const BookingConfirm = () => {
             </>
           )}
         </div>
+
+        {/* DỊCH VỤ KÈM SÂN */}
+        {services.length > 0 && (
+          <div className="bg-white border border-line rounded-2xl p-4 shadow-card">
+            <div className="flex items-center gap-2 mb-3">
+              <Coffee size={18} className="text-pitch" />
+              <h3 className="font-display font-bold text-ink text-lg">Dịch vụ kèm theo</h3>
+            </div>
+            <div className="space-y-2">
+              {services.map((s) => (
+                <div key={s.id} className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-ink text-sm truncate">{s.name}</p>
+                    <p className="text-xs text-muted">{formatPrice(s.price)}/{s.unit}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <button onClick={() => changeQty(s.id, -1)} className="w-8 h-8 rounded-full border border-line flex items-center justify-center text-ink hover:bg-chalk disabled:opacity-40" disabled={!qty[s.id]}>
+                      <Minus size={15} />
+                    </button>
+                    <span className="w-6 text-center font-bold text-ink">{qty[s.id] || 0}</span>
+                    <button onClick={() => changeQty(s.id, 1)} className="w-8 h-8 rounded-full bg-pitch text-white flex items-center justify-center shadow-glow">
+                      <Plus size={15} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="bg-white border border-line rounded-2xl p-4 shadow-card">
           <h3 className="font-display font-bold text-ink text-lg mb-3">

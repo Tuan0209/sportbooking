@@ -19,6 +19,7 @@ import com.sportbooking.api.common.enums.PaymentMethod;
 import com.sportbooking.api.common.exception.AppException;
 import com.sportbooking.api.dto.request.booking.CreateBookingRequest;
 import com.sportbooking.api.dto.request.booking.CreateMonthlyBookingRequest;
+import com.sportbooking.api.dto.response.booking.AdminBookingResponse;
 import com.sportbooking.api.dto.response.booking.BookedSlotResponse;
 import com.sportbooking.api.dto.response.booking.BookingResponse;
 import com.sportbooking.api.dto.response.booking.MonthlyBookingResponse;
@@ -200,6 +201,61 @@ public class BookingService {
                             .build();
                 })
                 .toList();
+    }
+
+    /** [ADMIN] Danh sách tất cả lịch đặt, lọc theo trạng thái (tuỳ chọn). */
+    public List<AdminBookingResponse> adminList(String statusFilter) {
+        return bookingRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(b -> statusFilter == null || statusFilter.isBlank()
+                        || b.getStatus().name().equals(statusFilter))
+                .map(b -> AdminBookingResponse.builder()
+                        .id(b.getId())
+                        .bookingCode(b.getBookingCode())
+                        .customerName(b.getCustomerName())
+                        .customerPhone(b.getCustomerPhone())
+                        .fieldName(b.getField().getName())
+                        .venueName(b.getField().getVenue().getName())
+                        .bookingDate(b.getBookingDate())
+                        .startTime(b.getStartTime())
+                        .endTime(b.getEndTime())
+                        .totalPrice(b.getTotalPrice())
+                        .status(b.getStatus().name())
+                        .createdAt(b.getCreatedAt())
+                        .build())
+                .toList();
+    }
+
+    /** [ADMIN] Đổi trạng thái lịch đặt (CONFIRMED / COMPLETED / CANCELED). */
+    @Transactional
+    public AdminBookingResponse adminUpdateStatus(String bookingId, String status) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        BookingStatus newStatus;
+        try {
+            newStatus = BookingStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+        booking.setStatus(newStatus);
+        if (newStatus == BookingStatus.CANCELED) {
+            booking.setCanceledAt(java.time.LocalDateTime.now());
+            booking.setCancelReason("Admin huỷ");
+        }
+        bookingRepository.save(booking);
+        return AdminBookingResponse.builder()
+                .id(booking.getId())
+                .bookingCode(booking.getBookingCode())
+                .customerName(booking.getCustomerName())
+                .customerPhone(booking.getCustomerPhone())
+                .fieldName(booking.getField().getName())
+                .venueName(booking.getField().getVenue().getName())
+                .bookingDate(booking.getBookingDate())
+                .startTime(booking.getStartTime())
+                .endTime(booking.getEndTime())
+                .totalPrice(booking.getTotalPrice())
+                .status(booking.getStatus().name())
+                .createdAt(booking.getCreatedAt())
+                .build();
     }
 
     /** Lấy danh sách khung giờ đã đặt của các sân thuộc 1 cơ sở trong 1 ngày. */

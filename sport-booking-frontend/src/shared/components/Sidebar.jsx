@@ -11,7 +11,9 @@ import {
   Wallet,
   RotateCcw,
   Tag,
-  Crown
+  Crown,
+  Coffee,
+  Star
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, role }) => {
@@ -31,6 +33,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
         { name: 'Khu vực', icon: <MapPin size={20} />, path: '/admin/areas' },
         { name: 'Sân', icon: <LayoutGrid size={20} />, path: '/admin/fields' },
         { name: 'Loại sân', icon: <LayoutGrid size={20} />, path: '/admin/field-types' },
+        { name: 'Dịch vụ', icon: <Coffee size={20} />, path: '/admin/services' },
       ],
     },
     {
@@ -52,6 +55,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
       title: 'Người dùng',
       links: [
         { name: 'User', icon: <Users size={20} />, path: '/admin/users' },
+        { name: 'Đánh giá', icon: <Star size={20} />, path: '/admin/reviews' },
       ],
     },
   ];

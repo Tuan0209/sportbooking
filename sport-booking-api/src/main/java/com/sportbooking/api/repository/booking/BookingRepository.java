@@ -16,4 +16,8 @@ public interface BookingRepository
             LocalDate bookingDate);
 
     List<Booking> findByUserIdOrderByCreatedAtDesc(String userId);
+
+    List<Booking> findAllByOrderByCreatedAtDesc();
+
+    long countByBookingDate(LocalDate bookingDate);
 }

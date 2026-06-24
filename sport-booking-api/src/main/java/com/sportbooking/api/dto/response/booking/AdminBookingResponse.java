@@ -1,6 +1,9 @@
-package com.sportbooking.api.dto.response.review;
+package com.sportbooking.api.dto.response.booking;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,13 +19,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReviewResponse {
+public class AdminBookingResponse {
     String id;
-    String userName;
-    String userAvatar;
-    int rating;
-    String comment;
+    String bookingCode;
+    String customerName;
+    String customerPhone;
     String fieldName;
     String venueName;
+    LocalDate bookingDate;
+    LocalTime startTime;
+    LocalTime endTime;
+    BigDecimal totalPrice;
+    String status;
     LocalDateTime createdAt;
 }

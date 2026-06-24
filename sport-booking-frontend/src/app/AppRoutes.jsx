@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Profile from '../features/user/pages/Profile';
 import AdminLayout from '../layouts/AdminLayout';
@@ -28,6 +28,10 @@ import Wallet from '../features/wallet/pages/Wallet';
 import Membership from '../features/membership/pages/Membership';
 import ManageVouchers from '../features/voucher/pages/admin/ManageVouchers';
 import ManagePlans from '../features/membership/pages/admin/ManagePlans';
+import ManageBookings from '../features/booking/pages/admin/ManageBookings';
+import ManageServices from '../features/service/pages/admin/ManageServices';
+import ManageReviews from '../features/review/pages/admin/ManageReviews';
+import { adminStatsService } from '../features/booking/services/bookingService';
 const PublicRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   if (loading) return null;
@@ -66,6 +70,9 @@ const AppRoutes = () => {
         <Route path="refunds" element={<ManageRefunds />} />
         <Route path="vouchers" element={<ManageVouchers />} />
         <Route path="membership-plans" element={<ManagePlans />} />
+        <Route path="bookings" element={<ManageBookings />} />
+        <Route path="services" element={<ManageServices />} />
+        <Route path="reviews" element={<ManageReviews />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
@@ -92,7 +99,27 @@ const AppRoutes = () => {
   );
 };
 
-const AdminDashboard = () => (
+const AdminDashboard = () => {
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    adminStatsService.getStats()
+      .then((res) => { if (res.data.code === 0) setStats(res.data.result); })
+      .catch(() => {});
+  }, []);
+
+  const fmt = (n) => (n == null ? '—' : Number(n).toLocaleString('vi-VN'));
+  const cards = [
+    { label: 'Cơ sở', value: fmt(stats?.totalVenues) },
+    { label: 'Sân', value: fmt(stats?.totalFields) },
+    { label: 'Lượt đặt hôm nay', value: fmt(stats?.todayBookings) },
+    { label: 'Người dùng', value: fmt(stats?.totalUsers) },
+    { label: 'Tổng lượt đặt', value: fmt(stats?.totalBookings) },
+    { label: 'Chờ duyệt thanh toán', value: fmt(stats?.pendingPayments) },
+    { label: 'Chờ hoàn tiền', value: fmt(stats?.pendingRefunds) },
+    { label: 'Doanh thu (đ)', value: fmt(stats?.totalRevenue) },
+  ];
+
+  return (
   <div className="animate-fade-up">
     <div className="stadium pitch-lines rounded-[28px] p-8 relative overflow-hidden mb-6">
       <div className="pointer-events-none absolute -right-16 -top-16 w-56 h-56 rounded-full border border-white/10" />
@@ -101,12 +128,7 @@ const AdminDashboard = () => (
       <p className="text-white/70 text-sm mt-2">Theo dõi cơ sở, sân và lượt đặt trong một màn hình.</p>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      {[
-        { label: 'Cơ sở', value: '—' },
-        { label: 'Sân hoạt động', value: '—' },
-        { label: 'Lượt đặt hôm nay', value: '—' },
-        { label: 'Người dùng', value: '—' },
-      ].map((s) => (
+      {cards.map((s) => (
         <div key={s.label} className="bg-white border border-line rounded-2xl p-5 shadow-card">
           <p className="text-xs font-semibold text-muted uppercase tracking-wider">{s.label}</p>
           <p className="font-display text-3xl font-extrabold text-ink mt-2">{s.value}</p>
@@ -114,7 +136,8 @@ const AdminDashboard = () => (
       ))}
     </div>
   </div>
-);
+  );
+};
 
 const ComingSoon = ({ title, desc }) => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6 animate-fade-up">

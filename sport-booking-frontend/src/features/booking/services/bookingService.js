@@ -9,4 +9,12 @@ export const bookingService = {
 
   // Đặt vé tháng
   createMonthly: (data) => axiosClient.post('/bookings/monthly', data),
+
+  // Admin
+  adminList: (status) => axiosClient.get('/admin/bookings', { params: status ? { status } : {} }),
+  adminUpdateStatus: (id, status) => axiosClient.post(`/admin/bookings/${id}/status`, { status }),
+};
+
+export const adminStatsService = {
+  getStats: () => axiosClient.get('/admin/stats'),
 };

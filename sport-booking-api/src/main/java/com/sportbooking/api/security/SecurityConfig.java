@@ -127,7 +127,11 @@ public class SecurityConfig {
                                                                 "/admin/payments/**",
                                                                 "/admin/refunds/**",
                                                                 "/admin/vouchers/**",
-                                                                "/admin/membership-plans/**")
+                                                                "/admin/membership-plans/**",
+                                                                "/admin/bookings/**",
+                                                                "/admin/stats/**",
+                                                                "/admin/services/**",
+                                                                "/admin/reviews/**")
                                                 .hasAuthority("ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(AbstractHttpConfigurer::disable)
