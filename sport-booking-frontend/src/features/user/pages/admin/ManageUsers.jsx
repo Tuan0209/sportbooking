@@ -5,6 +5,10 @@ import Button from '../../../../shared/components/Button';
 import Input from '../../../../shared/components/Input';
 import Modal from '../../../../shared/components/Modal';
 
+// Avatar dự phòng dạng SVG inline (không bao giờ lỗi tải, tránh log lỗi mạng)
+const AVATAR_FALLBACK =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56'><rect width='56' height='56' rx='16' fill='%23E8F5EC'/><circle cx='28' cy='22' r='9' fill='%230E8C4E'/><rect x='13' y='35' width='30' height='17' rx='8.5' fill='%230E8C4E'/></svg>";
+
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -166,8 +170,9 @@ const ManageUsers = () => {
                     <div className="flex items-center gap-4">
                       <div className="relative group/avatar">
                         <img
-                          src={u.avatarUrl || 'https://via.placeholder.com/150'}
+                          src={u.avatarUrl || AVATAR_FALLBACK}
                           alt="avatar"
+                          onError={(e) => { e.currentTarget.src = AVATAR_FALLBACK; }}
                           className={`w-14 h-14 rounded-2xl object-cover shadow-card border-2 border-white transition-all duration-300 ${uploadingId === u.id ? 'opacity-20 blur-sm scale-90' : 'opacity-100'}`}
                         />
                         {uploadingId === u.id ? (

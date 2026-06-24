@@ -92,7 +92,7 @@ const rankStyle = {
 };
 
 const PodiumCard = ({ venue, rank }) => {
-  const navigate = (id) => (window.location.href = `/booking/${id}`);
+  const navigate = (id) => (window.location.href = `/venue/${id}`);
   return (
     <button
       onClick={() => navigate(venue.id)}

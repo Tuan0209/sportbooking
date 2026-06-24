@@ -34,9 +34,12 @@ import com.sportbooking.api.repository.fields.FieldRepository;
 import com.sportbooking.api.repository.user.UserRepository;
 import com.sportbooking.api.repository.payment.PaymentRepository;
 import com.sportbooking.api.repository.refund.RefundRequestRepository;
+import com.sportbooking.api.repository.wallet.WalletTransactionRepository;
 import com.sportbooking.api.common.enums.PaymentStatus;
 import com.sportbooking.api.common.enums.RefundStatus;
+import com.sportbooking.api.common.enums.WalletTransactionType;
 import com.sportbooking.api.entity.payment.Payment;
+import com.sportbooking.api.entity.wallet.WalletTransaction;
 import com.sportbooking.api.service.payment.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,7 @@ public class BookingService {
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
     private final RefundRequestRepository refundRequestRepository;
+    private final WalletTransactionRepository walletTransactionRepository;
 
     @Transactional
     public BookingResponse create(
@@ -159,6 +163,15 @@ public class BookingService {
             // Trả bằng coin: đã thanh toán ngay -> tạo payment PAID để có thể hoàn tiền
             Payment payment = paymentService.createCoinPaid(booking);
             paymentId = payment.getId();
+            // Ghi sổ ví: trừ tiền đặt sân (để đối soát lịch sử)
+            walletTransactionRepository.save(WalletTransaction.builder()
+                    .userId(user.getId())
+                    .amount(request.getTotalPrice())
+                    .type(WalletTransactionType.SUBTRACT)
+                    .reason("Thanh toán đặt sân " + booking.getBookingCode())
+                    .relatedBookingId(booking.getId())
+                    .balanceAfter(user.getCoinBalance())
+                    .build());
         }
 
         return BookingResponse.builder()
