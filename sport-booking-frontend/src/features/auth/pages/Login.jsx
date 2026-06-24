@@ -9,19 +9,19 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState('email');
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { loginContext } = useContext(AuthContext);
-  const [error, setError] = useState(null); // Thêm state để lưu lỗi
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Reset lỗi trước khi gửi yêu cầu
+    setError(null);
     try {
       const res = await authService.login(formData);
       if (res.data.code === 0) {
-        const role = loginContext(res.data.result.token);
+        const role = await loginContext(res.data.result.token);
         role === 'ADMIN' ? navigate('/admin/dashboard') : navigate('/dashboard');
-      }else {
-        setError(res.data.message); // Hiển thị lỗi từ API nếu có
+      } else {
+        setError(res.data.message);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại');
@@ -29,33 +29,36 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#c8102e] flex flex-col items-center justify-center p-6 relative font-sans">
-      {/* Sao trang trí to hơn */}
-      <div className="absolute top-20 left-[10%] text-white/20 text-6xl transform rotate-12">✦</div>
-      <div className="absolute bottom-20 right-[10%] text-white/20 text-6xl transform -rotate-12">✦</div>
+    <div className="min-h-screen stadium pitch-lines flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+      {/* Cung góc sân — vạch kẻ trắng signature */}
+      <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 rounded-full border border-white/10" />
+      <div className="pointer-events-none absolute -bottom-40 -right-24 w-96 h-96 rounded-full border border-white/10" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-px bg-white/10" />
 
-      {/* Tăng max-w từ 440px lên 520px */}
-      <div className="w-full max-w-[520px] z-10">
-        <h2 className="text-white text-center text-[24px] font-bold mb-10 uppercase tracking-[3px]">Đăng nhập</h2>
-        
-        <div className="bg-white rounded-[24px] shadow-2xl overflow-hidden">
-          {/* Tabs cao hơn: h-[70px] */}
-          <div className="flex bg-gray-100 h-[70px]">
-            <button 
-              className={`flex-1 text-[16px] font-bold transition-all ${
-                activeTab === 'phone' 
-                ? 'bg-white text-gray-800 rounded-tr-[40px]' 
-                : 'text-gray-400 hover:text-gray-500'
+      <div className="w-full max-w-[440px] z-10 animate-fade-up">
+        {/* Logo phù hiệu */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-pitch flex items-center justify-center shadow-glow-lime mb-4 rotate-3">
+            <span className="font-display font-extrabold text-white text-3xl italic">S</span>
+          </div>
+          <h1 className="text-white text-center text-3xl font-extrabold tracking-tight">Vào sân thôi!</h1>
+          <p className="text-lime/90 text-sm mt-2 font-medium">Đặt sân thể thao gần bạn chỉ trong vài giây</p>
+        </div>
+
+        <div className="bg-white rounded-[28px] shadow-2xl overflow-hidden">
+          {/* Tabs */}
+          <div className="flex p-1.5 bg-chalk gap-1.5">
+            <button
+              className={`flex-1 py-3 text-[14px] font-semibold rounded-2xl transition-all ${
+                activeTab === 'phone' ? 'bg-white text-ink shadow-card' : 'text-muted hover:text-ink'
               }`}
               onClick={() => setActiveTab('phone')}
             >
               Số điện thoại
             </button>
-            <button 
-              className={`flex-1 text-[16px] font-bold transition-all ${
-                activeTab === 'email' 
-                ? 'bg-white text-gray-800 rounded-tl-[40px]' 
-                : 'text-gray-400 hover:text-gray-500 border-l border-gray-200'
+            <button
+              className={`flex-1 py-3 text-[14px] font-semibold rounded-2xl transition-all ${
+                activeTab === 'email' ? 'bg-white text-ink shadow-card' : 'text-muted hover:text-ink'
               }`}
               onClick={() => setActiveTab('email')}
             >
@@ -63,35 +66,41 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Padding form rộng hơn: p-12 */}
-          <form className="p-10 md:p-12" onSubmit={handleSubmit}>
-            <Input 
-              label={activeTab === 'email' ? "Email của bạn?" : "Số điện thoại?"}
-              placeholder={activeTab === 'email' ? "Nhập email của bạn (*)" : "Nhập số điện thoại (*)"}
-              value={formData.email} 
-              onChange={e => setFormData({...formData, email: e.target.value})} 
-              onClear={() => setFormData({...formData, email: ''})} 
+          <form className="p-7 md:p-9" onSubmit={handleSubmit}>
+            <Input
+              label={activeTab === 'email' ? 'Email của bạn' : 'Số điện thoại'}
+              placeholder={activeTab === 'email' ? 'Nhập email của bạn (*)' : 'Nhập số điện thoại (*)'}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onClear={() => setFormData({ ...formData, email: '' })}
             />
-            <Input 
-              label="Mật khẩu (*)" 
-              isPassword 
-              placeholder="Nhập mật khẩu (*)" 
-              value={formData.password} 
-              onChange={e => setFormData({...formData, password: e.target.value})} 
+            <Input
+              label="Mật khẩu (*)"
+              isPassword
+              placeholder="Nhập mật khẩu (*)"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
-            {error && <div className="text-red-500 text-sm mt-2">{error}</div>} {/* Hiển thị lỗi nếu có */}
-            <Button type="submit" className="mt-4">Đăng nhập</Button>
-             
-              
-            <div className="text-center mt-8 text-[15px]">
-              <span className="text-gray-500">Bạn quên mật khẩu? </span>
-              <button type="button" className="text-[#004d31] font-extrabold underline underline-offset-4">Quên mật khẩu</button>
+            {error && (
+              <div className="text-red-600 text-sm mt-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                {error}
+              </div>
+            )}
+            <Button type="submit" className="mt-5">Đăng nhập</Button>
+
+            <div className="text-center mt-6 text-[14px]">
+              <button type="button" className="text-pitch font-semibold hover:text-pitch-deep transition-colors">
+                Quên mật khẩu?
+              </button>
             </div>
           </form>
         </div>
-         
-        <div className="text-center mt-10 text-white text-[16px]">
-          Bạn chưa có tài khoản? <Link to="/register" className="font-bold underline underline-offset-4 ml-1">Đăng ký ngay</Link>
+
+        <div className="text-center mt-8 text-white/80 text-[15px]">
+          Bạn chưa có tài khoản?{' '}
+          <Link to="/register" className="text-lime font-bold hover:text-lime-deep transition-colors ml-1">
+            Đăng ký ngay
+          </Link>
         </div>
       </div>
     </div>

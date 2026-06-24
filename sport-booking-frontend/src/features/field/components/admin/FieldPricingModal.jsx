@@ -93,15 +93,15 @@ const FieldPricingModal = ({ isOpen, onClose, field }) => {
     <Modal isOpen={isOpen} onClose={onClose} title={`Khung giá: ${field?.name}`} size="xl">
       <div className="space-y-6">
         {/* FIELD INFO SUMMARY */}
-        <div className="flex items-center justify-between p-5 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-inner">
+        <div className="flex items-center justify-between p-5 bg-chalk rounded-2xl border border-line">
           <div className="space-y-1">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Giá cơ bản</p>
-            <p className="text-xl font-black text-indigo-600">{formatPrice(field?.pricePerHour)}/h</p>
+            <p className="text-[10px] font-bold text-muted uppercase tracking-[0.2em]">Giá cơ bản</p>
+            <p className="text-xl font-bold text-pitch">{formatPrice(field?.pricePerHour)}/h</p>
           </div>
           <div className="text-right space-y-1">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Giờ hoạt động</p>
-            <p className="text-sm font-bold text-slate-600 flex items-center justify-end gap-1.5">
-              <Clock size={14} className="text-indigo-400"/> {formatTime(field?.openTime)} - {formatTime(field?.closeTime)}
+            <p className="text-[10px] font-bold text-muted uppercase tracking-[0.2em]">Giờ hoạt động</p>
+            <p className="text-sm font-semibold text-ink-soft flex items-center justify-end gap-1.5">
+              <Clock size={14} className="text-pitch"/> {formatTime(field?.openTime)} - {formatTime(field?.closeTime)}
             </p>
           </div>
         </div>
@@ -109,13 +109,13 @@ const FieldPricingModal = ({ isOpen, onClose, field }) => {
         {/* ACTIONS & LIST */}
         <div className="space-y-4">
           <div className="flex justify-between items-center px-2">
-            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <h4 className="text-[11px] font-bold text-muted uppercase tracking-widest flex items-center gap-2">
                <Coins size={14}/> Danh sách khung giá tùy chỉnh
             </h4>
             {!showForm && (
-              <button 
+              <button
                 onClick={() => { setEditingSlot(null); setFormData({startTime: '17:00', endTime: '22:00', price: '', dayOfWeek: '', startDate: '', endDate: '', priority: 1}); setShowForm(true); }}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                className="bg-pitch text-white px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2 hover:bg-pitch-deep transition-all shadow-glow"
               >
                 <Plus size={14}/> Thêm khung giá
               </button>
@@ -123,23 +123,23 @@ const FieldPricingModal = ({ isOpen, onClose, field }) => {
           </div>
 
           {showForm && (
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2rem] border-2 border-indigo-100 space-y-5 animate-in slide-in-from-top-4 duration-300">
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl border border-pitch/20 space-y-5 animate-fade-up">
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Giờ bắt đầu" type="time" value={formData.startTime} onChange={e => setFormData({...formData, startTime: e.target.value})} required />
                 <Input label="Giờ kết thúc" type="time" value={formData.endTime} onChange={e => setFormData({...formData, endTime: e.target.value})} required />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Giá áp dụng (đ)" type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Độ ưu tiên (Priority)</label>
-                  <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})} min="0" />
+                  <label className="text-[11px] font-bold text-muted uppercase tracking-widest">Độ ưu tiên (Priority)</label>
+                  <input type="number" className="w-full px-4 py-3 bg-chalk border border-line rounded-xl outline-none focus:ring-2 focus:ring-pitch font-medium" value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})} min="0" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Ngày trong tuần</label>
-                <select value={formData.dayOfWeek} onChange={e => setFormData({...formData, dayOfWeek: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-sm">
+                <label className="text-[11px] font-bold text-muted uppercase tracking-widest">Ngày trong tuần</label>
+                <select value={formData.dayOfWeek} onChange={e => setFormData({...formData, dayOfWeek: e.target.value})} className="w-full px-4 py-3 bg-chalk border border-line rounded-xl outline-none focus:ring-2 focus:ring-pitch font-medium text-sm">
                   {DAYS.map(d => <option key={d.val} value={d.val === null ? '' : d.val}>{d.label}</option>)}
                 </select>
               </div>
@@ -150,66 +150,66 @@ const FieldPricingModal = ({ isOpen, onClose, field }) => {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button type="submit" disabled={loading} className="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all">
+                <button type="submit" disabled={loading} className="flex-1 bg-pitch text-white py-3 rounded-xl font-semibold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-pitch-deep transition-all shadow-glow">
                   {loading ? <Loader2 size={16} className="animate-spin"/> : <><Save size={16}/> Lưu khung giá</>}
                 </button>
-                <button type="button" onClick={() => {setShowForm(false); setEditingSlot(null);}} className="px-6 bg-slate-100 text-slate-500 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-200 transition-all">
+                <button type="button" onClick={() => {setShowForm(false); setEditingSlot(null);}} className="px-6 bg-chalk text-muted rounded-xl font-semibold text-[11px] uppercase tracking-widest border border-line hover:bg-line transition-all">
                   Hủy
                 </button>
               </div>
             </form>
           )}
 
-          <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden min-h-[200px]">
+          <div className="bg-white rounded-2xl border border-line overflow-hidden min-h-[200px]">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-slate-50 border-b border-slate-100">
+                <thead className="bg-chalk border-b border-line">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Khung giờ</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Giá</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Áp dụng</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ưu tiên</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Thao tác</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-muted uppercase tracking-widest">Khung giờ</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-muted uppercase tracking-widest">Giá</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-muted uppercase tracking-widest">Áp dụng</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-muted uppercase tracking-widest text-center">Ưu tiên</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-muted uppercase tracking-widest text-right">Thao tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-line">
                   {slots.length > 0 ? slots.map(slot => (
-                    <tr key={slot.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <tr key={slot.id} className="hover:bg-chalk transition-colors group">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-slate-700 font-bold text-xs">
-                          <Clock size={12} className="text-indigo-400"/>
+                        <div className="flex items-center gap-2 text-ink-soft font-semibold text-xs">
+                          <Clock size={12} className="text-pitch"/>
                           {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                         </div>
                       </td>
-                      <td className="px-6 py-4 font-black text-emerald-600 text-sm">
+                      <td className="px-6 py-4 font-bold text-pitch text-sm">
                         {formatPrice(slot.price)}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter italic">
+                          <span className="text-[10px] font-semibold text-ink-soft uppercase tracking-tighter">
                              {slot.dayOfWeek === null ? 'Toàn bộ tuần' : DAYS.find(d => d.val === slot.dayOfWeek)?.label}
                           </span>
                           {slot.startDate && (
-                            <span className="text-[9px] font-bold text-indigo-400 flex items-center gap-1">
+                            <span className="text-[9px] font-medium text-muted flex items-center gap-1">
                                <Calendar size={10}/> {slot.startDate} → {slot.endDate || '...'}
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                         <span className="px-2 py-0.5 bg-slate-100 rounded-md text-[10px] font-black text-slate-400 border border-slate-200">P{slot.priority}</span>
+                         <span className="px-2 py-0.5 bg-chalk rounded-md text-[10px] font-semibold text-muted border border-line">P{slot.priority}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => handleEdit(slot)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"><Edit2 size={14}/></button>
-                          <button onClick={() => handleDelete(slot.id)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 size={14}/></button>
+                          <button onClick={() => handleEdit(slot)} className="p-2 text-pitch hover:bg-pitch-soft rounded-lg"><Edit2 size={14}/></button>
+                          <button onClick={() => handleDelete(slot.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={14}/></button>
                         </div>
                       </td>
                     </tr>
                   )) : (
                     <tr>
                       <td colSpan="5" className="py-12 text-center">
-                         <div className="flex flex-col items-center gap-2 text-slate-300 italic text-sm">
+                         <div className="flex flex-col items-center gap-2 text-muted text-sm">
                             <AlertCircle size={32} strokeWidth={1}/>
                             Chưa có khung giá tùy chỉnh nào cho sân này.
                          </div>

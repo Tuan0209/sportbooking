@@ -56,26 +56,26 @@ const UserVenueHome = () => {
   }, [venues, userLocation, searchTerm]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-28 font-sans animate-in fade-in duration-500">
-      
-      {/* 1. HEADER: ĐẨY HẾT LÊN 1 HÀNG VÀ MỞ RỘNG CHIỀU NGANG */}
-      <div className="bg-white/90 backdrop-blur-md px-4 md:px-8 py-4 sticky top-0 z-40 border-b border-gray-100 shadow-sm">
+    <div className="min-h-screen bg-chalk pb-28 font-sans animate-fade-up">
+
+      {/* 1. HEADER */}
+      <div className="bg-white/90 backdrop-blur-md px-4 md:px-8 py-4 sticky top-0 z-40 border-b border-line shadow-sm">
         <div className="max-w-[1600px] mx-auto flex flex-wrap lg:flex-nowrap items-center gap-4">
-          
+
           {/* Logo */}
-          <div className="w-10 h-10 bg-[#00a651] rounded-xl flex items-center justify-center text-white italic font-black text-2xl shadow-lg shrink-0">A</div>
-          
+          <div className="w-10 h-10 bg-pitch rounded-xl flex items-center justify-center text-white italic font-display font-extrabold text-2xl shadow-glow-lime shrink-0">S</div>
+
           {/* Thanh tìm kiếm - Co giãn linh hoạt (flex-1) */}
-          <div className="flex-1 relative min-w-[300px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm cơ sở, địa chỉ..." 
-              className="w-full bg-gray-100/50 border-none py-3 pl-12 pr-12 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#00a651] transition-all shadow-inner"
+          <div className="flex-1 relative min-w-[260px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm cơ sở, địa chỉ..."
+              className="w-full bg-chalk border border-line py-3 pl-12 pr-12 rounded-2xl text-sm font-medium text-ink placeholder:text-muted/70 focus:outline-none focus:border-pitch focus:ring-2 focus:ring-pitch/20 focus:bg-white transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[#00a651]">
+            <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-muted hover:text-pitch">
                <SlidersHorizontal size={20} />
             </button>
           </div>
@@ -89,17 +89,38 @@ const UserVenueHome = () => {
         </div>
       </div>
 
-      {/* 2. NỘI DUNG CHÍNH: MỞ RỘNG KHÔNG GIAN HIỂN THỊ */}
+      {/* 2. NỘI DUNG CHÍNH */}
       <div className="max-w-[1600px] mx-auto p-4 md:p-8">
+        {/* Dải hero sân vận động */}
+        <div className="stadium pitch-lines rounded-[28px] p-6 md:p-9 mb-8 relative overflow-hidden">
+          <div className="pointer-events-none absolute -right-16 -top-16 w-56 h-56 rounded-full border border-white/10" />
+          <div className="relative">
+            <span className="inline-flex items-center gap-1.5 text-lime text-[11px] font-bold uppercase tracking-widest bg-white/10 rounded-full px-3 py-1 mb-3">
+              Sân gần bạn
+            </span>
+            <h2 className="font-display text-white text-2xl md:text-3xl font-extrabold max-w-xl leading-tight">
+              Chọn sân, chốt giờ, ra sân thôi!
+            </h2>
+            <p className="text-white/70 text-sm mt-2 max-w-md">
+              Đặt sân bóng đá, cầu lông, pickleball quanh bạn — nhanh gọn, không gọi điện.
+            </p>
+          </div>
+        </div>
+
         {!loading && (
-          <div className="mb-6 flex items-center justify-between px-2">
-             <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Gần bạn nhất ({processedVenues.length})</h2>
+          <div className="mb-6 flex items-center justify-between px-1">
+             <h3 className="text-sm font-bold text-muted uppercase tracking-[0.2em]">Gần bạn nhất ({processedVenues.length})</h3>
           </div>
         )}
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {[1,2,3,4].map(i => <div key={i} className="h-96 bg-gray-100 rounded-[2.5rem] animate-pulse"></div>)}
+            {[1,2,3,4].map(i => <div key={i} className="h-96 bg-white border border-line rounded-4xl animate-pulse"></div>)}
+          </div>
+        ) : processedVenues.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="font-display text-ink text-lg font-bold">Chưa tìm thấy sân nào</p>
+            <p className="text-muted text-sm mt-1">Thử đổi từ khoá hoặc xoá bộ lọc tìm kiếm.</p>
           </div>
         ) : (
           /* Grid 4 cột trên màn hình siêu rộng để không bị trống */

@@ -34,27 +34,27 @@ const VenueMapPicker = ({ address, lat, lng, onSelect }) => {
   return (
     <div className="space-y-3">
       <div className="relative">
-        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Địa chỉ & Bản đồ</label>
+        <label className="text-xs font-semibold text-muted uppercase tracking-wide mb-2 block">Địa chỉ & Bản đồ</label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input 
-            type="text" 
-            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
+          <input
+            type="text"
+            className="w-full pl-10 pr-4 py-3 bg-chalk border border-line rounded-xl text-sm text-ink outline-none focus:ring-2 focus:ring-pitch"
             placeholder="Tìm kiếm địa chỉ trên Goong Maps..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
-        
+
         {suggestions.length > 0 && (
-          <div className="absolute w-full mt-1 bg-white border border-slate-100 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
+          <div className="absolute w-full mt-1 bg-white border border-line rounded-xl shadow-card-hover z-50 max-h-60 overflow-y-auto scrollbar-thin">
             {suggestions.map((p) => (
-              <button 
-                key={p.place_id} 
+              <button
+                key={p.place_id}
                 onClick={() => selectPlace(p)}
-                className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-start gap-2 border-b border-slate-50 last:border-none"
+                className="w-full text-left px-4 py-3 text-sm text-ink hover:bg-chalk flex items-start gap-2 border-b border-line last:border-none"
               >
-                <MapPin size={16} className="text-indigo-500 mt-0.5 shrink-0" />
+                <MapPin size={16} className="text-pitch mt-0.5 shrink-0" />
                 <span>{p.description}</span>
               </button>
             ))}
@@ -63,11 +63,11 @@ const VenueMapPicker = ({ address, lat, lng, onSelect }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
-          Lat: <span className="text-indigo-600">{lat || '0.0'}</span>
+        <div className="p-3 bg-chalk rounded-xl border border-line text-[11px] font-semibold text-muted uppercase tracking-wide">
+          Lat: <span className="text-pitch">{lat || '0.0'}</span>
         </div>
-        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
-          Lng: <span className="text-indigo-600">{lng || '0.0'}</span>
+        <div className="p-3 bg-chalk rounded-xl border border-line text-[11px] font-semibold text-muted uppercase tracking-wide">
+          Lng: <span className="text-pitch">{lng || '0.0'}</span>
         </div>
       </div>
     </div>

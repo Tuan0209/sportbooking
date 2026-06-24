@@ -8,8 +8,68 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Be Vietnam Pro", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: #06231A;
+  background: #F5F7F4;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5 {
+    font-family: "Sora", system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  /* Bề mặt "sân vận động" tối — panel signature.
+     Gộp luôn motif vạch kẻ sân vào background-image để không cần
+     ghi đè position/background, an toàn với .fixed/.sticky. */
+  .stadium {
+    background-color: #06231A;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px),
+      radial-gradient(120% 80% at 50% -10%, rgba(190,242,100,0.16), transparent 60%),
+      radial-gradient(90% 60% at 100% 110%, rgba(14,140,78,0.30), transparent 55%),
+      linear-gradient(160deg, #06231A 0%, #0A3A28 55%, #062019 100%);
+    background-size: 56px 56px, 56px 56px, auto, auto, auto;
+  }
+
+  /* .pitch-lines giữ làm class đánh dấu (vạch kẻ đã nằm trong .stadium) */
+  .pitch-lines { background-position: center; }
+
+  /* Thanh cuộn ẩn cho hàng chip ngang */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Thanh cuộn mảnh cho khu vực nội dung */
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cdd8cf; border-radius: 9999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+
+  .text-balance { text-wrap: balance; }
+}
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tiêu điểm bàn phím rõ ràng cho khả năng truy cập */
+:focus-visible {
+  outline: 2px solid #0E8C4E;
+  outline-offset: 2px;
 }

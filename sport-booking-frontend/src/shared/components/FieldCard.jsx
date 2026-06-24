@@ -9,42 +9,41 @@ const FieldCard = ({ field, onDetail }) => {
   const thumbImg = field.images?.find(img => img.type === 'thumbnail')?.imageUrl || field.thumbnailUrl;
 
   const getStatusColor = (status) => {
-    if (status === 'ACTIVE') return 'bg-green-500 hover:bg-green-600';
-    if (status === 'INACTIVE') return 'bg-yellow-400 hover:bg-yellow-500';
-    if (status === 'MAINTENANCE') return 'bg-yellow-400 hover:bg-yellow-500';
+    if (status === 'ACTIVE') return 'bg-pitch hover:bg-pitch-deep';
+    if (status === 'INACTIVE') return 'bg-amber hover:brightness-95';
+    if (status === 'MAINTENANCE') return 'bg-amber hover:brightness-95';
     return 'bg-gray-400';
-
   };
 
   return (
-    <div 
-      className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col group transition-all hover:shadow-lg cursor-pointer"
+    <div
+      className="bg-white rounded-2xl shadow-card overflow-hidden border border-line flex flex-col group transition-all hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer"
       onClick={() => onDetail(field)}
     >
       {/* PHẦN ẢNH BÌA (COVER) */}
-      <div className="relative h-48 overflow-hidden bg-slate-200">
+      <div className="relative h-48 overflow-hidden bg-ink-soft">
         {coverImg ? (
-          <img 
-            src={coverImg} 
+          <img
+            src={coverImg}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             alt={field.name}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-300 font-bold">
-            NO COVER IMAGE
+          <div className="w-full h-full flex items-center justify-center bg-chalk text-muted/50 font-medium text-sm">
+            Chưa có ảnh bìa
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent"></div>
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1.5">
           <div className="bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm w-fit">
-            <Star size={10} className="text-yellow-500 fill-yellow-500" />
-            <span className="text-[10px] font-black text-gray-700">5.0</span>
+            <Star size={10} className="text-amber fill-amber" />
+            <span className="text-[10px] font-bold text-ink">5.0</span>
           </div>
           <div className="flex gap-1">
-            <span className="bg-[#00a651] text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">Đơn ngày</span>
-            <span className="bg-[#bf5af2] text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">Sự kiện</span>
+            <span className="bg-pitch text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Đơn ngày</span>
+            <span className="bg-ink text-lime text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">Sự kiện</span>
           </div>
         </div>
       </div>
@@ -52,36 +51,36 @@ const FieldCard = ({ field, onDetail }) => {
       {/* PHẦN THÔNG TIN & AVATAR (THUMBNAIL) */}
       <div className="p-3 flex gap-3 relative">
         {/* Logo sân tròn (Thumbnail/Avatar) */}
-        <div className="w-12 h-12 rounded-full border-2 border-white shadow-md bg-white flex-shrink-0 -mt-8 z-10 flex items-center justify-center overflow-hidden">
+        <div className="w-12 h-12 rounded-full border-2 border-white shadow-card bg-white flex-shrink-0 -mt-8 z-10 flex items-center justify-center overflow-hidden">
            {thumbImg ? (
              <img src={thumbImg} className="w-full h-full object-cover" alt="logo" />
            ) : (
-             <span className="text-[14px] font-black text-indigo-400 uppercase">{field.name?.charAt(0)}</span>
+             <span className="text-[14px] font-display font-extrabold text-pitch uppercase">{field.name?.charAt(0)}</span>
            )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-gray-800 text-[14px] uppercase truncate tracking-tight leading-tight">
+          <h3 className="font-display font-bold text-ink text-[14px] truncate tracking-tight leading-tight">
             {field.name}
           </h3>
-          <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1">
-            <span className="text-[#f3a638] font-black shrink-0">(631.3km)</span>
+          <p className="text-[11px] text-muted mt-1 flex items-center gap-1">
+            <span className="text-pitch font-bold shrink-0">(631.3km)</span>
             <span className="truncate">{field.address}</span>
           </p>
-          <div className="flex items-center gap-1 text-gray-400 mt-1.5">
+          <div className="flex items-center gap-1 text-muted mt-1.5">
             <Clock size={12} />
-            <span className="text-[11px] font-bold">
+            <span className="text-[11px] font-medium">
               {formatTime(field.openTime)} - {formatTime(field.closeTime)}
             </span>
           </div>
         </div>
 
         <div className="flex items-center">
-          <button 
+          <button
             disabled={field.status !== 'ACTIVE'}
-            className={`${getStatusColor(field.status)} text-white text-[11px] font-black px-3.5 py-2 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap`}
+            className={`${getStatusColor(field.status)} text-white text-[11px] font-bold px-3.5 py-2 rounded-lg shadow-sm transition-all active:scale-95 whitespace-nowrap`}
           >
-            {field.status === 'ACTIVE' ? 'ĐẶT LỊCH' : 'ĐẶT LỊCH'}        
+            ĐẶT LỊCH
           </button>
         </div>
       </div>

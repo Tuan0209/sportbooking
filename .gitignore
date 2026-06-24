@@ -3,3 +3,15 @@ node_modules/
 .vscode/
 dist/
 build/
+
+# Logs
+*.log
+backend.log
+frontend.log
+
+# Playwright / ảnh chụp kiểm thử
+screenshots/
+test-results/
+playwright-report/
+sport-booking-frontend/shots.mjs
+sport-booking-frontend/verify.mjs

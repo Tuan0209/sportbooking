@@ -15,10 +15,10 @@ import VenueImagesModal from '../../components/admin/VenueImagesModal';
 
 const getStatusStyles = (status) => {
   switch (status) {
-    case 'ACTIVE': return 'bg-green-100 text-green-700 border-green-200';
-    case 'INACTIVE': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    case 'MAINTENANCE': return 'bg-red-100 text-red-700 border-red-200';
-    default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    case 'ACTIVE': return 'bg-pitch-soft text-pitch border-pitch/20';
+    case 'INACTIVE': return 'bg-amber-50 text-amber-600 border-amber-200';
+    case 'MAINTENANCE': return 'bg-red-50 text-red-600 border-red-200';
+    default: return 'bg-chalk text-muted border-line';
   }
 };
 
@@ -100,27 +100,27 @@ const ManageVenues = () => {
   return (
     <div className="space-y-6 p-2 animate-in fade-in duration-500">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="stadium pitch-lines rounded-3xl px-8 py-7 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-indigo-500 decoration-4">Quản lý Cơ sở</h1>
-          <p className="text-slate-400 text-sm font-medium italic">Hiển thị {filteredVenues.length} kết quả</p>
+          <h1 className="font-display text-2xl md:text-3xl font-extrabold text-white tracking-tight">Quản lý Cơ sở</h1>
+          <p className="text-white/60 text-sm font-medium mt-1">Hiển thị {filteredVenues.length} kết quả</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-bold flex items-center gap-2 hover:bg-indigo-700 shadow-xl shadow-indigo-100 active:scale-95 transition-all">
+        <button onClick={() => handleOpenModal()} className="bg-pitch text-white px-8 py-3.5 rounded-2xl font-semibold flex items-center gap-2 hover:bg-pitch-deep shadow-glow active:scale-95 transition-all">
           <Plus size={20} /> Thêm cơ sở mới
         </button>
       </div>
 
       {/* FILTER BAR */}
-      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white p-6 rounded-3xl shadow-card border border-line grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="relative md:col-span-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input type="text" placeholder="Tìm kiếm nhanh..." className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+          <input type="text" placeholder="Tìm kiếm nhanh..." className="w-full pl-10 pr-4 py-3 bg-chalk border border-line rounded-xl outline-none focus:ring-2 focus:ring-pitch text-sm font-semibold text-ink" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
-        <select className="px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm font-bold text-slate-600" value={filterArea} onChange={(e) => setFilterArea(e.target.value)}>
+        <select className="px-4 py-3 bg-chalk border border-line rounded-xl outline-none text-sm font-semibold text-ink focus:ring-2 focus:ring-pitch" value={filterArea} onChange={(e) => setFilterArea(e.target.value)}>
           <option value="">-- Tất cả khu vực --</option>
           {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
         </select>
-        <select className="px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm font-bold text-slate-600" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+        <select className="px-4 py-3 bg-chalk border border-line rounded-xl outline-none text-sm font-semibold text-ink focus:ring-2 focus:ring-pitch" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
           <option value="">-- Trạng thái --</option>
           <option value="ACTIVE">ACTIVE</option>
           <option value="INACTIVE">INACTIVE</option>
@@ -129,85 +129,85 @@ const ManageVenues = () => {
       </div>
 
       {/* TABLE SECTION */}
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-card border border-line overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left min-w-[1100px]">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-100">
-                <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">Cơ sở</th>
-                <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Khu vực</th>
-                <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Số sân</th>
-                <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Hoạt động</th>
-                <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Trạng thái</th>
-                <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Thao tác</th>
+              <tr className="bg-chalk border-b border-line">
+                <th className="px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wide">Cơ sở</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wide text-center">Khu vực</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wide text-center">Số sân</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wide text-center">Hoạt động</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wide text-center">Trạng thái</th>
+                <th className="px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wide text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-line">
               {currentItems.length > 0 ? currentItems.map((v) => (
-                <tr key={v.id} className="hover:bg-slate-50/50 transition-colors group">
-                  
-<td className="px-8 py-5">
-  <div 
-    className="flex items-center gap-4 cursor-pointer group/item" 
+                <tr key={v.id} className="hover:bg-chalk transition-colors group">
+
+<td className="px-8 py-4">
+  <div
+    className="flex items-center gap-4 cursor-pointer group/item"
     onClick={() => navigate(`/admin/venues/${v.id}`)} // Điều hướng vào Detail
   >
-    <img src={v.thumbnailUrl || '...'} className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm" />
+    <img src={v.thumbnailUrl || '...'} className="w-14 h-14 rounded-2xl object-cover border border-line shadow-sm" />
     <div>
-      <p className="font-black text-slate-800 text-[15px] group-hover/item:text-indigo-600 transition-colors">{v.name}</p>
-      <p className="text-[10px] text-slate-400 italic">Nhấn để quản lý chi tiết →</p>
+      <p className="font-bold text-ink text-[15px] group-hover/item:text-pitch transition-colors">{v.name}</p>
+      <p className="text-[11px] text-muted">Nhấn để quản lý chi tiết →</p>
     </div>
   </div>
 </td>
-                  <td className="px-6 py-5 text-center">
-                    <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase italic tracking-tighter border border-indigo-100/50">{v.areaName}</span>
+                  <td className="px-6 py-4 text-center">
+                    <span className="px-3 py-1 bg-pitch-soft text-pitch rounded-full text-[11px] font-semibold uppercase tracking-wide border border-pitch/15">{v.areaName}</span>
                   </td>
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-6 py-4 text-center">
                     <div className="flex flex-col items-center">
-                      <span className="text-sm font-black text-slate-700">{v.totalFields || 0} sân</span>
+                      <span className="text-sm font-bold text-ink">{v.totalFields || 0} sân</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-center font-bold text-slate-500 text-[12px]">
+                  <td className="px-6 py-4 text-center font-semibold text-muted text-[12px]">
                     {v.openTime?.slice(0, 5)} - {v.closeTime?.slice(0, 5)}
                   </td>
-                  <td className="px-6 py-5 text-center">
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase border tracking-widest ${getStatusStyles(v.status)}`}>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`px-3 py-1 rounded-full text-[11px] font-semibold uppercase border tracking-wide ${getStatusStyles(v.status)}`}>
                       {v.status}
                     </span>
                   </td>
-                  <td className="px-8 py-5 text-right">
+                  <td className="px-8 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => { setSelectedVenue(v); setIsImgModalOpen(true); }} className="p-2.5 text-amber-600 hover:bg-amber-50 rounded-xl transition-all shadow-sm border border-transparent hover:border-amber-100" title="Quản lý ảnh"><ImageIcon size={18} /></button>
-                      <button onClick={() => handleOpenModal(v)} className="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all shadow-sm border border-transparent hover:border-indigo-100" title="Sửa"><Edit size={18} /></button>
-                      <button onClick={() => { if(window.confirm("Xóa cơ sở này?")) venueService.deleteVenue(v.id).then(fetchData) }} className="p-2.5 text-rose-500 hover:bg-rose-100 rounded-xl transition-all shadow-sm border border-transparent hover:border-rose-100" title="Xóa"><Trash2 size={18} /></button>
+                      <button onClick={() => { setSelectedVenue(v); setIsImgModalOpen(true); }} className="p-2.5 text-amber-600 hover:bg-amber-50 rounded-xl transition-all border border-transparent hover:border-amber-100" title="Quản lý ảnh"><ImageIcon size={18} /></button>
+                      <button onClick={() => handleOpenModal(v)} className="p-2.5 text-pitch hover:bg-pitch-soft rounded-xl transition-all border border-transparent hover:border-pitch/15" title="Sửa"><Edit size={18} /></button>
+                      <button onClick={() => { if(window.confirm("Xóa cơ sở này?")) venueService.deleteVenue(v.id).then(fetchData) }} className="p-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100" title="Xóa"><Trash2 size={18} /></button>
                     </div>
                   </td>
                 </tr>
               )) : (
-                <tr><td colSpan="6" className="py-20 text-center text-slate-400 font-bold italic text-sm">Không có dữ liệu hiển thị.</td></tr>
+                <tr><td colSpan="6" className="py-20 text-center text-muted font-semibold text-sm">Không có dữ liệu hiển thị.</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
         {/* FOOTER PHÂN TRANG */}
-        <div className="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="px-8 py-5 bg-chalk border-t border-line flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 italic">Hiển thị</span>
-            <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="bg-white border border-slate-200 rounded-lg text-xs font-black p-1.5 outline-none">
+            <span className="text-xs font-semibold text-muted">Hiển thị</span>
+            <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="bg-white border border-line rounded-lg text-xs font-bold p-1.5 outline-none focus:ring-2 focus:ring-pitch">
               {[5, 10, 20].map(size => <option key={size} value={size}>{size}</option>)}
             </select>
-            <span className="text-xs font-bold text-slate-500 italic">dòng mỗi trang</span>
+            <span className="text-xs font-semibold text-muted">dòng mỗi trang</span>
           </div>
 
           <div className="flex items-center gap-1">
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage(1)} className="p-2 rounded-xl text-slate-400 hover:bg-white hover:text-indigo-600 disabled:opacity-30 transition-all"><ChevronsLeft size={18} /></button>
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="p-2 rounded-xl text-slate-400 hover:bg-white hover:text-indigo-600 disabled:opacity-30 transition-all"><ChevronLeft size={18} /></button>
+            <button disabled={currentPage === 1} onClick={() => setCurrentPage(1)} className="p-2 rounded-xl text-muted hover:bg-white hover:text-pitch disabled:opacity-30 transition-all"><ChevronsLeft size={18} /></button>
+            <button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="p-2 rounded-xl text-muted hover:bg-white hover:text-pitch disabled:opacity-30 transition-all"><ChevronLeft size={18} /></button>
             <div className="flex items-center gap-1 mx-2">
-               <span className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-black shadow-lg shadow-indigo-100">{currentPage}</span>
-               <span className="text-xs font-bold text-slate-400 uppercase">/ {totalPages || 1}</span>
+               <span className="px-3 py-1.5 bg-pitch text-white rounded-lg text-xs font-bold shadow-glow">{currentPage}</span>
+               <span className="text-xs font-semibold text-muted uppercase">/ {totalPages || 1}</span>
             </div>
-            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="p-2 rounded-xl text-slate-400 hover:bg-white hover:text-indigo-600 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
-            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(totalPages)} className="p-2 rounded-xl text-slate-400 hover:bg-white hover:text-indigo-600 disabled:opacity-30 transition-all"><ChevronsRight size={18} /></button>
+            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="p-2 rounded-xl text-muted hover:bg-white hover:text-pitch disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
+            <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage(totalPages)} className="p-2 rounded-xl text-muted hover:bg-white hover:text-pitch disabled:opacity-30 transition-all"><ChevronsRight size={18} /></button>
           </div>
         </div>
       </div>
@@ -219,19 +219,19 @@ const ManageVenues = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Khu vực</label>
-                <select value={formData.areaId} onChange={e => setFormData({ ...formData, areaId: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm font-bold border-slate-100">
+                <label className="text-xs font-semibold text-muted uppercase tracking-wide">Khu vực</label>
+                <select value={formData.areaId} onChange={e => setFormData({ ...formData, areaId: e.target.value })} className="w-full p-3 bg-chalk border rounded-xl outline-none text-sm font-semibold text-ink border-line focus:ring-2 focus:ring-pitch">
                   <option value="">-- Chọn khu vực --</option>
                   {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                <label className="text-xs font-semibold text-muted uppercase tracking-wide flex items-center gap-1">
                   <Activity size={12}/> Trạng thái
                 </label>
-                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm font-bold border-slate-100">
-                  <option value="ACTIVE" className="text-green-600 font-bold">ACTIVE (Hoạt động)</option>
-                  <option value="INACTIVE" className="text-yellow-600 font-bold">INACTIVE (Tạm dừng)</option>
+                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full p-3 bg-chalk border rounded-xl outline-none text-sm font-semibold text-ink border-line focus:ring-2 focus:ring-pitch">
+                  <option value="ACTIVE" className="text-pitch font-bold">ACTIVE (Hoạt động)</option>
+                  <option value="INACTIVE" className="text-amber-600 font-bold">INACTIVE (Tạm dừng)</option>
                   <option value="MAINTENANCE" className="text-red-600 font-bold">MAINTENANCE (Bảo trì)</option>
                 </select>
               </div>

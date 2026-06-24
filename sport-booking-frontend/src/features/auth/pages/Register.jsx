@@ -17,34 +17,49 @@ const Register = () => {
         alert('Đăng ký thành công!');
         navigate('/login');
       }
-    } catch (err) { alert('Lỗi đăng ký, vui lòng thử lại!'); }
+    } catch (err) {
+      alert('Lỗi đăng ký, vui lòng thử lại!');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#c8102e] flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-20 right-[5%] text-white/10 text-9xl font-serif">✦</div>
-      
-      <button onClick={() => navigate('/login')} className="absolute top-6 left-6 text-white">
-        <ChevronLeft size={28} />
+    <div className="min-h-screen stadium pitch-lines flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+      <div className="pointer-events-none absolute -top-32 -right-32 w-80 h-80 rounded-full border border-white/10" />
+      <div className="pointer-events-none absolute -bottom-40 -left-24 w-96 h-96 rounded-full border border-white/10" />
+
+      <button
+        onClick={() => navigate('/login')}
+        className="absolute top-6 left-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-20"
+        aria-label="Quay lại"
+      >
+        <ChevronLeft size={24} />
       </button>
 
-      <div className="w-full max-w-[440px] z-10">
-        <h2 className="text-white text-center text-[20px] font-bold mb-8 uppercase tracking-wider">Đăng ký</h2>
-        
-        <div className="bg-white rounded-[20px] p-8 pt-10 shadow-2xl">
+      <div className="w-full max-w-[440px] z-10 animate-fade-up">
+        <div className="flex flex-col items-center mb-7">
+          <div className="w-16 h-16 rounded-2xl bg-pitch flex items-center justify-center shadow-glow-lime mb-4 -rotate-3">
+            <span className="font-display font-extrabold text-white text-3xl italic">S</span>
+          </div>
+          <h1 className="text-white text-center text-3xl font-extrabold tracking-tight">Tạo tài khoản</h1>
+          <p className="text-lime/90 text-sm mt-2 font-medium">Gia nhập cộng đồng mê thể thao</p>
+        </div>
+
+        <div className="bg-white rounded-[28px] p-7 md:p-9 shadow-2xl">
           <form onSubmit={handleRegister}>
-            <Input label="Họ và tên (*)" placeholder="Nhập họ và tên" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} onClear={() => setFormData({ ...formData, name: '' })}/>
-            <Input label="Số điện thoại (*)" placeholder="Nhập số điện thoại" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} onClear={() => setFormData({ ...formData, phone: '' })} />
-            <Input label="Email (*)" placeholder="Nhập email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} onClear={() => setFormData({ ...formData, email: '' })}  />
-            <Input label="Mật khẩu (*)" isPassword placeholder="Nhập mật khẩu" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} onClear={() => setFormData({ ...formData, password: '' })} />
-            
-            <Button type="submit" className="mt-6">Đăng ký ngay</Button>
+            <Input label="Họ và tên (*)" placeholder="Nhập họ và tên" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} onClear={() => setFormData({ ...formData, name: '' })} />
+            <Input label="Số điện thoại (*)" placeholder="Nhập số điện thoại" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} onClear={() => setFormData({ ...formData, phone: '' })} />
+            <Input label="Email (*)" placeholder="Nhập email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} onClear={() => setFormData({ ...formData, email: '' })} />
+            <Input label="Mật khẩu (*)" isPassword placeholder="Nhập mật khẩu" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} onClear={() => setFormData({ ...formData, password: '' })} />
+
+            <Button type="submit" className="mt-5">Đăng ký ngay</Button>
           </form>
         </div>
-        
-        <div className="text-center mt-8 text-white text-[15px]">
-          Đã có tài khoản? <Link to="/login" className="font-bold underline decoration-1 ml-1">Đăng nhập</Link>
+
+        <div className="text-center mt-8 text-white/80 text-[15px]">
+          Đã có tài khoản?{' '}
+          <Link to="/login" className="text-lime font-bold hover:text-lime-deep transition-colors ml-1">
+            Đăng nhập
+          </Link>
         </div>
       </div>
     </div>

@@ -129,86 +129,86 @@ const ManageUsers = () => {
   // Logic màu sắc trạng thái
   const getStatusStyles = (status) => {
     switch (status) {
-      case 'ACTIVE': return 'bg-green-100 text-green-700 border-green-200';
-      case 'INACTIVE': return 'bg-yellow-100 text-yellow-700 border-yellow-200'; // Vàng
-      case 'BLOCKED': return 'bg-red-100 text-red-700 border-red-200';         // Đỏ
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'ACTIVE': return 'bg-pitch-soft text-pitch border-pitch/20';
+      case 'INACTIVE': return 'bg-amber/10 text-amber border-amber/20'; // Vàng
+      case 'BLOCKED': return 'bg-red-50 text-red-600 border-red-200';   // Đỏ
+      default: return 'bg-chalk text-muted border-line';
     }
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-up">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-800 tracking-tight">Quản lý Người dùng</h1>
-          <p className="text-gray-500 text-sm font-medium">Chỉnh sửa quyền hạn, trạng thái và ví tiền thành viên</p>
+          <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">Quản lý Người dùng</h1>
+          <p className="text-muted text-sm font-medium">Chỉnh sửa quyền hạn, trạng thái và ví tiền thành viên</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-6 py-3.5 rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all">
+        <button onClick={() => handleOpenModal()} className="flex items-center justify-center gap-2 bg-pitch text-white px-6 py-3.5 rounded-2xl font-semibold shadow-glow hover:bg-pitch-deep transition-all">
           <Plus size={20} /> Thêm User mới
         </button>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-card border border-line overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Thành viên</th>
-                <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest">Liên hệ</th>
-                <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Ví tiền</th>
-                <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Trạng thái</th>
-                <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Hành động</th>
+              <tr className="bg-chalk border-b border-line">
+                <th className="px-6 py-5 text-xs font-bold text-muted uppercase tracking-widest">Thành viên</th>
+                <th className="px-6 py-5 text-xs font-bold text-muted uppercase tracking-widest">Liên hệ</th>
+                <th className="px-6 py-5 text-xs font-bold text-muted uppercase tracking-widest text-center">Ví tiền</th>
+                <th className="px-6 py-5 text-xs font-bold text-muted uppercase tracking-widest text-center">Trạng thái</th>
+                <th className="px-6 py-5 text-xs font-bold text-muted uppercase tracking-widest text-right">Hành động</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-line">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50/80 transition-colors group">
+                <tr key={u.id} className="hover:bg-chalk transition-colors group">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
                       <div className="relative group/avatar">
-                        <img 
-                          src={u.avatarUrl || 'https://via.placeholder.com/150'} 
-                          alt="avatar" 
-                          className={`w-14 h-14 rounded-2xl object-cover shadow-sm border-2 border-white transition-all duration-300 ${uploadingId === u.id ? 'opacity-20 blur-sm scale-90' : 'opacity-100'}`}
+                        <img
+                          src={u.avatarUrl || 'https://via.placeholder.com/150'}
+                          alt="avatar"
+                          className={`w-14 h-14 rounded-2xl object-cover shadow-card border-2 border-white transition-all duration-300 ${uploadingId === u.id ? 'opacity-20 blur-sm scale-90' : 'opacity-100'}`}
                         />
                         {uploadingId === u.id ? (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-6 h-6 border-2 border-pitch border-t-transparent rounded-full animate-spin"></div>
                           </div>
                         ) : (
-                          <button 
+                          <button
                             onClick={() => { setSelectedUserId(u.id); setIsAvatarModalOpen(true); }}
-                            className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-all"
+                            className="absolute inset-0 bg-ink/50 rounded-2xl flex items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-all"
                           >
                             <Camera size={18} />
                           </button>
                         )}
                       </div>
                       <div>
-                        <p className="font-bold text-gray-800 text-[15px]">{u.name}</p>
-                        <p className="text-[11px] text-indigo-600 font-black uppercase tracking-wider">{u.role}</p>
+                        <p className="font-semibold text-ink text-[15px]">{u.name}</p>
+                        <p className="text-[11px] text-pitch font-bold uppercase tracking-wider">{u.role}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                    <p className="text-sm font-medium text-gray-600">{u.email}</p>
-                    <p className="text-xs text-gray-400">{u.phone}</p>
+                    <p className="text-sm font-medium text-ink-soft">{u.email}</p>
+                    <p className="text-xs text-muted">{u.phone}</p>
                   </td>
                   <td className="px-6 py-5 text-center">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 rounded-xl">
-                       <Wallet size={14} className="text-orange-500" />
-                       <span className="text-sm font-black text-orange-600">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber/10 rounded-xl">
+                       <Wallet size={14} className="text-amber" />
+                       <span className="text-sm font-bold text-amber">
                          {u.coinBalance?.toLocaleString() || 0}đ
                        </span>
                     </div>
                   </td>
                   <td className="px-6 py-5 text-center">
-                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase border ${getStatusStyles(u.status)}`}>
+                    <span className={`px-3 py-1 rounded-full text-[11px] font-semibold uppercase border ${getStatusStyles(u.status)}`}>
                       {u.status}
                     </span>
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => handleOpenModal(u)} className="p-2.5 text-indigo-600 hover:bg-indigo-100 rounded-xl transition-all"><Edit size={18} /></button>
+                      <button onClick={() => handleOpenModal(u)} className="p-2.5 text-pitch hover:bg-pitch-soft rounded-xl transition-all"><Edit size={18} /></button>
                       <button onClick={() => handleDelete(u.id)} className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all"><Trash2 size={18} /></button>
                     </div>
                   </td>
@@ -222,22 +222,22 @@ const ManageUsers = () => {
       {/* MODAL CẬP NHẬT AVATAR GIỮ NGUYÊN */}
       <Modal isOpen={isAvatarModalOpen} onClose={() => setIsAvatarModalOpen(false)} title="Thay đổi ảnh đại diện">
     <div className="space-y-6">
-      <div className="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-        <label className="text-sm text-indigo-700 font-bold mb-3 flex items-center gap-2">
+      <div className="p-5 bg-pitch-soft rounded-2xl border border-pitch/15">
+        <label className="text-sm text-pitch-deep font-semibold mb-3 flex items-center gap-2">
           <LinkIcon size={16} /> Nhập link ảnh trực tiếp
         </label>
         <div className="flex gap-2">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="https://images.unsplash.com/..."
-            className="flex-1 px-4 py-3.5 rounded-xl border border-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white shadow-sm"
+            className="flex-1 px-4 py-3.5 rounded-xl border border-line outline-none focus:ring-2 focus:ring-pitch text-sm bg-white shadow-card"
             value={avatarUrlInput}
             onChange={(e) => setAvatarUrlInput(e.target.value)}
           />
-          <button 
+          <button
             onClick={() => handleAvatarUpdate('url', avatarUrlInput)}
             disabled={!avatarUrlInput}
-            className="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold disabled:opacity-50 hover:bg-indigo-700 transition-colors"
+            className="bg-pitch text-white px-5 py-2 rounded-xl font-semibold disabled:opacity-50 hover:bg-pitch-deep transition-colors"
           >
             Lưu
           </button>
@@ -245,20 +245,20 @@ const ManageUsers = () => {
       </div>
 
       <div className="relative flex items-center py-2">
-        <div className="flex-grow border-t border-gray-100"></div>
-        <span className="flex-shrink mx-4 text-xs font-black text-gray-300 uppercase tracking-widest">Hoặc</span>
-        <div className="flex-grow border-t border-gray-100"></div>
+        <div className="flex-grow border-t border-line"></div>
+        <span className="flex-shrink mx-4 text-xs font-bold text-muted uppercase tracking-widest">Hoặc</span>
+        <div className="flex-grow border-t border-line"></div>
       </div>
 
-      <button 
+      <button
         onClick={() => fileInputRef.current.click()}
-        className="w-full py-10 border-2 border-dashed border-gray-200 rounded-[2rem] hover:border-indigo-400 hover:bg-indigo-50/50 transition-all group flex flex-col items-center justify-center"
+        className="w-full py-10 border-2 border-dashed border-line rounded-3xl hover:border-pitch hover:bg-pitch-soft transition-all group flex flex-col items-center justify-center"
       >
-        <div className="p-4 bg-gray-50 rounded-2xl group-hover:bg-indigo-100 transition-colors mb-3">
-           <Camera className="text-gray-400 group-hover:text-indigo-600 transition-colors" size={32} />
+        <div className="p-4 bg-chalk rounded-2xl group-hover:bg-pitch-soft transition-colors mb-3">
+           <Camera className="text-muted group-hover:text-pitch transition-colors" size={32} />
         </div>
-        <p className="text-sm font-bold text-gray-500 group-hover:text-indigo-600">Tải ảnh lên từ thiết bị</p>
-        <p className="text-[11px] text-gray-400 mt-1">Chấp nhận JPG, PNG, WEBP</p>
+        <p className="text-sm font-semibold text-muted group-hover:text-pitch">Tải ảnh lên từ thiết bị</p>
+        <p className="text-[11px] text-muted mt-1">Chấp nhận JPG, PNG, WEBP</p>
       </button>
     </div>
   </Modal>
@@ -283,28 +283,28 @@ const ManageUsers = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Cột Role */}
             <div className="space-y-2">
-              <label className="text-[15px] font-bold text-[#004d31] flex items-center gap-2">
+              <label className="text-[15px] font-semibold text-ink-soft flex items-center gap-2">
                 <Shield size={16} /> Quyền hạn
               </label>
-              <select 
+              <select
                 value={formData.role}
                 onChange={e => setFormData({...formData, role: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium bg-gray-50"
+                className="w-full px-4 py-3 border border-line rounded-xl outline-none focus:ring-2 focus:ring-pitch text-sm font-medium bg-chalk"
               >
                 <option value="USER">USER (Khách hàng)</option>
                 <option value="ADMIN">ADMIN (Quản trị)</option>
               </select>
             </div>
-            
+
             {/* Cột Status */}
             <div className="space-y-2">
-              <label className="text-[15px] font-bold text-[#004d31] flex items-center gap-2">
+              <label className="text-[15px] font-semibold text-ink-soft flex items-center gap-2">
                 <Activity size={16} /> Trạng thái
               </label>
-              <select 
+              <select
                 value={formData.status}
                 onChange={e => setFormData({...formData, status: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium bg-gray-50"
+                className="w-full px-4 py-3 border border-line rounded-xl outline-none focus:ring-2 focus:ring-pitch text-sm font-medium bg-chalk"
               >
                 <option value="ACTIVE">ACTIVE (Hoạt động)</option>
                 <option value="INACTIVE" className="text-yellow-600">INACTIVE (Tạm Khóa)</option>
@@ -328,8 +328,8 @@ const ManageUsers = () => {
             />
           </div>
 
-          <div className="pt-4 border-t border-gray-100">
-            <Button type="submit" className="shadow-indigo-100 shadow-lg">
+          <div className="pt-4 border-t border-line">
+            <Button type="submit">
               {editUser ? "Xác nhận cập nhật" : "Tạo người dùng ngay"}
             </Button>
           </div>
