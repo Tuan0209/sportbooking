@@ -16,20 +16,20 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE) // mọi thuộc tính đều là private
 public class RegisterRequest {
-    @NotBlank(message = "Name is required")
-    @Size(min = 3, max = 100, message = "USER_INVALID")
+    @NotBlank(message = "Vui lòng nhập họ và tên")
+    @Size(min = 3, max = 100, message = "Họ và tên phải từ 3 đến 100 ký tự")
     private String name;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Vui lòng nhập email")
+    @Email(message = "Email không hợp lệ")
     @Size(max = 100)
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 255, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Vui lòng nhập mật khẩu")
+    @Size(min = 6, max = 255, message = "Mật khẩu tối thiểu 6 ký tự")
     private String password;
 
-    @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone must be 10-11 digits")
+    @Pattern(regexp = "^[0-9]{10,11}$", message = "Số điện thoại phải gồm 10-11 chữ số")
     private String phone;
 
 }

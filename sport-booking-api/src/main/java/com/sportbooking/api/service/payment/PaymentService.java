@@ -66,6 +66,20 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    /** Tạo bản ghi thanh toán đã PAID cho booking trả bằng COIN (để có thể hoàn tiền sau này). */
+    @Transactional
+    public Payment createCoinPaid(Booking booking) {
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .amount(booking.getTotalPrice())
+                .method(PaymentMethod.COIN)
+                .status(PaymentStatus.PAID)
+                .transactionCode(booking.getBookingCode())
+                .paidAt(LocalDateTime.now())
+                .build();
+        return paymentRepository.save(payment);
+    }
+
     /** Lấy thông tin thanh toán theo booking (để hiển thị QR). */
     public PaymentResponse getByBookingId(String bookingId) {
         Payment payment = paymentRepository.findByBookingId(bookingId)

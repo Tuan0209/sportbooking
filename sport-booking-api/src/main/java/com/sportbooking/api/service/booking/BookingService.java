@@ -149,10 +149,15 @@ public class BookingService {
 
         bookingSlotRepository.saveAll(bookingSlots);
 
-        // Với chuyển khoản QR / PayOS: tạo bản ghi thanh toán PENDING
+        // Tạo bản ghi thanh toán tương ứng phương thức
         String paymentId = null;
         if (paymentMethod == PaymentMethod.BANK_QR || paymentMethod == PaymentMethod.PAYOS) {
+            // Chuyển khoản QR / PayOS: thanh toán PENDING (chờ xác nhận)
             Payment payment = paymentService.createForBooking(booking, paymentMethod);
+            paymentId = payment.getId();
+        } else if (paymentMethod == PaymentMethod.COIN) {
+            // Trả bằng coin: đã thanh toán ngay -> tạo payment PAID để có thể hoàn tiền
+            Payment payment = paymentService.createCoinPaid(booking);
             paymentId = payment.getId();
         }
 

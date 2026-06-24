@@ -11,6 +11,14 @@ const STATUS_BADGE = {
   REFUNDED: 'bg-chalk text-muted border-line',
 };
 
+const STATUS_LABEL = {
+  PENDING: 'Chờ duyệt',
+  PAID: 'Đã duyệt',
+  FAILED: 'Từ chối',
+  EXPIRED: 'Hết hạn',
+  REFUNDED: 'Đã hoàn',
+};
+
 const ManagePayments = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +134,7 @@ const ManagePayments = () => {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[p.status] || 'bg-chalk text-muted border-line'}`}>
-                      {p.status}
+                      {STATUS_LABEL[p.status] || p.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">

@@ -7,18 +7,29 @@ import Button from '../../../shared/components/Button';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(null);
+
+    // Kiểm tra phía client trước khi gửi
+    if (!formData.name || !formData.email || !formData.password || !formData.phone) {
+      setError('Vui lòng nhập đầy đủ thông tin.');
+      return;
+    }
+
     try {
       const res = await authService.register(formData);
       if (res.data.code === 0) {
         alert('Đăng ký thành công!');
         navigate('/login');
+      } else {
+        setError(res.data.message || 'Đăng ký thất bại');
       }
     } catch (err) {
-      alert('Lỗi đăng ký, vui lòng thử lại!');
+      setError(err.response?.data?.message || 'Đăng ký thất bại, vui lòng thử lại!');
     }
   };
 
@@ -50,6 +61,12 @@ const Register = () => {
             <Input label="Số điện thoại (*)" placeholder="Nhập số điện thoại" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} onClear={() => setFormData({ ...formData, phone: '' })} />
             <Input label="Email (*)" placeholder="Nhập email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} onClear={() => setFormData({ ...formData, email: '' })} />
             <Input label="Mật khẩu (*)" isPassword placeholder="Nhập mật khẩu" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} onClear={() => setFormData({ ...formData, password: '' })} />
+
+            {error && (
+              <div className="text-red-600 text-sm mt-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                {error}
+              </div>
+            )}
 
             <Button type="submit" className="mt-5">Đăng ký ngay</Button>
           </form>

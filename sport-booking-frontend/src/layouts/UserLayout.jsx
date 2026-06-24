@@ -35,17 +35,17 @@ const UserLayout = () => {
          <BottomNavItem path="/map" icon={MapIcon} label="Bản đồ" />
 
          {/* Nút Khám phá ở giữa */}
-         <div className="flex flex-col items-center -translate-y-4 flex-1">
-            <div
-              onClick={() => navigate('/explore')}
-              className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-chalk mb-1 group cursor-pointer active:scale-90 transition-all"
-            >
+         <button
+           onClick={() => navigate('/explore')}
+           className="flex flex-col items-center -translate-y-4 flex-1 group cursor-pointer"
+         >
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-chalk mb-1 active:scale-90 transition-all">
                <div className="w-12 h-12 bg-pitch rounded-full flex items-center justify-center text-white shadow-glow-lime">
                   <Compass size={28} className="group-hover:rotate-45 transition-transform duration-500" />
                </div>
             </div>
             <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Khám phá</span>
-         </div>
+         </button>
 
          <BottomNavItem path="/trending" icon={Zap} label="Nổi bật" />
          <BottomNavItem path="/profile" icon={User} label="Tài khoản" />

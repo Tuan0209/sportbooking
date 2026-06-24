@@ -6,6 +6,7 @@ import com.sportbooking.api.dto.request.auth.RegisterRequest;
 import com.sportbooking.api.dto.response.auth.AuthResponse;
 import com.sportbooking.api.service.auth.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    ApiResponse<AuthResponse> register(@RequestBody RegisterRequest request) {
+    ApiResponse<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         return ApiResponse.<AuthResponse>builder()
                 .message("User registered successfully")
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ApiResponse<AuthResponse> login(@RequestBody LoginRequest request) {
+    ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.<AuthResponse>builder()
                 .result(authService.login(request))
                 .build();

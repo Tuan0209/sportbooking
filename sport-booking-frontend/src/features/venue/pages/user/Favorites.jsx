@@ -60,7 +60,7 @@ const Favorites = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {venues.map((v) => (
-              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} />
+              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} isFavorite={true} />
             ))}
           </div>
         )}
