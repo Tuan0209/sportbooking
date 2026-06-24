@@ -41,6 +41,7 @@ import com.sportbooking.api.common.enums.WalletTransactionType;
 import com.sportbooking.api.entity.payment.Payment;
 import com.sportbooking.api.entity.wallet.WalletTransaction;
 import com.sportbooking.api.service.payment.PaymentService;
+import com.sportbooking.api.service.notification.EmailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,6 +57,7 @@ public class BookingService {
     private final PaymentRepository paymentRepository;
     private final RefundRequestRepository refundRequestRepository;
     private final WalletTransactionRepository walletTransactionRepository;
+    private final EmailService emailService;
 
     @Transactional
     public BookingResponse create(
@@ -173,6 +175,12 @@ public class BookingService {
                     .balanceAfter(user.getCoinBalance())
                     .build());
         }
+
+        // Gửi email báo đơn mới cho admin (bất đồng bộ, best-effort)
+        emailService.sendNewBookingNotification(
+                booking.getBookingCode(), request.getCustomerName(), request.getCustomerPhone(),
+                field.getVenue().getName(), field.getName(), bookingDate.toString(),
+                bookingStart + " - " + bookingEnd, request.getTotalPrice(), paymentMethod.name());
 
         return BookingResponse.builder()
                 .id(booking.getId())
@@ -384,6 +392,16 @@ public class BookingService {
 
             createdDates.add(date.toString());
             totalPrice = totalPrice.add(pricePerDay);
+        }
+
+        // Gửi email báo vé tháng mới cho admin
+        if (!createdDates.isEmpty()) {
+            emailService.sendNewBookingNotification(
+                    "VÉ THÁNG (" + createdDates.size() + " buổi)",
+                    request.getCustomerName(), request.getCustomerPhone(),
+                    field.getVenue().getName(), field.getName(),
+                    "Tháng " + request.getMonth() + "/" + request.getYear(),
+                    bookingStart + " - " + bookingEnd, totalPrice, "Vé tháng");
         }
 
         return MonthlyBookingResponse.builder()

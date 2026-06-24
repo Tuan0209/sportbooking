@@ -29,6 +29,7 @@ cloudinary:
   api-secret: pmJw_zzLGnKjz3FGP3itz8IKcDM
 
 app:
+  admin-notify-email: "buituan2000.tt@gmail.com" # email nhận thông báo đơn mới
   avatar:
     max-size: 5242880 # 5MB
   bank: # Thông tin nhận chuyển khoản thủ công (sinh QR VietQR)
@@ -41,6 +42,12 @@ payos: # Để trống nếu chưa có tài khoản -> chạy chế độ mô ph
   client-id: ""
   api-key: ""
   checksum-key: ""
+
+# Gửi email báo đơn (Resend)
+resend:
+  api-key: "re_34pau2R4_9fXu5vcBo6MzBWNaXJpHLcC6"
+mail:
+  from: "SVĐ Booking <noreply@qlhtt.io.vn>"
 application:
   jwt:
     secret-key: your-secret-key-your-secret-key-123456

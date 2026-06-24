@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { venueService } from '../../services/venueService';
 import { favoriteService } from '../../services/favoriteService';
 import VenueCard from '../../components/user/VenueCard';
+import { useUserLocation } from '../../../../shared/hooks/useUserLocation';
+import { calculateDistance } from '../../../../shared/utils/distance';
 import { Search, MapPin, X } from 'lucide-react';
 
 // Lấy danh sách môn thể thao có trong 1 cơ sở (từ các sân con)
@@ -14,6 +16,9 @@ const Explore = () => {
   const [sport, setSport] = useState('');
   const [area, setArea] = useState('');
   const [favIds, setFavIds] = useState(new Set());
+  const { userLocation, isLocating } = useUserLocation();
+  const distanceOf = (v) =>
+    userLocation ? calculateDistance(userLocation.lat, userLocation.lng, v.latitude, v.longitude) : null;
 
   useEffect(() => {
     venueService
@@ -125,7 +130,7 @@ const Explore = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
             {filtered.map((v) => (
-              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} isFavorite={favIds.has(v.id)} />
+              <VenueCard key={v.id} venue={v} distance={distanceOf(v)} isLocating={isLocating} isFavorite={favIds.has(v.id)} />
             ))}
           </div>
         )}

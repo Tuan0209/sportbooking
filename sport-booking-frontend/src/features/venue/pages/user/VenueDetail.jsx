@@ -5,6 +5,8 @@ import { venueService } from '../../services/venueService';
 import { favoriteService } from '../../services/favoriteService';
 import { reviewService } from '../../../review/services/reviewService';
 import VenueMap from '../../../../shared/components/VenueMap';
+import { useUserLocation } from '../../../../shared/hooks/useUserLocation';
+import { calculateDistance, formatDistance } from '../../../../shared/utils/distance';
 import { formatTime, formatPrice } from '../../../../shared/utils/formatDate';
 
 const STATUS = {
@@ -20,6 +22,10 @@ const VenueDetail = () => {
   const [reviews, setReviews] = useState({ averageRating: 0, totalReviews: 0, items: [] });
   const [loading, setLoading] = useState(true);
   const [fav, setFav] = useState(false);
+  const { userLocation } = useUserLocation();
+  const distance = venue && userLocation
+    ? calculateDistance(userLocation.lat, userLocation.lng, venue.latitude, venue.longitude)
+    : null;
 
   useEffect(() => {
     venueService.getVenueById(venueId)
@@ -85,7 +91,10 @@ const VenueDetail = () => {
           </div>
           <div className="flex items-start gap-2">
             <MapPin size={16} className="text-pitch shrink-0 mt-0.5" />
-            <span className="text-sm text-ink">{venue.address}</span>
+            <span className="text-sm text-ink">
+              {distance != null && <span className="font-bold text-pitch mr-1">{formatDistance(distance)} ·</span>}
+              {venue.address}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-muted" />

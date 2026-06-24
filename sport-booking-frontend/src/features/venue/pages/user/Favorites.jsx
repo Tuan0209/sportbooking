@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Loader2 } from 'lucide-react';
 import { favoriteService } from '../../services/favoriteService';
 import VenueCard from '../../components/user/VenueCard';
+import { useUserLocation } from '../../../../shared/hooks/useUserLocation';
+import { calculateDistance } from '../../../../shared/utils/distance';
 
 const Favorites = () => {
   const navigate = useNavigate();
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { userLocation, isLocating } = useUserLocation();
+  const distanceOf = (v) =>
+    userLocation ? calculateDistance(userLocation.lat, userLocation.lng, v.latitude, v.longitude) : null;
 
   useEffect(() => {
     favoriteService
@@ -60,7 +65,7 @@ const Favorites = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {venues.map((v) => (
-              <VenueCard key={v.id} venue={v} distance={null} isLocating={false} isFavorite={true} />
+              <VenueCard key={v.id} venue={v} distance={distanceOf(v)} isLocating={isLocating} isFavorite={true} />
             ))}
           </div>
         )}
