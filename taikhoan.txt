@@ -1,0 +1,63 @@
+==========================================================
+ HỆ THỐNG ĐẶT SÂN THỂ THAO (SVĐ) - THÔNG TIN TÀI KHOẢN
+==========================================================
+
+------------------------------
+ TÀI KHOẢN ĐĂNG NHẬP (mật khẩu đều: 123456)
+------------------------------
+ADMIN (quản trị):
+  Email   : admin@gmail.com
+  Mật khẩu: 123456
+
+NGƯỜI DÙNG (demo):
+  Email   : demo@test.com
+  Mật khẩu: 123456
+
+(Có thể tự đăng ký tài khoản mới ở trang /register)
+(Quên mật khẩu: trang /forgot-password - chỉ cần nhập email)
+
+------------------------------
+ ĐỊA CHỈ TRUY CẬP (chạy trên máy local)
+------------------------------
+Giao diện web : http://localhost:5173
+API backend   : http://localhost:8081/api
+
+------------------------------
+ CƠ SỞ DỮ LIỆU (MySQL)
+------------------------------
+Database : sportbookingg
+Host     : localhost:3306
+User     : root
+Mật khẩu : root
+
+------------------------------
+ CÁCH CHẠY DỰ ÁN
+------------------------------
+1) MySQL: tạo DB "sportbookingg" và import file SQL trong thư mục gốc
+   (file: "sportbookingg (9).sql" - bản mới nhất).
+
+2) Backend (Spring Boot) - thư mục sport-booking-api:
+   - Build : mvnw -DskipTests clean package
+   - Chạy  : java -jar target/sport-booking-api-0.0.1-SNAPSHOT.jar --server.port=8081
+   (Port 8081 vì 8080 có thể bị app khác chiếm; nếu muốn dùng 8080
+    thì sửa lại baseURL ở sport-booking-frontend/src/shared/services/axiosClient.js)
+
+3) Frontend (React + Vite) - thư mục sport-booking-frontend:
+   - Cài  : npm install
+   - Chạy : npm run dev   (mở http://localhost:5173)
+
+------------------------------
+ CẤU HÌNH DỊCH VỤ (sport-booking-api/src/main/resources/application.yaml)
+------------------------------
+- Ngân hàng nhận chuyển khoản (sinh mã QR VietQR): app.bank.*
+  (đang để MB Bank demo - đổi sang số TK thật khi triển khai)
+- PayOS: payos.client-id / api-key / checksum-key (đang để trống -> chạy
+  chế độ mô phỏng; điền key thật khi có tài khoản PayOS)
+- Cloudinary: dùng để upload ảnh (bill thanh toán, avatar, ảnh sân)
+
+------------------------------
+ MÃ GIẢM GIÁ MẪU (để thử ở trang xác nhận đặt sân)
+------------------------------
+WELCOME10 : giảm 10% (tối đa 50.000đ)
+GIAM50K   : giảm 50.000đ cho đơn từ 200.000đ
+==========================================================

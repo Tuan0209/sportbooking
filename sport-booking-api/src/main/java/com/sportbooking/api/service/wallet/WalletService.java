@@ -61,7 +61,7 @@ public class WalletService {
                 .userId(userId)
                 .amount(amount)
                 .type(WalletTransactionType.ADD)
-                .reason("Nạp coin vào ví")
+                .reason("Nạp coin qua cổng PayOS")
                 .balanceAfter(newBalance)
                 .build());
 

@@ -40,7 +40,7 @@ const VenueCard = ({ venue, distance, onBooking, isLocating, isFavorite: initial
 
   return (
     <div className={`group bg-white rounded-4xl shadow-card overflow-hidden flex flex-col border border-line transition-all duration-300 ${!isAvailable ? 'opacity-90' : 'hover:shadow-card-hover hover:-translate-y-1'}`}>
-      <div className="relative h-52 overflow-hidden bg-ink-soft">
+      <div className="relative h-52 overflow-hidden bg-ink-soft cursor-pointer" onClick={() => navigate(`/venue/${venue.id}`)}>
         <img
           src={venue.coverUrl || "https://images.unsplash.com/photo-1459865264687-595d652de67e?q=80&w=800&auto=format&fit=crop"}
           className={`w-full h-full object-cover transition-all duration-700 ${isAvailable ? 'group-hover:scale-110' : 'grayscale-[0.5]'}`}
@@ -70,7 +70,7 @@ const VenueCard = ({ venue, distance, onBooking, isLocating, isFavorite: initial
       </div>
 
       <div className="p-5 flex flex-col flex-1">
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 items-start cursor-pointer" onClick={() => navigate(`/venue/${venue.id}`)}>
           <div className="w-14 h-14 rounded-2xl border-4 border-white shadow-card bg-white -mt-10 z-10 overflow-hidden shrink-0 flex items-center justify-center">
             {venue.thumbnailUrl
               ? <img src={venue.thumbnailUrl} className="w-full h-full object-cover" alt="logo" />

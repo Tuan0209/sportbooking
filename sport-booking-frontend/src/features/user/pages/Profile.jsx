@@ -1,6 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
+import { bookingService } from '../../booking/services/bookingService';
+import { favoriteService } from '../../venue/services/favoriteService';
+import { formatPrice } from '../../../shared/utils/formatDate';
 import {
   LayoutGrid,
   Calendar,
@@ -24,6 +27,22 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview');
+  const [myBookings, setMyBookings] = useState([]);
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    bookingService.myBookings()
+      .then((res) => { if (res.data.code === 0) setMyBookings(res.data.result || []); })
+      .catch(() => {});
+    favoriteService.myFavoriteIds()
+      .then((res) => { if (res.data.code === 0) setFavCount((res.data.result || []).length); })
+      .catch(() => {});
+  }, []);
+
+  const totalSpent = myBookings
+    .filter((b) => b.status === 'CONFIRMED' || b.status === 'COMPLETED')
+    .reduce((s, b) => s + Number(b.totalPrice || 0), 0);
+  const recentBookings = myBookings.slice(0, 3);
 
   const tabs = [
     {
@@ -86,20 +105,20 @@ const Profile = () => {
             {/* INFO */}
             <div className="mt-5">
               <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-                {user?.fullName || 'Nguyễn Văn A'}
+                {user?.name || user?.fullName || 'Người dùng'}
               </h1>
 
               <p className="text-white/70 mt-2 font-medium">
-                {user?.email || 'user@gmail.com'}
+                {user?.email || ''}
               </p>
 
               <div className="flex items-center justify-center gap-3 flex-wrap mt-5">
                 <div className="px-5 py-2 rounded-full bg-white/10 backdrop-blur-md text-white font-semibold border border-white/20">
-                  Thành viên từ 2026
+                  {user?.role === 'ADMIN' ? 'Quản trị viên' : 'Thành viên'}
                 </div>
 
                 <div className="px-5 py-2 rounded-full bg-lime text-ink font-display font-extrabold shadow-glow-lime">
-                  1,250 Coin
+                  {formatPrice(Number(user?.coinBalance || 0))}
                 </div>
               </div>
             </div>
@@ -119,7 +138,12 @@ const Profile = () => {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                      if (tab.id === 'history') return navigate('/my-bookings');
+                      if (tab.id === 'favorites') return navigate('/favorites');
+                      if (tab.id === 'wallet') return navigate('/wallet');
+                      setActiveTab(tab.id);
+                    }}
                     className={`
                       w-full h-14 px-4 rounded-2xl
                       flex items-center justify-between
@@ -172,25 +196,25 @@ const Profile = () => {
                 <StatCard
                   icon={<Calendar size={24} />}
                   title="Trận đã đặt"
-                  value="12"
+                  value={String(myBookings.length)}
                 />
 
                 <StatCard
                   icon={<TrendingUp size={24} />}
                   title="Đã chi tiêu"
-                  value="2.450.000đ"
+                  value={formatPrice(totalSpent)}
                 />
 
                 <StatCard
                   icon={<Heart size={24} />}
                   title="Sân yêu thích"
-                  value="08"
+                  value={String(favCount)}
                 />
 
                 <StatCard
-                  icon={<Star size={24} />}
-                  title="Đánh giá"
-                  value="4.8"
+                  icon={<Wallet size={24} />}
+                  title="Số dư ví"
+                  value={formatPrice(Number(user?.coinBalance || 0))}
                 />
               </div>
 
@@ -206,11 +230,15 @@ const Profile = () => {
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  {[1, 2, 3].map((item) => (
-                    <BookingCard key={item} />
-                  ))}
-                </div>
+                {recentBookings.length === 0 ? (
+                  <p className="text-muted text-sm">Bạn chưa có lượt đặt nào. Hãy đặt sân đầu tiên nhé!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {recentBookings.map((b) => (
+                      <BookingCard key={b.id} booking={b} onClick={() => navigate('/my-bookings')} />
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* QUICK ACTIONS */}
@@ -370,38 +398,40 @@ const StatCard = ({ icon, title, value }) => {
   );
 };
 
-const BookingCard = () => {
+const BOOKING_STATUS = {
+  CONFIRMED: { l: 'Đã xác nhận', c: 'bg-pitch-soft text-pitch' },
+  PENDING_PAYMENT: { l: 'Chờ thanh toán', c: 'bg-amber-50 text-amber-600' },
+  PENDING_CONFIRMATION: { l: 'Chờ duyệt', c: 'bg-amber-50 text-amber-600' },
+  COMPLETED: { l: 'Hoàn thành', c: 'bg-pitch-soft text-pitch' },
+  CANCELED: { l: 'Đã huỷ', c: 'bg-red-50 text-red-600' },
+  REJECTED: { l: 'Bị từ chối', c: 'bg-red-50 text-red-600' },
+};
+
+const BookingCard = ({ booking, onClick }) => {
+  const st = BOOKING_STATUS[booking?.status] || { l: booking?.status, c: 'bg-chalk text-muted' };
   return (
-    <div className="flex items-center gap-4 sm:gap-5 bg-chalk hover:bg-pitch-soft/60 transition-all rounded-2xl p-4 sm:p-5 border border-line cursor-pointer">
-      {/* IMAGE */}
-      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0">
-        <img
-          src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"
-          alt=""
-          className="w-full h-full object-cover"
-        />
+    <div onClick={onClick} className="flex items-center gap-4 sm:gap-5 bg-chalk hover:bg-pitch-soft/60 transition-all rounded-2xl p-4 sm:p-5 border border-line cursor-pointer">
+      <div className="w-14 h-14 rounded-2xl bg-pitch-soft flex items-center justify-center text-pitch shrink-0">
+        <Calendar size={24} />
       </div>
 
-      {/* CONTENT */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-display text-base sm:text-lg font-bold text-ink truncate">
-              Sân bóng ABC - Sân 5A
+              {booking?.fieldName}
             </h3>
-
-            <p className="text-muted mt-1 text-sm">
-              17:00 • 22/04/2026
+            <p className="text-muted mt-1 text-sm truncate">
+              {booking?.venueName} · {booking?.bookingDate}
             </p>
           </div>
 
           <div className="text-right shrink-0">
             <p className="font-display text-lg sm:text-xl font-extrabold text-pitch">
-              200k
+              {formatPrice(Number(booking?.totalPrice || 0))}
             </p>
-
-            <div className="mt-2 inline-flex px-3 py-1 rounded-full bg-pitch-soft text-pitch text-xs font-semibold">
-              Đã xác nhận
+            <div className={`mt-2 inline-flex px-3 py-1 rounded-full text-xs font-semibold ${st.c}`}>
+              {st.l}
             </div>
           </div>
         </div>

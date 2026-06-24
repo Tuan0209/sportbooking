@@ -20,6 +20,8 @@ import BookingConfirm from '../features/booking/pages/BookingConfirm';
 import MonthlyBooking from '../features/booking/pages/MonthlyBooking';
 import Explore from '../features/venue/pages/user/Explore';
 import Trending from '../features/venue/pages/user/Trending';
+import VenueDetailUser from '../features/venue/pages/user/VenueDetail';
+import MapPage from '../features/venue/pages/user/MapPage';
 import PaymentPage from '../features/payment/pages/PaymentPage';
 import ManagePayments from '../features/payment/pages/admin/ManagePayments';
 import ManageRefunds from '../features/payment/pages/admin/ManageRefunds';
@@ -84,9 +86,10 @@ const AppRoutes = () => {
         
         <Route path="/profile" element={<Profile />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/map" element={<ComingSoon title="Bản đồ" desc="Sắp ra mắt — xem sân trên bản đồ." />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/trending" element={<Trending />} />
       </Route>
+      <Route path="/venue/:venueId" element={<VenueDetailUser />} />
       <Route path="/booking/:venueId" element={<UserFieldBooking />} />
       <Route path="/monthly/:venueId" element={<MonthlyBooking />} />
       <Route path="/booking-confirm" element={<BookingConfirm />} />
