@@ -52,8 +52,25 @@ public class AuthService {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
         }
 
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token);
+        return AuthResponse.builder()
+                .token(jwtService.generateToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user))
+                .build();
+    }
+
+    /** Cấp lại access token (và refresh token mới) từ refresh token hợp lệ. */
+    public AuthResponse refresh(String refreshToken) {
+        if (refreshToken == null || !jwtService.isRefreshTokenValid(refreshToken)) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+        String userId = jwtService.extractUserId(refreshToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return AuthResponse.builder()
+                .token(jwtService.generateToken(user))
+                .refreshToken(jwtService.generateRefreshToken(user)) // xoay vòng refresh token
+                .build();
     }
 
     /** Đặt lại mật khẩu: xác minh email tồn tại rồi đổi mật khẩu. */

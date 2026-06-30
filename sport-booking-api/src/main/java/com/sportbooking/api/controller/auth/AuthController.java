@@ -2,6 +2,7 @@ package com.sportbooking.api.controller.auth;
 
 import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.auth.LoginRequest;
+import com.sportbooking.api.dto.request.auth.RefreshTokenRequest;
 import com.sportbooking.api.dto.request.auth.RegisterRequest;
 import com.sportbooking.api.dto.request.auth.ResetPasswordRequest;
 import com.sportbooking.api.dto.response.auth.AuthResponse;
@@ -30,6 +31,13 @@ public class AuthController {
     ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.<AuthResponse>builder()
                 .result(authService.login(request))
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ApiResponse.<AuthResponse>builder()
+                .result(authService.refresh(request.getRefreshToken()))
                 .build();
     }
 

@@ -12,6 +12,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1007, "Mật khẩu cũ không đúng"),
     WRONG_PASSWORD(1008, "Sai mật khẩu"),
     RESET_INFO_MISMATCH(1010, "Email không tồn tại trong hệ thống"),
+    INVALID_TOKEN(1011, "Token không hợp lệ hoặc đã hết hạn"),
     FIELD_NOT_FOUND(2001, "Field not found"),
     SLOT_ALREADY_BOOKED(2002, "Khung giờ đã được đặt"),
     BOOKING_NOT_FOUND(2003, "Booking not found"),
