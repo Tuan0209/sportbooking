@@ -1,6 +1,7 @@
 package com.sportbooking.api.controller.auth;
 
 import com.sportbooking.api.common.ApiResponse;
+import com.sportbooking.api.dto.request.auth.ForgotPasswordRequest;
 import com.sportbooking.api.dto.request.auth.LoginRequest;
 import com.sportbooking.api.dto.request.auth.RefreshTokenRequest;
 import com.sportbooking.api.dto.request.auth.RegisterRequest;
@@ -38,6 +39,14 @@ public class AuthController {
     ApiResponse<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return ApiResponse.<AuthResponse>builder()
                 .result(authService.refresh(request.getRefreshToken()))
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    ApiResponse<AuthResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ApiResponse.<AuthResponse>builder()
+                .message("Nếu email tồn tại, mã xác thực đã được gửi")
                 .build();
     }
 

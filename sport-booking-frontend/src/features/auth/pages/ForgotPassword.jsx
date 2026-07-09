@@ -1,22 +1,47 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, MailCheck } from 'lucide-react';
 import { authService } from '../services/authService';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 
 const ForgotPassword = () => {
-  const [form, setForm] = useState({ email: '', newPassword: '', confirm: '' });
+  const [step, setStep] = useState('email');
+  const [form, setForm] = useState({ email: '', otp: '', newPassword: '', confirm: '' });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setError(null);
 
-    if (!form.email || !form.newPassword) {
+    if (!form.email) {
+      setError('Vui lòng nhập email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await authService.forgotPassword({ email: form.email });
+      if (res.data.code === 0) {
+        setStep('otp');
+      } else {
+        setError(res.data.message || 'Gửi mã xác thực thất bại');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gửi mã xác thực thất bại');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!form.otp || !form.newPassword) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
@@ -33,6 +58,7 @@ const ForgotPassword = () => {
     try {
       const res = await authService.resetPassword({
         email: form.email,
+        otp: form.otp,
         newPassword: form.newPassword,
       });
       if (res.data.code === 0) {
@@ -67,7 +93,9 @@ const ForgotPassword = () => {
           </div>
           <h1 className="text-white text-center text-3xl font-extrabold tracking-tight">Quên mật khẩu</h1>
           <p className="text-lime/90 text-sm mt-2 font-medium text-center">
-            Nhập email tài khoản để đặt lại mật khẩu
+            {step === 'email'
+              ? 'Nhập email tài khoản để nhận mã xác thực'
+              : 'Nhập mã xác thực đã gửi tới email của bạn'}
           </p>
         </div>
 
@@ -81,14 +109,39 @@ const ForgotPassword = () => {
               <p className="text-muted text-sm mt-2">Bạn có thể đăng nhập bằng mật khẩu mới.</p>
               <Button onClick={() => navigate('/login')} className="mt-6">Về đăng nhập</Button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit}>
+          ) : step === 'email' ? (
+            <form onSubmit={handleSendOtp}>
               <Input
                 label="Email tài khoản"
                 placeholder="Nhập email đã đăng ký"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 onClear={() => setForm({ ...form, email: '' })}
+              />
+
+              {error && (
+                <div className="text-red-600 text-sm mt-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="mt-5">
+                {loading ? 'Đang gửi mã...' : 'Gửi mã xác thực'}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleReset}>
+              <div className="flex items-center gap-2 mb-4 bg-pitch-soft text-pitch rounded-xl px-3 py-2.5 text-sm">
+                <MailCheck size={18} className="shrink-0" />
+                <span>Mã xác thực đã gửi tới <b>{form.email}</b></span>
+              </div>
+
+              <Input
+                label="Mã xác thực (6 số)"
+                placeholder="Nhập mã gồm 6 chữ số"
+                value={form.otp}
+                onChange={(e) => setForm({ ...form, otp: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                onClear={() => setForm({ ...form, otp: '' })}
               />
               <Input
                 label="Mật khẩu mới"
@@ -114,6 +167,14 @@ const ForgotPassword = () => {
               <Button type="submit" className="mt-5">
                 {loading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
               </Button>
+
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setError(null); }}
+                className="w-full text-center mt-4 text-sm text-muted hover:text-pitch transition-colors"
+              >
+                Nhập sai email? Gửi lại mã
+              </button>
             </form>
           )}
         </div>

@@ -2,6 +2,7 @@ package com.sportbooking.api.service.refund;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import com.sportbooking.api.entity.refund.RefundRequest;
 import com.sportbooking.api.entity.user.User;
 import com.sportbooking.api.entity.wallet.WalletTransaction;
 import com.sportbooking.api.repository.booking.BookingRepository;
+import com.sportbooking.api.repository.booking.BookingSlotRepository;
 import com.sportbooking.api.repository.payment.PaymentRepository;
 import com.sportbooking.api.repository.refund.RefundRequestRepository;
 import com.sportbooking.api.repository.user.UserRepository;
@@ -37,6 +39,7 @@ public class RefundService {
     private final RefundRequestRepository refundRequestRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final BookingRepository bookingRepository;
+    private final BookingSlotRepository bookingSlotRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
 
@@ -55,6 +58,12 @@ public class RefundService {
 
         if (payment.getStatus() != PaymentStatus.PAID) {
             throw new AppException(ErrorCode.REFUND_INVALID);
+        }
+
+        LocalTime startTime = booking.getStartTime() != null ? booking.getStartTime() : LocalTime.MIDNIGHT;
+        LocalDateTime bookingStart = LocalDateTime.of(booking.getBookingDate(), startTime);
+        if (LocalDateTime.now().isAfter(bookingStart.minusHours(2))) {
+            throw new AppException(ErrorCode.REFUND_TOO_LATE);
         }
 
         boolean existed = refundRequestRepository.existsByBookingIdAndStatusIn(
@@ -82,11 +91,12 @@ public class RefundService {
                 .build();
         refundRequestRepository.save(refund);
 
-        // Hủy booking khi yêu cầu hoàn tiền
+        // Hủy booking khi yêu cầu hoàn tiền + giải phóng slot để mở lại sân
         booking.setStatus(BookingStatus.CANCELED);
         booking.setCanceledAt(LocalDateTime.now());
         booking.setCancelReason("Yêu cầu hoàn tiền");
         bookingRepository.save(booking);
+        bookingSlotRepository.deleteByBooking_Id(booking.getId());
 
         return toResponse(refund);
     }

@@ -465,6 +465,7 @@ const ManageFields = () => {
             <thead>
               <tr className="bg-chalk border-b border-line">
                 <th className="px-8 py-5 text-[11px] font-bold text-muted uppercase tracking-widest">Sân</th>
+                <th className="px-6 py-5 text-[11px] font-bold text-muted uppercase tracking-widest text-center">Cơ sở</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-muted uppercase tracking-widest text-center">Loại sân</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-muted uppercase tracking-widest text-center">Khu vực</th>
                 <th className="px-6 py-5 text-[11px] font-bold text-muted uppercase tracking-widest text-center">Giá</th>
@@ -481,6 +482,7 @@ const ManageFields = () => {
                     <p className="font-semibold text-ink text-[15px]">{f.name}</p>
                     <p className="text-[11px] text-muted font-medium truncate max-w-[150px]">{f.address}</p>
                   </td>
+                  <td className="px-6 py-5 text-center text-sm font-semibold text-ink-soft">{f.venueName || '—'}</td>
                   <td className="px-6 py-5 text-center text-sm font-medium text-ink-soft">{f.fieldTypeName}</td>
                   <td className="px-6 py-5 text-center">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-pitch-soft text-pitch rounded-full text-[11px] font-semibold uppercase">

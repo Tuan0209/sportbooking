@@ -45,17 +45,16 @@ public class ReviewService {
         if (!booking.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
-        if (reviewRepository.existsByBookingId(booking.getId())) {
-            throw new AppException(ErrorCode.INVALID_REQUEST);
-        }
 
-        Review review = Review.builder()
-                .user(user)
-                .field(booking.getField())
-                .booking(booking)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .build();
+        // Nếu đã đánh giá đơn này rồi thì cập nhật lại thay vì báo lỗi
+        Review review = reviewRepository.findByBookingId(booking.getId())
+                .orElseGet(() -> Review.builder()
+                        .user(user)
+                        .field(booking.getField())
+                        .booking(booking)
+                        .build());
+        review.setRating(request.getRating());
+        review.setComment(request.getComment());
         reviewRepository.save(review);
 
         // Cập nhật điểm trung bình + số lượt đánh giá cho cơ sở

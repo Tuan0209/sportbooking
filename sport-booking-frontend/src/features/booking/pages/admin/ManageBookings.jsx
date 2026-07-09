@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { bookingService } from '../../services/bookingService';
-import { Check, X, CheckCircle2, Loader2, RefreshCw, Calendar } from 'lucide-react';
+import { Check, X, CheckCircle2, Loader2, RefreshCw, Calendar, Info } from 'lucide-react';
 import { formatPrice } from '../../../../shared/utils/formatDate';
 
 const STATUS_LABEL = {
@@ -83,6 +83,24 @@ const ManageBookings = () => {
             {f.l}
           </button>
         ))}
+      </div>
+
+      {/* GIẢI THÍCH TRẠNG THÁI */}
+      <div className="bg-white border border-line rounded-2xl p-5 mb-6 shadow-card">
+        <div className="flex items-center gap-2 mb-3">
+          <Info size={16} className="text-pitch" />
+          <h3 className="font-display font-bold text-ink text-sm">Giải thích trạng thái đặt lịch</h3>
+        </div>
+        <ul className="text-[13px] text-ink-soft space-y-1.5">
+          <li><span className="font-semibold text-amber-600">Chờ duyệt</span> — khách trả bằng chuyển khoản/PayOS và đã tải bill, đang chờ admin duyệt ở mục <b>Duyệt thanh toán</b>.</li>
+          <li><span className="font-semibold text-pitch">Đã xác nhận</span> — thanh toán đã được <b>duyệt</b> (hoặc khách trả bằng coin). Sân đã được giữ cho khách.</li>
+          <li><span className="font-semibold text-pitch">Hoàn thành</span> — buổi đặt đã diễn ra xong (admin bấm "Hoàn thành").</li>
+          <li><span className="font-semibold text-red-600">Đã huỷ</span> — khách yêu cầu hoàn tiền hoặc admin huỷ. Khung giờ được mở lại để đặt tiếp.</li>
+          <li><span className="font-semibold text-red-600">Từ chối</span> — admin <b>từ chối</b> thanh toán ở mục Duyệt thanh toán. Khung giờ cũng được mở lại.</li>
+        </ul>
+        <p className="text-[12px] text-muted mt-3 pt-3 border-t border-line">
+          Liên quan duyệt thanh toán: ở mục <b>Duyệt thanh toán</b>, bấm <span className="text-pitch font-semibold">Duyệt</span> sẽ chuyển đơn sang <b>Đã xác nhận</b>; bấm <span className="text-red-600 font-semibold">Từ chối</span> sẽ chuyển đơn sang <b>Từ chối</b> và giải phóng khung giờ.
+        </p>
       </div>
 
       {/* BẢNG */}

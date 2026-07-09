@@ -21,4 +21,7 @@ public interface BookingSlotRepository
     List<BookingSlot> findByField_Venue_IdAndBookingDate(
             String venueId,
             LocalDate bookingDate);
+
+    // Giải phóng slot khi booking bị hủy / từ chối để mở lại sân
+    void deleteByBooking_Id(String bookingId);
 }

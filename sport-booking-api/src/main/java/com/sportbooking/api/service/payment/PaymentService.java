@@ -25,6 +25,7 @@ import com.sportbooking.api.entity.booking.Booking;
 import com.sportbooking.api.entity.payment.Payment;
 import com.sportbooking.api.entity.payment.PaymentProof;
 import com.sportbooking.api.repository.booking.BookingRepository;
+import com.sportbooking.api.repository.booking.BookingSlotRepository;
 import com.sportbooking.api.repository.payment.PaymentProofRepository;
 import com.sportbooking.api.repository.payment.PaymentRepository;
 
@@ -39,6 +40,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentProofRepository paymentProofRepository;
     private final BookingRepository bookingRepository;
+    private final BookingSlotRepository bookingSlotRepository;
     private final Cloudinary cloudinary;
 
     @Value("${app.bank.bin:970422}")
@@ -177,6 +179,7 @@ public class PaymentService {
         Booking booking = payment.getBooking();
         booking.setStatus(BookingStatus.REJECTED);
         bookingRepository.save(booking);
+        bookingSlotRepository.deleteByBooking_Id(booking.getId());
 
         return toAdminResponse(payment);
     }

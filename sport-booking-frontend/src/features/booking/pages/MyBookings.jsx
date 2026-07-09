@@ -78,7 +78,7 @@ const MyBookings = () => {
                   )}
                   {(b.status === 'CONFIRMED' || b.status === 'COMPLETED') && (
                     <button onClick={() => setReviewFor(b)} className="text-sm font-semibold border border-line text-ink px-4 py-2 rounded-xl hover:bg-chalk transition inline-flex items-center gap-1">
-                      <Star size={15} className="text-amber" /> Đánh giá
+                      <Star size={15} className="text-amber" /> {b.reviewed ? 'Sửa đánh giá' : 'Đánh giá'}
                     </button>
                   )}
                 </div>
@@ -100,7 +100,7 @@ const MyBookings = () => {
         <ReviewModal
           booking={reviewFor}
           onClose={() => setReviewFor(null)}
-          onSuccess={() => { setReviewFor(null); setReviewed(true); }}
+          onSuccess={() => { setReviewFor(null); setReviewed(true); load(); }}
         />
       )}
 
@@ -166,6 +166,7 @@ const RefundModal = ({ booking, onClose, onSuccess }) => {
         <div className="p-6 border-b border-line">
           <h3 className="font-display text-lg font-bold text-ink">Yêu cầu hoàn tiền</h3>
           <p className="text-muted text-sm mt-1">{booking.fieldName} · {formatPrice(booking.totalPrice)}</p>
+          <p className="text-[12px] text-amber-600 mt-2">Chỉ được yêu cầu hoàn tiền trước giờ bắt đầu ít nhất 2 tiếng.</p>
         </div>
         <div className="p-6 space-y-3">
           <button onClick={() => setMethod('COIN')} className={`w-full flex items-center gap-3 border rounded-xl px-4 py-3 text-left transition-all ${method === 'COIN' ? 'border-pitch bg-pitch-soft' : 'border-line'}`}>
@@ -203,9 +204,9 @@ const RefundModal = ({ booking, onClose, onSuccess }) => {
 };
 
 const ReviewModal = ({ booking, onClose, onSuccess }) => {
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(booking.reviewRating || 5);
   const [hover, setHover] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(booking.reviewComment || '');
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
@@ -225,7 +226,7 @@ const ReviewModal = ({ booking, onClose, onSuccess }) => {
       <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
       <div className="bg-white w-full max-w-sm rounded-4xl shadow-card-hover relative overflow-hidden animate-fade-up">
         <div className="p-6 border-b border-line">
-          <h3 className="font-display text-lg font-bold text-ink">Đánh giá sân</h3>
+          <h3 className="font-display text-lg font-bold text-ink">{booking.reviewed ? 'Sửa đánh giá' : 'Đánh giá sân'}</h3>
           <p className="text-muted text-sm mt-1">{booking.fieldName} · {booking.venueName}</p>
         </div>
         <div className="p-6">

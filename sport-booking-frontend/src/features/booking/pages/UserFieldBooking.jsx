@@ -182,6 +182,12 @@ const UserFieldBooking = () => {
 
   const selectionCount = summary?.slotCount || 0;
 
+  const todayStr = formatLocalDate(new Date());
+  const nowMinutes = (() => {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  })();
+
   const handleMouseDown = (e) => {
     if (!timelineRef.current) return;
 
@@ -317,7 +323,8 @@ const UserFieldBooking = () => {
                     const isSelected = selectedSlots[`${field.id}|${time}`];
                     const isClosed = time < field.openTime?.slice(0, 5) || time >= field.closeTime?.slice(0, 5);
                     const isBooked = bookedSet.has(`${field.id}|${time}`);
-                    const isNotAvailable = field.status !== 'ACTIVE' || isClosed || isBooked;
+                    const isPast = selectedDate < todayStr || (selectedDate === todayStr && totalMinutes <= nowMinutes);
+                    const isNotAvailable = field.status !== 'ACTIVE' || isClosed || isBooked || isPast;
                     return (
                       <div
                         key={time}

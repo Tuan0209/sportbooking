@@ -1,16 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { venueService } from '../../services/venueService';
 import { favoriteService } from '../../services/favoriteService';
+import { fieldService } from '../../../field/services/fieldService';
 import VenueCard from '../../components/user/VenueCard';
 import { useUserLocation } from '../../../../shared/hooks/useUserLocation';
 import { calculateDistance } from '../../../../shared/utils/distance';
 import { Search, MapPin, X } from 'lucide-react';
 
 // Lấy danh sách môn thể thao có trong 1 cơ sở (từ các sân con)
-const venueSports = (v) => [...new Set((v.fields || []).map((f) => f.sportTypeName).filter(Boolean))];
+const venueSports = (v) => [
+  ...new Set(
+    (v.fields || [])
+      .flatMap((f) => [f.sportTypeName, f.fieldTypeName])
+      .filter(Boolean)
+  ),
+];
 
 const Explore = () => {
   const [venues, setVenues] = useState([]);
+  const [fieldTypes, setFieldTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sport, setSport] = useState('');
@@ -27,17 +35,20 @@ const Explore = () => {
         if (res.data.code === 0) setVenues(res.data.result || []);
       })
       .finally(() => setLoading(false));
+    fieldService.getAllFieldTypes()
+      .then((res) => { if (res.data.code === 0) setFieldTypes((res.data.result || []).map((t) => t.name).filter(Boolean)); })
+      .catch(() => {});
     favoriteService.myFavoriteIds()
       .then((res) => { if (res.data.code === 0) setFavIds(new Set(res.data.result || [])); })
       .catch(() => {});
   }, []);
 
-  // Gom danh sách môn & khu vực từ dữ liệu thật
+  // Danh sách môn thể thao: lấy từ quản lý loại sân + môn có thật trong dữ liệu
   const sports = useMemo(() => {
-    const s = new Set();
+    const s = new Set(fieldTypes);
     venues.forEach((v) => venueSports(v).forEach((x) => s.add(x)));
     return [...s].sort();
-  }, [venues]);
+  }, [venues, fieldTypes]);
 
   const areas = useMemo(() => {
     const s = new Set();

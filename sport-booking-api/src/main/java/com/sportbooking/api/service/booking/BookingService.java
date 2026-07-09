@@ -3,6 +3,7 @@ package com.sportbooking.api.service.booking;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ import com.sportbooking.api.repository.fields.FieldRepository;
 import com.sportbooking.api.repository.user.UserRepository;
 import com.sportbooking.api.repository.payment.PaymentRepository;
 import com.sportbooking.api.repository.refund.RefundRequestRepository;
+import com.sportbooking.api.repository.review.ReviewRepository;
 import com.sportbooking.api.repository.wallet.WalletTransactionRepository;
+import com.sportbooking.api.entity.review.Review;
 import com.sportbooking.api.common.enums.PaymentStatus;
 import com.sportbooking.api.common.enums.RefundStatus;
 import com.sportbooking.api.common.enums.WalletTransactionType;
@@ -57,6 +60,7 @@ public class BookingService {
     private final PaymentRepository paymentRepository;
     private final RefundRequestRepository refundRequestRepository;
     private final WalletTransactionRepository walletTransactionRepository;
+    private final ReviewRepository reviewRepository;
     private final EmailService emailService;
 
     @Transactional
@@ -77,6 +81,10 @@ public class BookingService {
         for (String slot : request.getSlots()) {
 
             LocalTime start = LocalTime.parse(slot);
+
+            if (LocalDateTime.of(bookingDate, start).isBefore(LocalDateTime.now())) {
+                throw new AppException(ErrorCode.SLOT_IN_PAST);
+            }
 
             boolean existed = bookingSlotRepository
                     .existsByFieldIdAndBookingDateAndStartTime(
@@ -209,10 +217,17 @@ public class BookingService {
                             b.getId(),
                             List.of(RefundStatus.REQUESTED, RefundStatus.APPROVED, RefundStatus.DONE));
 
+                    LocalTime bStart = b.getStartTime() != null ? b.getStartTime() : LocalTime.MIDNIGHT;
+                    boolean beforeDeadline = LocalDateTime.now()
+                            .isBefore(LocalDateTime.of(b.getBookingDate(), bStart).minusHours(2));
+
                     boolean refundable = b.getStatus() == BookingStatus.CONFIRMED
                             && payment != null
                             && payment.getStatus() == PaymentStatus.PAID
-                            && !alreadyRefunding;
+                            && !alreadyRefunding
+                            && beforeDeadline;
+
+                    Review review = reviewRepository.findByBookingId(b.getId()).orElse(null);
 
                     return MyBookingResponse.builder()
                             .id(b.getId())
@@ -224,6 +239,9 @@ public class BookingService {
                             .status(b.getStatus().name())
                             .paymentStatus(paymentStatus)
                             .refundable(refundable)
+                            .reviewed(review != null)
+                            .reviewRating(review != null ? review.getRating() : null)
+                            .reviewComment(review != null ? review.getComment() : null)
                             .build();
                 })
                 .toList();
@@ -266,6 +284,7 @@ public class BookingService {
         if (newStatus == BookingStatus.CANCELED) {
             booking.setCanceledAt(java.time.LocalDateTime.now());
             booking.setCancelReason("Admin huỷ");
+            bookingSlotRepository.deleteByBooking_Id(booking.getId());
         }
         bookingRepository.save(booking);
         return AdminBookingResponse.builder()

@@ -40,7 +40,7 @@ public class VoucherService {
                 || (v.getEndDate() != null && now.isAfter(v.getEndDate()))) {
             throw new AppException(ErrorCode.VOUCHER_INVALID);
         }
-        if (v.getUsageLimit() != null && v.getUsedCount() >= v.getUsageLimit()) {
+        if (v.getUsageLimit() != null && v.getUsageLimit() > 0 && v.getUsedCount() >= v.getUsageLimit()) {
             throw new AppException(ErrorCode.VOUCHER_INVALID);
         }
         if (amount == null) amount = BigDecimal.ZERO;
@@ -52,7 +52,8 @@ public class VoucherService {
         if (v.getDiscountType() == DiscountType.PERCENT) {
             discount = amount.multiply(v.getDiscountValue())
                     .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-            if (v.getMaxDiscount() != null && discount.compareTo(v.getMaxDiscount()) > 0) {
+            if (v.getMaxDiscount() != null && v.getMaxDiscount().signum() > 0
+                    && discount.compareTo(v.getMaxDiscount()) > 0) {
                 discount = v.getMaxDiscount();
             }
         } else {
@@ -66,6 +67,19 @@ public class VoucherService {
                 .finalAmount(amount.subtract(discount))
                 .message("Áp dụng mã thành công")
                 .build();
+    }
+
+    /** Danh sách mã giảm giá đang hoạt động, còn hạn — cho người dùng xem. */
+    public List<VoucherResponse> listActiveForUser() {
+        LocalDateTime now = LocalDateTime.now();
+        return voucherRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(v -> v.getStatus() == Status.ACTIVE)
+                .filter(v -> v.getStartDate() == null || !now.isBefore(v.getStartDate()))
+                .filter(v -> v.getEndDate() == null || !now.isAfter(v.getEndDate()))
+                .filter(v -> v.getUsageLimit() == null || v.getUsageLimit() <= 0
+                        || v.getUsedCount() < v.getUsageLimit())
+                .map(this::toResponse)
+                .toList();
     }
 
     /* ============ Admin CRUD ============ */

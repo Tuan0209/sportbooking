@@ -28,4 +28,7 @@ public class MyBookingResponse {
     String status;        // trạng thái booking
     String paymentStatus; // trạng thái thanh toán (nếu có)
     boolean refundable;   // có thể yêu cầu hoàn tiền không
+    boolean reviewed;     // đã đánh giá đơn này chưa
+    Integer reviewRating; // điểm đã đánh giá (nếu có)
+    String reviewComment; // nội dung đã đánh giá (nếu có)
 }

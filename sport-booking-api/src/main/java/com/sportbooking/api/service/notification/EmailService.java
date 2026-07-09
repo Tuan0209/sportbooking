@@ -104,4 +104,55 @@ public class EmailService {
             }
         });
     }
+
+    /** Gửi mã OTP đặt lại mật khẩu tới email người dùng. Trả về true nếu gửi thành công. */
+    public boolean sendPasswordResetOtp(String toEmail, String otp) {
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Chưa cấu hình Resend, không gửi được OTP.");
+            return false;
+        }
+
+        String html = """
+                <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;border:1px solid #E4EAE3;border-radius:16px;overflow:hidden">
+                  <div style="background:#0E8C4E;color:#fff;padding:18px 22px">
+                    <h2 style="margin:0;font-size:18px">🔐 Đặt lại mật khẩu</h2>
+                  </div>
+                  <div style="padding:24px;text-align:center">
+                    <p style="margin:0 0 16px;color:#5B6B61;font-size:14px">Mã xác thực đặt lại mật khẩu của bạn là:</p>
+                    <div style="font-size:34px;font-weight:800;letter-spacing:10px;color:#0E8C4E;margin:8px 0 16px">%s</div>
+                    <p style="margin:0;color:#8A968E;font-size:12px">Mã có hiệu lực trong 5 phút. Không chia sẻ mã này cho bất kỳ ai.</p>
+                    <p style="margin:14px 0 0;color:#8A968E;font-size:12px">Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+                  </div>
+                  <div style="background:#F5F7F4;padding:14px 22px;color:#5B6B61;font-size:12px;text-align:center">SVĐ · Hệ thống đặt sân thể thao</div>
+                </div>
+                """
+                .formatted(otp);
+
+        try {
+            Map<String, Object> body = Map.of(
+                    "from", from,
+                    "to", List.of(toEmail),
+                    "subject", "Mã đặt lại mật khẩu · SVĐ Booking",
+                    "html", html);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(
+                            objectMapper.writeValueAsString(body), StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> res = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (res.statusCode() >= 200 && res.statusCode() < 300) {
+                log.info("Đã gửi OTP đặt lại mật khẩu tới {}", toEmail);
+                return true;
+            }
+            log.warn("Gửi OTP thất bại ({}): {}", res.statusCode(), res.body());
+            return false;
+        } catch (Exception e) {
+            log.warn("Lỗi gửi OTP: {}", e.getMessage());
+            return false;
+        }
+    }
 }

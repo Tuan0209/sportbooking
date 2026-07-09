@@ -1,6 +1,7 @@
 import axiosClient from '../../../shared/services/axiosClient';
 
 export const voucherService = {
+  list: () => axiosClient.get('/vouchers'),
   apply: (code, amount) => axiosClient.post('/vouchers/apply', { code, amount }),
 
   // Admin

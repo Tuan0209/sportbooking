@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Map as MapIcon, Compass, Zap, User } from 'lucide-react';
+import { Home, Map as MapIcon, Compass, Ticket, User } from 'lucide-react';
 
 const UserLayout = () => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const UserLayout = () => {
             <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Khám phá</span>
          </button>
 
-         <BottomNavItem path="/trending" icon={Zap} label="Nổi bật" />
+         <BottomNavItem path="/trending" icon={Ticket} label="Ưu đãi" />
          <BottomNavItem path="/profile" icon={User} label="Tài khoản" />
       </div>
     </div>

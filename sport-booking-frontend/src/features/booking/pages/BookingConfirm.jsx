@@ -4,6 +4,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { bookingService } from '../services/bookingService';
 import { voucherService } from '../../voucher/services/voucherService';
 import { serviceService } from '../../service/services/serviceService';
+import { membershipService } from '../../membership/services/membershipService';
 import VenueMap from '../../../shared/components/VenueMap';
 import {
   ChevronLeft,
@@ -42,9 +43,18 @@ const BookingConfirm = () => {
   const [services, setServices] = useState([]);
   const [qty, setQty] = useState({}); // { serviceId: số lượng }
 
+  // Gói VIP đang dùng (để giảm giá đặt sân)
+  const [vip, setVip] = useState(null); // { planName, discountPercent }
+
   useEffect(() => {
     serviceService.list()
       .then((res) => { if (res.data.code === 0) setServices(res.data.result || []); })
+      .catch(() => {});
+    membershipService.my()
+      .then((res) => {
+        const m = res.data.result;
+        if (m && Number(m.discountPercent) > 0) setVip(m);
+      })
       .catch(() => {});
   }, []);
 
@@ -73,7 +83,10 @@ const BookingConfirm = () => {
   }
 
   const baseTotal = Number(state?.totalPrice || 0);
-  const finalTotal = (voucher ? Number(voucher.finalAmount) : baseTotal) + servicesTotal;
+  const voucherDiscount = voucher ? Number(voucher.discount) : 0;
+  const vipDiscount = vip ? Math.round(baseTotal * Number(vip.discountPercent) / 100) : 0;
+  const courtFinal = Math.max(0, baseTotal - voucherDiscount - vipDiscount);
+  const finalTotal = courtFinal + servicesTotal;
 
   const applyVoucher = async () => {
     if (!voucherCode.trim()) return;
@@ -297,6 +310,13 @@ const BookingConfirm = () => {
               </div>
             )}
 
+            {vip && vipDiscount > 0 && (
+              <div className="flex items-center justify-between border-b border-line pb-3">
+                <span className="text-muted text-sm">Ưu đãi VIP ({vip.planName} -{vip.discountPercent}%)</span>
+                <span className="font-semibold text-amber-600">- {formatPrice(vipDiscount)}</span>
+              </div>
+            )}
+
             {servicesTotal > 0 && (
               <div className="flex items-center justify-between border-b border-line pb-3">
                 <span className="text-muted text-sm">Dịch vụ kèm theo</span>
@@ -307,8 +327,8 @@ const BookingConfirm = () => {
             <div className="flex items-center justify-between pt-1">
               <span className="text-ink font-semibold">Tổng tiền</span>
               <div className="text-right">
-                {voucher && (
-                  <span className="block text-sm text-muted line-through">{formatPrice(baseTotal)}</span>
+                {(voucher || vipDiscount > 0) && (
+                  <span className="block text-sm text-muted line-through">{formatPrice(baseTotal + servicesTotal)}</span>
                 )}
                 <span className="text-2xl font-display font-extrabold text-pitch">
                   {formatPrice(finalTotal)}
