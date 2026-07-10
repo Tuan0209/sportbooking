@@ -9,6 +9,7 @@ import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.request.booking.CreateBookingRequest;
 import com.sportbooking.api.dto.request.booking.CreateMonthlyBookingRequest;
 import com.sportbooking.api.dto.response.booking.BookedSlotResponse;
+import com.sportbooking.api.dto.response.booking.BookingDetailResponse;
 import com.sportbooking.api.dto.response.booking.BookingResponse;
 import com.sportbooking.api.dto.response.booking.MonthlyBookingResponse;
 import com.sportbooking.api.dto.response.booking.MyBookingResponse;
@@ -43,6 +44,17 @@ public class BookingController {
         return ApiResponse.<List<MyBookingResponse>>builder()
                 .code(0)
                 .result(bookingService.getMyBookings(authentication))
+                .build();
+    }
+
+    /** Chi tiết 1 đơn đặt sân của người dùng (kèm khung giờ & dịch vụ). */
+    @GetMapping("/{id}")
+    public ApiResponse<BookingDetailResponse> detail(
+            @PathVariable String id,
+            Authentication authentication) {
+        return ApiResponse.<BookingDetailResponse>builder()
+                .code(0)
+                .result(bookingService.getDetailForUser(id, authentication.getName()))
                 .build();
     }
 

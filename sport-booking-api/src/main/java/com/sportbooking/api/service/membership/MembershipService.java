@@ -126,6 +126,8 @@ public class MembershipService {
 
     @Transactional
     public void delete(String id) {
+        // Dọn các bản ghi user đang giữ gói này trước để tránh lỗi ràng buộc
+        userMembershipRepository.deleteByPlanId(id);
         planRepository.deleteById(id);
     }
 

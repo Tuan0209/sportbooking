@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { bookingService } from '../../services/bookingService';
-import { Check, X, CheckCircle2, Loader2, RefreshCw, Calendar, Info } from 'lucide-react';
+import { Check, X, CheckCircle2, Loader2, RefreshCw, Calendar, Info, Eye } from 'lucide-react';
+import BookingDetailModal from '../../components/BookingDetailModal';
 import { formatPrice } from '../../../../shared/utils/formatDate';
 
 const STATUS_LABEL = {
@@ -32,6 +33,7 @@ const ManageBookings = () => {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [filter, setFilter] = useState('');
+  const [detailId, setDetailId] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -152,6 +154,12 @@ const ManageBookings = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setDetailId(b.id)}
+                        className="inline-flex items-center gap-1 border border-line text-ink text-xs font-semibold px-3 py-2 rounded-xl hover:bg-chalk"
+                      >
+                        <Eye size={14} /> Chi tiết
+                      </button>
                       {!done.includes(b.status) && (
                         <button
                           disabled={busyId === b.id}
@@ -190,6 +198,10 @@ const ManageBookings = () => {
           </table>
         </div>
       </div>
+
+      {detailId && (
+        <BookingDetailModal bookingId={detailId} admin onClose={() => setDetailId(null)} />
+      )}
     </div>
   );
 };

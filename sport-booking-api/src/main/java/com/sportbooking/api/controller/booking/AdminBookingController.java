@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.sportbooking.api.common.ApiResponse;
 import com.sportbooking.api.dto.response.booking.AdminBookingResponse;
+import com.sportbooking.api.dto.response.booking.BookingDetailResponse;
 import com.sportbooking.api.service.booking.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,14 @@ public class AdminBookingController {
         return ApiResponse.<List<AdminBookingResponse>>builder()
                 .code(0)
                 .result(bookingService.adminList(status))
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<BookingDetailResponse> detail(@PathVariable String id) {
+        return ApiResponse.<BookingDetailResponse>builder()
+                .code(0)
+                .result(bookingService.getDetailForAdmin(id))
                 .build();
     }
 

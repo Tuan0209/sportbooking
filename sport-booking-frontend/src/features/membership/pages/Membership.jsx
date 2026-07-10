@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Crown, Check, Loader2, ShieldCheck } from 'lucide-react';
 import { membershipService } from '../services/membershipService';
 import { formatPrice } from '../../../shared/utils/formatDate';
+import { useToast } from '../../../shared/components/Toast';
 
 const formatVN = (dateStr) => {
   if (!dateStr) return '--';
@@ -15,6 +16,7 @@ const formatVN = (dateStr) => {
 
 const Membership = () => {
   const navigate = useNavigate();
+  const { notify } = useToast();
 
   const [plans, setPlans] = useState([]);
   const [my, setMy] = useState(null);
@@ -41,13 +43,13 @@ const Membership = () => {
     try {
       await membershipService.buy(planId);
       await loadMy();
-      alert('Mua gói thành viên thành công!');
+      notify('Mua gói thành viên thành công!', 'success');
     } catch (err) {
       const message =
         err?.response?.data?.message ||
         err?.message ||
         'Mua gói thất bại, vui lòng thử lại.';
-      alert(message);
+      notify(message, 'error');
     } finally {
       setBuyingId(null);
     }

@@ -14,4 +14,6 @@ public interface UserMembershipRepository extends JpaRepository<UserMembership, 
 
     Optional<UserMembership> findFirstByUserIdAndStatusAndEndDateAfterOrderByEndDateDesc(
             String userId, MembershipStatus status, LocalDateTime now);
+
+    void deleteByPlanId(String planId);
 }

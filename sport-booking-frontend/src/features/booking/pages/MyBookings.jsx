@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Loader2, Wallet, Landmark, RotateCcw, CheckCircle2, Star } from 'lucide-react';
+import { ChevronLeft, Loader2, Wallet, Landmark, RotateCcw, CheckCircle2, Star, Eye } from 'lucide-react';
 import { refundService } from '../../payment/services/refundService';
 import { reviewService } from '../../review/services/reviewService';
 import { formatPrice } from '../../../shared/utils/formatDate';
+import BookingDetailModal from '../components/BookingDetailModal';
 
 const STATUS = {
   CONFIRMED: { l: 'Đã xác nhận', c: 'bg-pitch-soft text-pitch border-pitch/20' },
@@ -20,6 +21,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true);
   const [refundFor, setRefundFor] = useState(null); // booking đang yêu cầu hoàn
   const [reviewFor, setReviewFor] = useState(null); // booking đang đánh giá
+  const [detailId, setDetailId] = useState(null); // booking đang xem chi tiết
   const [done, setDone] = useState(false);
   const [reviewed, setReviewed] = useState(false);
 
@@ -65,7 +67,10 @@ const MyBookings = () => {
 
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-line">
                 <span className="font-display text-lg font-extrabold text-pitch">{formatPrice(b.totalPrice)}</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap justify-end">
+                  <button onClick={() => setDetailId(b.id)} className="text-sm font-semibold border border-line text-ink px-4 py-2 rounded-xl hover:bg-chalk transition inline-flex items-center gap-1">
+                    <Eye size={15} /> Chi tiết
+                  </button>
                   {b.status === 'PENDING_PAYMENT' && (
                     <button onClick={() => navigate(`/payment/${b.id}`)} className="text-sm font-semibold bg-pitch text-white px-4 py-2 rounded-xl shadow-glow hover:bg-pitch-deep transition">
                       Thanh toán
@@ -87,6 +92,10 @@ const MyBookings = () => {
           );
         })}
       </div>
+
+      {detailId && (
+        <BookingDetailModal bookingId={detailId} onClose={() => setDetailId(null)} />
+      )}
 
       {refundFor && (
         <RefundModal

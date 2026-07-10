@@ -24,4 +24,7 @@ public interface BookingSlotRepository
 
     // Giải phóng slot khi booking bị hủy / từ chối để mở lại sân
     void deleteByBooking_Id(String bookingId);
+
+    // Khung giờ thuộc 1 đơn (để hiển thị chi tiết đặt sân)
+    List<BookingSlot> findByBooking_Id(String bookingId);
 }

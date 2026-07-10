@@ -45,4 +45,6 @@ public class CreateBookingRequest {
     @NotNull(message = "total_price không được để trống")
     @DecimalMin(value = "0.0", inclusive = false, message = "total_price phải lớn hơn 0")
     BigDecimal totalPrice;
+
+    List<BookingServiceRequest> services;
 }

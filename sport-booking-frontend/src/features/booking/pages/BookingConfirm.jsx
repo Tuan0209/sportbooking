@@ -131,6 +131,10 @@ const BookingConfirm = () => {
     setLoading(true);
 
     try {
+      const selectedServices = services
+        .filter((s) => (qty[s.id] || 0) > 0)
+        .map((s) => ({ serviceId: s.id, quantity: qty[s.id] }));
+
       const res = await bookingService.createBooking({
         fieldId: state.fieldId,
         bookingDate: state.bookingDate,
@@ -139,7 +143,8 @@ const BookingConfirm = () => {
         customerPhone: phone,
         note: voucher ? `${note || ''} [Mã: ${voucher.code}]`.trim() : note,
         totalPrice: finalTotal,
-        paymentMethod: paymentMethod
+        paymentMethod: paymentMethod,
+        services: selectedServices
       });
 
       const result = res.data.result;
