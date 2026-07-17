@@ -122,6 +122,10 @@ public class SecurityConfig {
                                                 .hasAuthority("ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/bookings/**")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/payments/payos/webhook")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/payments/*/mock-success")
+                                                .permitAll()
                                                 // Khu vực quản trị: chỉ ADMIN
                                                 .requestMatchers(
                                                                 "/admin/payments/**",
@@ -145,7 +149,9 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:5173")); // Vite dev server
+                config.setAllowedOrigins(List.of(
+                                "http://localhost:5173",
+                                "https://amniotic-valuables-viper.ngrok-free.dev"));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);

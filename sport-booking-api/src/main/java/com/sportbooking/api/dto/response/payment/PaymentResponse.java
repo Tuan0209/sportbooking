@@ -36,4 +36,5 @@ public class PaymentResponse {
 
     // Ảnh bill đã upload (nếu có)
     String proofImageUrl;
+    String checkoutUrl;
 }

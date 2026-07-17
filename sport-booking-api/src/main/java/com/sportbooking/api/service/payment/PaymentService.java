@@ -31,218 +31,457 @@ import com.sportbooking.api.repository.payment.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import vn.payos.PayOS;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final PaymentProofRepository paymentProofRepository;
-    private final BookingRepository bookingRepository;
-    private final BookingSlotRepository bookingSlotRepository;
-    private final Cloudinary cloudinary;
+        private final PaymentRepository paymentRepository;
+        private final PaymentProofRepository paymentProofRepository;
+        private final BookingRepository bookingRepository;
+        private final BookingSlotRepository bookingSlotRepository;
+        private final Cloudinary cloudinary;
 
-    @Value("${app.bank.bin:970422}")
-    private String bankBin;
-    @Value("${app.bank.account-no:0000000000}")
-    private String accountNo;
-    @Value("${app.bank.account-name:SAN BONG SVD}")
-    private String accountName;
-    @Value("${app.bank.bank-name:MB Bank}")
-    private String bankName;
+        @Value("${app.bank.bin:970422}")
+        private String bankBin;
+        @Value("${app.bank.account-no:0000000000}")
+        private String accountNo;
+        @Value("${app.bank.account-name:SAN BONG SVD}")
+        private String accountName;
+        @Value("${app.bank.bank-name:MB Bank}")
+        private String bankName;
+        @Value("${payos.client-id}")
+        private String clientId;
 
-    private static final String PROOF_FOLDER = "sport-booking/payment-proof";
+        @Value("${payos.api-key}")
+        private String apiKey;
 
-    /** Tạo bản ghi thanh toán PENDING cho booking (BANK_QR / PAYOS). */
-    @Transactional
-    public Payment createForBooking(Booking booking, PaymentMethod method) {
-        Payment payment = Payment.builder()
-                .booking(booking)
-                .amount(booking.getTotalPrice())
-                .method(method)
-                .status(PaymentStatus.PENDING)
-                .transactionCode(booking.getBookingCode())
-                .expiredAt(LocalDateTime.now().plusMinutes(15))
-                .build();
-        return paymentRepository.save(payment);
-    }
+        @Value("${payos.checksum-key}")
+        private String checksumKey;
 
-    /** Tạo bản ghi thanh toán đã PAID cho booking trả bằng COIN (để có thể hoàn tiền sau này). */
-    @Transactional
-    public Payment createCoinPaid(Booking booking) {
-        Payment payment = Payment.builder()
-                .booking(booking)
-                .amount(booking.getTotalPrice())
-                .method(PaymentMethod.COIN)
-                .status(PaymentStatus.PAID)
-                .transactionCode(booking.getBookingCode())
-                .paidAt(LocalDateTime.now())
-                .build();
-        return paymentRepository.save(payment);
-    }
+        private static final String PROOF_FOLDER = "sport-booking/payment-proof";
 
-    /** Lấy thông tin thanh toán theo booking (để hiển thị QR). */
-    public PaymentResponse getByBookingId(String bookingId) {
-        Payment payment = paymentRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        return toResponse(payment);
-    }
-
-    /** Người dùng upload ảnh bill chuyển khoản. */
-    @Transactional
-    public PaymentResponse uploadProof(String paymentId, MultipartFile file) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-
-        if (file == null || file.isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+        /** Tạo bản ghi thanh toán PENDING cho booking (BANK_QR / PAYOS). */
+        @Transactional
+        public Payment createForBooking(Booking booking, PaymentMethod method) {
+                Payment payment = Payment.builder()
+                                .booking(booking)
+                                .amount(booking.getTotalPrice())
+                                .method(method)
+                                .status(PaymentStatus.PENDING)
+                                .transactionCode(booking.getBookingCode())
+                                .expiredAt(LocalDateTime.now().plusMinutes(15))
+                                .build();
+                return paymentRepository.save(payment);
         }
 
-        String imageUrl;
-        try {
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(
-                    file.getBytes(),
-                    ObjectUtils.asMap(
-                            "folder", PROOF_FOLDER,
-                            "public_id", payment.getId(),
-                            "overwrite", true,
-                            "resource_type", "image"));
-            imageUrl = uploadResult.get("secure_url").toString();
-        } catch (Exception e) {
-            log.error("Upload bill thất bại", e);
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        /**
+         * Tạo bản ghi thanh toán đã PAID cho booking trả bằng COIN (để có thể hoàn tiền
+         * sau này).
+         */
+        @Transactional
+        public Payment createCoinPaid(Booking booking) {
+                Payment payment = Payment.builder()
+                                .booking(booking)
+                                .amount(booking.getTotalPrice())
+                                .method(PaymentMethod.COIN)
+                                .status(PaymentStatus.PAID)
+                                .transactionCode(booking.getBookingCode())
+                                .paidAt(LocalDateTime.now())
+                                .build();
+                return paymentRepository.save(payment);
         }
 
-        PaymentProof proof = PaymentProof.builder()
-                .payment(payment)
-                .imageUrl(imageUrl)
-                .build();
-        paymentProofRepository.save(proof);
+        /** Lấy thông tin thanh toán theo booking (để hiển thị QR). */
+        public PaymentResponse getByBookingId(String bookingId) {
+                Payment payment = paymentRepository.findByBookingId(bookingId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+                return toResponse(payment);
+        }
 
-        // Đã có bill -> chờ admin xác nhận
-        Booking booking = payment.getBooking();
-        booking.setStatus(BookingStatus.PENDING_CONFIRMATION);
-        bookingRepository.save(booking);
+        /** Người dùng upload ảnh bill chuyển khoản. */
+        @Transactional
+        public PaymentResponse uploadProof(String paymentId, MultipartFile file) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
-        return toResponse(payment);
-    }
+                if (file == null || file.isEmpty()) {
+                        throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+                }
 
-    /** Giả lập PayOS thanh toán thành công (dùng khi chưa cấu hình tài khoản PayOS thật). */
-    @Transactional
-    public PaymentResponse mockSuccess(String paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        payment.setStatus(PaymentStatus.PAID);
-        payment.setPaidAt(LocalDateTime.now());
-        paymentRepository.save(payment);
+                String imageUrl;
+                try {
+                        Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                                        file.getBytes(),
+                                        ObjectUtils.asMap(
+                                                        "folder", PROOF_FOLDER,
+                                                        "public_id", payment.getId(),
+                                                        "overwrite", true,
+                                                        "resource_type", "image"));
+                        imageUrl = uploadResult.get("secure_url").toString();
+                } catch (Exception e) {
+                        log.error("Upload bill thất bại", e);
+                        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+                }
 
-        Booking booking = payment.getBooking();
-        booking.setStatus(BookingStatus.CONFIRMED);
-        bookingRepository.save(booking);
+                PaymentProof proof = PaymentProof.builder()
+                                .payment(payment)
+                                .imageUrl(imageUrl)
+                                .build();
+                paymentProofRepository.save(proof);
 
-        return toResponse(payment);
-    }
+                // Đã có bill -> chờ admin xác nhận
+                Booking booking = payment.getBooking();
+                booking.setStatus(BookingStatus.PENDING_CONFIRMATION);
+                bookingRepository.save(booking);
 
-    /** Danh sách thanh toán cho admin duyệt (loại trừ thanh toán bằng coin). */
-    public List<AdminPaymentResponse> listForAdmin() {
-        return paymentRepository.findAllByOrderByCreatedAtDesc().stream()
-                .filter(p -> p.getMethod() != PaymentMethod.COIN)
-                .map(this::toAdminResponse)
-                .toList();
-    }
+                return toResponse(payment);
+        }
 
-    /** Admin duyệt: xác nhận đã nhận tiền -> booking CONFIRMED. */
-    @Transactional
-    public AdminPaymentResponse approve(String paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        payment.setStatus(PaymentStatus.PAID);
-        payment.setPaidAt(LocalDateTime.now());
-        paymentRepository.save(payment);
+        /**
+         * Giả lập PayOS thanh toán thành công (dùng khi chưa cấu hình tài khoản PayOS
+         * thật).
+         */
+        // @Transactional
+        // public PaymentResponse mockSuccess(String paymentId) {
+        // Payment payment = paymentRepository.findById(paymentId)
+        // .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        // payment.setStatus(PaymentStatus.PAID);
+        // payment.setPaidAt(LocalDateTime.now());
+        // paymentRepository.save(payment);
 
-        Booking booking = payment.getBooking();
-        booking.setStatus(BookingStatus.CONFIRMED);
-        bookingRepository.save(booking);
+        // Booking booking = payment.getBooking();
+        // booking.setStatus(BookingStatus.CONFIRMED);
+        // bookingRepository.save(booking);
 
-        return toAdminResponse(payment);
-    }
+        // return toResponse(payment);
+        // }
 
-    /** Admin từ chối: booking REJECTED. */
-    @Transactional
-    public AdminPaymentResponse reject(String paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        payment.setStatus(PaymentStatus.FAILED);
-        paymentRepository.save(payment);
+        @Transactional
+        public PaymentResponse mockSuccess(String paymentId) {
 
-        Booking booking = payment.getBooking();
-        booking.setStatus(BookingStatus.REJECTED);
-        bookingRepository.save(booking);
-        bookingSlotRepository.deleteByBooking_Id(booking.getId());
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
-        return toAdminResponse(payment);
-    }
+                PaymentResponse response = toResponse(payment);
 
-    /* ===================== Helpers ===================== */
+                String checkoutUrl = createPayosCheckoutUrl(payment);
 
-    private String buildQrUrl(Payment payment) {
-        long amount = payment.getAmount() != null
-                ? payment.getAmount().setScale(0, java.math.RoundingMode.HALF_UP).longValueExact()
-                : 0L;
-        String content = payment.getTransactionCode() != null ? payment.getTransactionCode() : "";
-        String encodedName = URLEncoder.encode(accountName, StandardCharsets.UTF_8);
-        String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-        return String.format(
-                "https://img.vietqr.io/image/%s-%s-compact2.png?amount=%d&addInfo=%s&accountName=%s",
-                bankBin, accountNo, amount, encodedContent, encodedName);
-    }
+                response.setCheckoutUrl(checkoutUrl);
 
-    private PaymentResponse toResponse(Payment payment) {
-        String proofUrl = paymentProofRepository
-                .findTopByPaymentIdOrderByUploadedAtDesc(payment.getId())
-                .map(PaymentProof::getImageUrl)
-                .orElse(null);
+                return response;
+        }
 
-        return PaymentResponse.builder()
-                .paymentId(payment.getId())
-                .bookingId(payment.getBooking().getId())
-                .bookingCode(payment.getBooking().getBookingCode())
-                .amount(payment.getAmount())
-                .method(payment.getMethod().name())
-                .status(payment.getStatus().name())
-                .expiredAt(payment.getExpiredAt())
-                .qrUrl(buildQrUrl(payment))
-                .bankName(bankName)
-                .accountNo(accountNo)
-                .accountName(accountName)
-                .transferContent(payment.getTransactionCode())
-                .proofImageUrl(proofUrl)
-                .build();
-    }
+        @Transactional
+        public void handlePayosWebhook(Map<String, Object> body) {
+                try {
+                        System.out.println("\n========== HANDLEWEBHOOK START ==========");
 
-    private AdminPaymentResponse toAdminResponse(Payment payment) {
-        Booking booking = payment.getBooking();
-        String proofUrl = paymentProofRepository
-                .findTopByPaymentIdOrderByUploadedAtDesc(payment.getId())
-                .map(PaymentProof::getImageUrl)
-                .orElse(null);
+                        Map<String, Object> data = (Map<String, Object>) body.get("data");
 
-        return AdminPaymentResponse.builder()
-                .paymentId(payment.getId())
-                .bookingId(booking.getId())
-                .bookingCode(booking.getBookingCode())
-                .customerName(booking.getCustomerName())
-                .customerPhone(booking.getCustomerPhone())
-                .fieldName(booking.getField().getName())
-                .venueName(booking.getField().getVenue().getName())
-                .bookingDate(booking.getBookingDate())
-                .amount(payment.getAmount())
-                .method(payment.getMethod().name())
-                .status(payment.getStatus().name())
-                .bookingStatus(booking.getStatus().name())
-                .createdAt(payment.getCreatedAt())
-                .proofImageUrl(proofUrl)
-                .build();
-    }
+                        if (data == null) {
+                                System.out.println("Webhook verify request (no data)");
+                                return;
+                        }
+
+                        System.out.println("Webhook data: " + data);
+
+                        Object orderCodeObj = data.get("orderCode");
+                        System.out.println("orderCode object: " + orderCodeObj);
+                        System.out.println("orderCode type: "
+                                        + (orderCodeObj != null ? orderCodeObj.getClass().getName() : "null"));
+
+                        String orderCode = orderCodeObj != null ? String.valueOf(orderCodeObj) : null;
+                        System.out.println("Converted orderCode string: " + orderCode);
+
+                        if (orderCode == null || orderCode.isEmpty()) {
+                                System.out.println("Webhook verify request (no orderCode)");
+                                return;
+                        }
+
+                        System.out.println("========== SEARCHING PAYMENT ==========");
+                        System.out.println("Looking for transactionCode = " + orderCode);
+                        System.out.println("OrderCode length: " + (orderCode != null ? orderCode.length() : "null"));
+
+                        // Log all payments with their transaction codes
+                        var allPayments = paymentRepository.findAll();
+                        System.out.println("Total payments in DB: " + allPayments.size());
+                        allPayments.forEach(p -> {
+                                String tcStr = p.getTransactionCode() != null ? p.getTransactionCode() : "null";
+                                System.out.println("  - ID: " + p.getId() +
+                                                " | transactionCode: [" + tcStr + "] (length: " + tcStr.length() + ")" +
+                                                " | status: " + p.getStatus());
+                                if (tcStr.equals(orderCode)) {
+                                        System.out.println("    ✓ MATCH FOUND!");
+                                }
+                        });
+
+                        var paymentOpt = paymentRepository.findByTransactionCode(orderCode);
+
+                        if (paymentOpt.isEmpty()) {
+                                System.out.println("Payment not found for orderCode = " + orderCode);
+                                return;
+                        }
+
+                        Payment payment = paymentOpt.get();
+
+                        System.out.println("========== PAYMENT FOUND ==========");
+                        System.out.println("PaymentId: " + payment.getId());
+                        System.out.println("Current Status: " + payment.getStatus());
+                        System.out.println("Amount: " + payment.getAmount());
+                        System.out.println("Booking ID: " + payment.getBooking().getId());
+                        System.out.println("Booking Code: " + payment.getBooking().getBookingCode());
+
+                        if (payment.getStatus() == PaymentStatus.PAID) {
+                                System.out.println("WARNING: Payment already PAID, skipping update");
+                                System.out.println("========== WEBHOOK END (ALREADY PAID) ==========\n");
+                                return;
+                        }
+
+                        System.out.println("========== UPDATING PAYMENT & BOOKING ==========");
+
+                        payment.setStatus(PaymentStatus.PAID);
+                        payment.setPaidAt(LocalDateTime.now());
+                        paymentRepository.saveAndFlush(payment);
+                        System.out.println("✓ Payment updated: status = PAID, paidAt = " + payment.getPaidAt());
+
+                        Booking booking = payment.getBooking();
+                        booking.setStatus(BookingStatus.CONFIRMED);
+                        bookingRepository.saveAndFlush(booking);
+                        System.out.println("✓ Booking updated: status = CONFIRMED");
+
+                        System.out.println("========== BOOKING UPDATED SUCCESSFULLY ==========");
+                        System.out.println("BookingId: " + booking.getId());
+                        System.out.println("BookingCode: " + booking.getBookingCode());
+                        System.out.println("New BookingStatus: " + booking.getStatus());
+                        System.out.println("========== WEBHOOK END (SUCCESS) ==========\n");
+
+                } catch (Exception e) {
+                        System.out.println("========== WEBHOOK ERROR ==========");
+                        System.out.println("Exception: " + e.getClass().getName());
+                        System.out.println("Message: " + e.getMessage());
+                        e.printStackTrace();
+                        System.out.println("====================================\n");
+                        throw e;
+                }
+        }
+        // @Transactional
+        // public void handlePayosWebhook(Map<String, Object> body) {
+
+        // String paymentId = body.get("paymentId").toString();
+
+        // Payment payment = paymentRepository.findById(paymentId)
+        // .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        // if (payment.getStatus() == PaymentStatus.PAID) {
+        // return;
+        // }
+
+        // payment.setStatus(PaymentStatus.PAID);
+        // payment.setPaidAt(LocalDateTime.now());
+
+        // paymentRepository.save(payment);
+
+        // Booking booking = payment.getBooking();
+        // booking.setStatus(BookingStatus.CONFIRMED);
+
+        // bookingRepository.save(booking);
+        // }
+
+        private String createPayosCheckoutUrl(Payment payment) {
+
+                try {
+                        System.out.println("\n========== CREATING PAYOS CHECKOUT URL ==========");
+                        System.out.println("PaymentId: " + payment.getId());
+                        System.out.println("Amount: " + payment.getAmount());
+                        System.out.println("Booking: " + payment.getBooking().getBookingCode());
+
+                        PayOS payOS = new PayOS(
+                                        clientId,
+                                        apiKey,
+                                        checksumKey);
+
+                        long orderCode = Math.abs(System.currentTimeMillis());
+                        System.out.println("Generated OrderCode: " + orderCode);
+
+                        CreatePaymentLinkRequest request = CreatePaymentLinkRequest.builder()
+                                        .orderCode(orderCode)
+                                        .amount(payment.getAmount().longValue())
+                                        .description(payment.getBooking().getBookingCode())
+                                        .cancelUrl("http://localhost:5173/dashboard")
+                                        .returnUrl("http://localhost:5173/dashboard")
+                                        .build();
+
+                        System.out.println("Request created, now calling PayOS SDK...");
+
+                        var result = payOS.paymentRequests().create(request);
+
+                        System.out.println("PayOS response: " + result);
+                        System.out.println("Result class: " + result.getClass().getName());
+
+                        // Save transactionCode AFTER PayOS creates the link
+                        payment.setTransactionCode(String.valueOf(orderCode));
+                        paymentRepository.saveAndFlush(payment);
+                        System.out.println("✓ Saved transactionCode: " + payment.getTransactionCode());
+
+                        // Verify it was saved
+                        var savedPayment = paymentRepository.findById(payment.getId());
+                        if (savedPayment.isPresent()) {
+                                System.out.println("✓ Verified in DB: transactionCode = "
+                                                + savedPayment.get().getTransactionCode());
+                        } else {
+                                System.out.println("✗ ERROR: Payment not found after save!");
+                        }
+
+                        String checkoutUrl = result.getCheckoutUrl();
+                        System.out.println("CheckoutUrl: " + checkoutUrl);
+
+                        System.out.println("========== ORDER SEND SUCCESS ==========");
+                        System.out.println("OrderCode: " + orderCode);
+                        System.out.println("Amount: " + payment.getAmount());
+                        System.out.println("Booking Code: " + payment.getBooking().getBookingCode());
+                        System.out.println("CheckoutUrl: " + checkoutUrl);
+                        System.out.println("=====================================\n");
+
+                        return checkoutUrl;
+
+                } catch (Exception e) {
+                        System.out.println("========== ORDER SEND ERROR ==========");
+                        System.out.println("Exception: " + e.getClass().getName());
+                        System.out.println("Message: " + e.getMessage());
+                        e.printStackTrace();
+                        System.out.println("=====================================\n");
+                        log.error("PayOS create link failed", e);
+                        throw new RuntimeException("Không tạo được link PayOS");
+                }
+        }
+
+        @Transactional
+        public PaymentResponse payosSuccess(String paymentId) {
+
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+                if (payment.getStatus() == PaymentStatus.PAID) {
+                        return toResponse(payment);
+                }
+
+                payment.setStatus(PaymentStatus.PAID);
+                payment.setPaidAt(LocalDateTime.now());
+
+                paymentRepository.save(payment);
+
+                Booking booking = payment.getBooking();
+
+                booking.setStatus(BookingStatus.CONFIRMED);
+
+                bookingRepository.save(booking);
+
+                return toResponse(payment);
+        }
+
+        /** Danh sách thanh toán cho admin duyệt (loại trừ thanh toán bằng coin). */
+        public List<AdminPaymentResponse> listForAdmin() {
+                return paymentRepository.findAllByOrderByCreatedAtDesc().stream()
+                                .filter(p -> p.getMethod() != PaymentMethod.COIN)
+                                .map(this::toAdminResponse)
+                                .toList();
+        }
+
+        /** Admin duyệt: xác nhận đã nhận tiền -> booking CONFIRMED. */
+        @Transactional
+        public AdminPaymentResponse approve(String paymentId) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+                payment.setStatus(PaymentStatus.PAID);
+                payment.setPaidAt(LocalDateTime.now());
+                paymentRepository.save(payment);
+
+                Booking booking = payment.getBooking();
+                booking.setStatus(BookingStatus.CONFIRMED);
+                bookingRepository.save(booking);
+
+                return toAdminResponse(payment);
+        }
+
+        /** Admin từ chối: booking REJECTED. */
+        @Transactional
+        public AdminPaymentResponse reject(String paymentId) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+                payment.setStatus(PaymentStatus.FAILED);
+                paymentRepository.save(payment);
+
+                Booking booking = payment.getBooking();
+                booking.setStatus(BookingStatus.REJECTED);
+                bookingRepository.save(booking);
+                bookingSlotRepository.deleteByBooking_Id(booking.getId());
+
+                return toAdminResponse(payment);
+        }
+
+        /* ===================== Helpers ===================== */
+
+        private String buildQrUrl(Payment payment) {
+                long amount = payment.getAmount() != null
+                                ? payment.getAmount().setScale(0, java.math.RoundingMode.HALF_UP).longValueExact()
+                                : 0L;
+                String content = payment.getTransactionCode() != null ? payment.getTransactionCode() : "";
+                String encodedName = URLEncoder.encode(accountName, StandardCharsets.UTF_8);
+                String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                return String.format(
+                                "https://img.vietqr.io/image/%s-%s-compact2.png?amount=%d&addInfo=%s&accountName=%s",
+                                bankBin, accountNo, amount, encodedContent, encodedName);
+        }
+
+        private PaymentResponse toResponse(Payment payment) {
+                String proofUrl = paymentProofRepository
+                                .findTopByPaymentIdOrderByUploadedAtDesc(payment.getId())
+                                .map(PaymentProof::getImageUrl)
+                                .orElse(null);
+
+                return PaymentResponse.builder()
+                                .paymentId(payment.getId())
+                                .bookingId(payment.getBooking().getId())
+                                .bookingCode(payment.getBooking().getBookingCode())
+                                .amount(payment.getAmount())
+                                .method(payment.getMethod().name())
+                                .status(payment.getStatus().name())
+                                .expiredAt(payment.getExpiredAt())
+                                .qrUrl(buildQrUrl(payment))
+                                .bankName(bankName)
+                                .accountNo(accountNo)
+                                .accountName(accountName)
+                                .transferContent(payment.getTransactionCode())
+                                .proofImageUrl(proofUrl)
+                                .build();
+        }
+
+        private AdminPaymentResponse toAdminResponse(Payment payment) {
+                Booking booking = payment.getBooking();
+                String proofUrl = paymentProofRepository
+                                .findTopByPaymentIdOrderByUploadedAtDesc(payment.getId())
+                                .map(PaymentProof::getImageUrl)
+                                .orElse(null);
+
+                return AdminPaymentResponse.builder()
+                                .paymentId(payment.getId())
+                                .bookingId(booking.getId())
+                                .bookingCode(booking.getBookingCode())
+                                .customerName(booking.getCustomerName())
+                                .customerPhone(booking.getCustomerPhone())
+                                .fieldName(booking.getField().getName())
+                                .venueName(booking.getField().getVenue().getName())
+                                .bookingDate(booking.getBookingDate())
+                                .amount(payment.getAmount())
+                                .method(payment.getMethod().name())
+                                .status(payment.getStatus().name())
+                                .bookingStatus(booking.getStatus().name())
+                                .createdAt(payment.getCreatedAt())
+                                .proofImageUrl(proofUrl)
+                                .build();
+        }
 }

@@ -27,31 +27,65 @@ const PaymentPage = () => {
     setTimeout(() => setCopied(''), 1500);
   };
 
+  // const handlePayos = async () => {
+  //   setUploading(true);
+  //   try {
+  //     const res = await paymentService.mockSuccess(payment.paymentId);
+  //     if (res.data.code === 0) setPayment(res.data.result);
+  //   } catch (err) {
+  //     alert('Thanh toán PayOS thất bại, vui lòng thử lại.');
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
   const handlePayos = async () => {
-    setUploading(true);
-    try {
-      const res = await paymentService.mockSuccess(payment.paymentId);
-      if (res.data.code === 0) setPayment(res.data.result);
-    } catch (err) {
-      alert('Thanh toán PayOS thất bại, vui lòng thử lại.');
-    } finally {
-      setUploading(false);
-    }
-  };
+  setUploading(true);
 
-  const handleUpload = async (e) => {
+  try {
+    const res = await paymentService.mockSuccess(payment.paymentId);
+
+    if (res.data.code === 0) {
+
+      const checkoutUrl = res.data.result.checkoutUrl;
+
+      if (checkoutUrl) {
+         localStorage.setItem(
+        "payos_payment_id",
+        payment.paymentId
+    );
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      setPayment(res.data.result);
+    }
+
+  } catch (err) {
+    alert('Thanh toán PayOS thất bại, vui lòng thử lại.');
+  } finally {
+    setUploading(false);
+  }
+};
+
+ const handleUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setUploading(true);
+
     try {
-      const res = await paymentService.uploadProof(payment.paymentId, file);
-      if (res.data.code === 0) setPayment(res.data.result);
+        const res = await paymentService.uploadProof(payment.paymentId, file);
+
+        if (res.data.code === 0) {
+            setPayment(res.data.result);
+        }
+
     } catch (err) {
-      alert('Tải bill thất bại, vui lòng thử lại.');
+        alert("Tải bill thất bại");
     } finally {
-      setUploading(false);
+        setUploading(false);
     }
-  };
+};
 
   if (loading) {
     return <div className="h-screen flex items-center justify-center bg-chalk"><Loader2 className="animate-spin text-pitch" size={34} /></div>;

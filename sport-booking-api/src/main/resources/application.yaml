@@ -7,12 +7,12 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/sportbookingg
     username: root
-    password: root
+    password:
   #    // driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
 #     properties:
 #       hibernate:
@@ -33,15 +33,15 @@ app:
   avatar:
     max-size: 5242880 # 5MB
   bank: # Thông tin nhận chuyển khoản thủ công (sinh QR VietQR)
-    bin: "970422"            # MB Bank
-    account-no: "0909123456"
+    bin: "970422" # MB Bank
+    account-no: "0333169776"
     account-name: "SAN BONG SVD"
     bank-name: "MB Bank"
 
 payos: # Để trống nếu chưa có tài khoản -> chạy chế độ mô phỏng
-  client-id: ""
-  api-key: ""
-  checksum-key: ""
+  client-id: "15ce7a20-3651-4fad-a3dc-174f25bf2ab7"
+  api-key: "45a4cd9c-bc77-4fbc-a0ab-9b7a469fb5fb"
+  checksum-key: "4903ffb99c5909b6d87fdb4382c96efa725cd0bed3fdd86eebfbcaa7de8126bf"
 
 # Gửi email báo đơn (Resend)
 resend:
