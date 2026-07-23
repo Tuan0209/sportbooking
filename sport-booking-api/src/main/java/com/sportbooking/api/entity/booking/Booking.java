@@ -87,5 +87,7 @@ public class Booking {
     @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
+    @Column(name = "monthly_group", length = 50)
+    private String monthlyGroup;
 
 }

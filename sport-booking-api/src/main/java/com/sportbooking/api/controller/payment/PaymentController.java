@@ -89,4 +89,14 @@ public class PaymentController {
                 .result(paymentService.payosSuccess(id))
                 .build();
     }
+
+    @GetMapping("/{paymentId}")
+    public ApiResponse<PaymentResponse> getById(
+            @PathVariable String paymentId) {
+
+        return ApiResponse.<PaymentResponse>builder()
+                .code(0)
+                .result(paymentService.getById(paymentId))
+                .build();
+    }
 }

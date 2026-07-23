@@ -97,21 +97,48 @@ const MonthlyBooking = () => {
   const canSubmit = fieldId && slots.length > 0 && days.length > 0 && customerName && customerPhone && previewCount > 0;
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
-    setSubmitting(true);
-    try {
-      const { month, year } = monthOptions[monthIdx];
-      const res = await bookingService.createMonthly({
-        fieldId, slots, daysOfWeek: days, month, year,
-        customerName, customerPhone, pricePerDay, paymentMethod: 'COIN',
-      });
-      if (res.data.code === 0) setResult(res.data.result);
-    } catch (e) {
-      alert('Tạo vé tháng thất bại, vui lòng thử lại.');
-    } finally {
-      setSubmitting(false);
+  if (!canSubmit) return;
+  setSubmitting(true);
+
+  try {
+
+    const { month, year } = monthOptions[monthIdx];
+
+    const res = await bookingService.createMonthly({
+      fieldId,
+      slots,
+      daysOfWeek: days,
+      month,
+      year,
+      customerName,
+      customerPhone,
+      pricePerDay,
+      paymentMethod: 'PAYOS',
+    });
+
+    if (res.data.code === 0) {
+
+      const result = res.data.result;
+
+      if (result.paymentId) {
+        navigate(`/payment/${result.paymentId}`);
+        return;
+      }
+
+      setResult(result);
+
     }
-  };
+
+  } catch (e) {
+
+    alert('Tạo vé tháng thất bại, vui lòng thử lại.');
+
+  } finally {
+
+    setSubmitting(false);
+
+  }
+};
 
   if (loading) {
     return <div className="h-screen flex items-center justify-center bg-chalk"><Loader2 className="animate-spin text-pitch" size={34} /></div>;

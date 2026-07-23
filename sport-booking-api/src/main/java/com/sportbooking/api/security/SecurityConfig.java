@@ -124,6 +124,8 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/payments/payos/webhook")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/payments/**")
+                                                .permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/payments/*/mock-success")
                                                 .permitAll()
                                                 // Khu vực quản trị: chỉ ADMIN

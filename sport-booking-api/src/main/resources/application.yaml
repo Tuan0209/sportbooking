@@ -45,9 +45,9 @@ payos: # Để trống nếu chưa có tài khoản -> chạy chế độ mô ph
 
 # Gửi email báo đơn (Resend)
 resend:
-  api-key: "re_34pau2R4_9fXu5vcBo6MzBWNaXJpHLcC6"
+  api-key: "re_PpUm1HjN_EymFcAvecTwMDLfQmT2oUG5Y"
 mail:
-  from: "SVĐ Booking <noreply@qlhtt.io.vn>"
+  from: "SVĐ Booking <noreply@sportbooking.id.vn>"
 application:
   jwt:
     secret-key: your-secret-key-your-secret-key-123456

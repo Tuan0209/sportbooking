@@ -5,7 +5,7 @@ import { paymentService } from '../services/paymentService';
 import { formatPrice } from '../../../shared/utils/formatDate';
 
 const PaymentPage = () => {
-  const { bookingId } = useParams();
+  const {  paymentId } = useParams();
   const navigate = useNavigate();
 
   const [payment, setPayment] = useState(null);
@@ -13,13 +13,22 @@ const PaymentPage = () => {
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState('');
 
-  const load = () => {
-    paymentService.getByBooking(bookingId)
-      .then((res) => { if (res.data.code === 0) setPayment(res.data.result); })
-      .finally(() => setLoading(false));
-  };
+ const load = async () => {
+  try {
+    const res = await paymentService.getById(paymentId);
 
-  useEffect(() => { load(); }, [bookingId]);
+    console.log(res.data);
+
+    setPayment(res.data.result);
+
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
+    load();
+}, [paymentId]);
 
   const copy = (text, key) => {
     navigator.clipboard?.writeText(text);

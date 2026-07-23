@@ -19,8 +19,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MonthlyBookingResponse {
-    int createdCount;           // số buổi đã tạo
-    BigDecimal totalPrice;      // tổng tiền các buổi tạo
-    List<String> createdDates;  // các ngày đã đặt thành công (YYYY-MM-DD)
-    List<String> skippedDates;  // các ngày bị bỏ qua do trùng (YYYY-MM-DD)
+    int createdCount; // số buổi đã tạo
+    BigDecimal totalPrice; // tổng tiền các buổi tạo
+    List<String> createdDates; // các ngày đã đặt thành công (YYYY-MM-DD)
+    List<String> skippedDates; // các ngày bị bỏ qua do trùng (YYYY-MM-DD)
+    private String paymentId;
 }

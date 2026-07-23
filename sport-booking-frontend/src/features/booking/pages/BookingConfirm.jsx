@@ -151,7 +151,7 @@ const BookingConfirm = () => {
 
       // Chuyển khoản QR / PayOS -> sang trang thanh toán
       if (paymentMethod === 'BANK_QR' || paymentMethod === 'PAYOS') {
-        navigate(`/payment/${result.id}`);
+        navigate(`/payment/${result.paymentId}`);
         return;
       }
 
@@ -588,7 +588,7 @@ const BookingConfirm = () => {
             </p>
 
             <p>
-              • ALOBOOKING đóng vai trò kết nối, hỗ trợ tìm sân nhanh hơn.
+              • SPORTBOOKING đóng vai trò kết nối, hỗ trợ tìm sân nhanh hơn.
             </p>
 
             <p>

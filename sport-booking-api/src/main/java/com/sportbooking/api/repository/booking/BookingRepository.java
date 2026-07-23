@@ -9,15 +9,17 @@ import com.sportbooking.api.entity.booking.Booking;
 
 @Repository
 public interface BookingRepository
-        extends JpaRepository<Booking, String> {
+                extends JpaRepository<Booking, String> {
 
-    List<Booking> findByFieldIdAndBookingDate(
-            String fieldId,
-            LocalDate bookingDate);
+        List<Booking> findByFieldIdAndBookingDate(
+                        String fieldId,
+                        LocalDate bookingDate);
 
-    List<Booking> findByUserIdOrderByCreatedAtDesc(String userId);
+        List<Booking> findByUserIdOrderByCreatedAtDesc(String userId);
 
-    List<Booking> findAllByOrderByCreatedAtDesc();
+        List<Booking> findAllByOrderByCreatedAtDesc();
 
-    long countByBookingDate(LocalDate bookingDate);
+        List<Booking> findByMonthlyGroup(String monthlyGroup);
+
+        long countByBookingDate(LocalDate bookingDate);
 }

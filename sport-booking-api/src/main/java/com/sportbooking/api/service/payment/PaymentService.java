@@ -248,9 +248,26 @@ public class PaymentService {
                         paymentRepository.saveAndFlush(payment);
                         System.out.println("✓ Payment updated: status = PAID, paidAt = " + payment.getPaidAt());
 
+                        // Booking booking = payment.getBooking();
+                        // booking.setStatus(BookingStatus.CONFIRMED);
+                        // bookingRepository.saveAndFlush(booking);
                         Booking booking = payment.getBooking();
-                        booking.setStatus(BookingStatus.CONFIRMED);
-                        bookingRepository.saveAndFlush(booking);
+
+                        if (booking.getMonthlyGroup() == null) {
+
+                                booking.setStatus(BookingStatus.CONFIRMED);
+                                bookingRepository.saveAndFlush(booking);
+
+                        } else {
+
+                                List<Booking> bookings = bookingRepository.findByMonthlyGroup(
+                                                booking.getMonthlyGroup());
+
+                                bookings.forEach(b -> b.setStatus(BookingStatus.CONFIRMED));
+
+                                bookingRepository.saveAll(bookings);
+
+                        }
                         System.out.println("✓ Booking updated: status = CONFIRMED");
 
                         System.out.println("========== BOOKING UPDATED SUCCESSFULLY ==========");
@@ -376,9 +393,21 @@ public class PaymentService {
 
                 Booking booking = payment.getBooking();
 
-                booking.setStatus(BookingStatus.CONFIRMED);
+                if (booking.getMonthlyGroup() == null) {
 
-                bookingRepository.save(booking);
+                        booking.setStatus(BookingStatus.CONFIRMED);
+                        bookingRepository.save(booking);
+
+                } else {
+
+                        List<Booking> bookings = bookingRepository.findByMonthlyGroup(
+                                        booking.getMonthlyGroup());
+
+                        bookings.forEach(b -> b.setStatus(BookingStatus.CONFIRMED));
+
+                        bookingRepository.saveAll(bookings);
+
+                }
 
                 return toResponse(payment);
         }
@@ -405,6 +434,14 @@ public class PaymentService {
                 bookingRepository.save(booking);
 
                 return toAdminResponse(payment);
+        }
+
+        public PaymentResponse getById(String paymentId) {
+
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+                return toResponse(payment);
         }
 
         /** Admin từ chối: booking REJECTED. */

@@ -2,6 +2,8 @@ import axiosClient from '../../../shared/services/axiosClient';
 
 export const paymentService = {
   // Người dùng
+  getById: (paymentId) =>
+    axiosClient.get(`/payments/${paymentId}`),
   getByBooking: (bookingId) => axiosClient.get(`/payments/booking/${bookingId}`),
   uploadProof: (paymentId, file) => {
     const form = new FormData();

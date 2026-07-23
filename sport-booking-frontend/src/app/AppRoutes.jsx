@@ -93,7 +93,7 @@ const AppRoutes = () => {
       <Route path="/booking/:venueId" element={<UserFieldBooking />} />
       <Route path="/monthly/:venueId" element={<MonthlyBooking />} />
       <Route path="/booking-confirm" element={<BookingConfirm />} />
-      <Route path="/payment/:bookingId" element={<PaymentPage />} />
+      <Route path="/payment/:paymentId" element={<PaymentPage />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/favorites" element={<Favorites />} />
       <Route path="/wallet" element={<Wallet />} />

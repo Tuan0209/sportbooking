@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation   } from 'react-router-dom';
 import { ChevronLeft, Wallet as WalletIcon, Plus, ArrowUpRight, ArrowDownLeft, Loader2, CreditCard, CheckCircle2 } from 'lucide-react';
 import { walletService } from '../services/walletService';
 import { formatPrice } from '../../../shared/utils/formatDate';
@@ -22,6 +22,7 @@ const formatDateTime = (value) => {
 
 const Wallet = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,13 +40,47 @@ const Wallet = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    walletService
-      .getWallet()
-      .then((res) => applyResult(res.data?.result))
-      .finally(() => setLoading(false));
-  }, []);
 
+  const loadWallet = async () => {
+
+    try {
+
+      const params = new URLSearchParams(location.search);
+
+      const success = params.get("success");
+      const amount = params.get("amount");
+
+      if (success === "true" && amount) {
+
+        await walletService.confirmTopup(amount);
+
+        navigate("/wallet", {
+          replace: true,
+        });
+
+        setSuccess(true);
+
+      }
+
+      const res = await walletService.getWallet();
+
+      applyResult(res.data.result);
+
+    } catch (e) {
+
+      console.error(e);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  loadWallet();
+
+}, [location.search]);
   const pickQuick = (v) => { setAmount(v); setCustom(''); };
   const changeCustom = (e) => {
     const digits = e.target.value.replace(/[^0-9]/g, '');
@@ -60,23 +95,43 @@ const Wallet = () => {
   };
 
   // Giả lập thanh toán PayOS thành công -> cộng tiền vào ví
-  const payWithPayos = async () => {
-    setProcessing(true);
-    try {
-      const res = await walletService.topUp(amount);
-      applyResult(res.data?.result);
-      setPayosOpen(false);
-      setShowTopUp(false);
-      setAmount(0);
-      setCustom('');
-      setSuccess(true);
-    } catch (e) {
-      alert(e.response?.data?.message || 'Nạp coin thất bại, vui lòng thử lại.');
-    } finally {
-      setProcessing(false);
-    }
-  };
+ const payWithPayos = async () => {
 
+  setProcessing(true);
+
+  try {
+
+    const res = await walletService.createTopup(amount);
+
+    if (res.data.code === 0) {
+
+      const checkoutUrl = res.data.result.checkoutUrl;
+
+      if (checkoutUrl) {
+
+        window.location.href = checkoutUrl;
+        return;
+
+      }
+
+    }
+
+    alert("Không tạo được link PayOS");
+
+  } catch (e) {
+
+    alert(
+      e.response?.data?.message ||
+      "Không thể kết nối PayOS"
+    );
+
+  } finally {
+
+    setProcessing(false);
+
+  }
+
+};
   return (
     <div className="min-h-screen bg-chalk pb-28">
       {/* Header */}
